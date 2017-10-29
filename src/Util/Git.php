@@ -2,12 +2,30 @@
 
 namespace Ahc\Phint\Util;
 
+use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ExecutableFinder;
 
 class Git
 {
     /** @var array */
     protected $gitConfig;
+
+    /** @var string Git binary executable */
+    protected $gitBin;
+
+        /** @var string */
+    protected $workDir;
+
+    public function __construct($workDir = null, $gitBin = null)
+    {
+        if (!$gitBin) {
+            $finder = new ExecutableFinder();
+            $gitBin = $finder->find('git') ?: 'git';
+        }
+
+        $this->workDir = $workDir;
+        $this->gitBin  = '"' . $gitBin . '"';
+    }
 
     /**
      * Gets git config.
@@ -32,16 +50,41 @@ class Git
     protected function loadConfig()
     {
         $gitConfig = [];
-        $finder    = new ExecutableFinder();
 
-        exec(sprintf('"%s" config --list', $finder->find('git') ?: 'git'), $stdOut);
+        $output = $this->runCommand('config --list');
+        $output = explode("\n", str_replace(["\r\n", "\r"], "\n", $output));
 
-        foreach ($stdOut ?: [] as $config) {
+        foreach ($output as $config) {
             $parts = array_map('trim', explode('=', $config, 2)) + ['', ''];
 
             $gitConfig[$parts[0]] = $parts[1];
         }
 
         $this->gitConfig = $gitConfig;
+    }
+
+    public function init()
+    {
+        $this->runCommand('init');
+
+        return $this;
+    }
+
+    public function addRemote($username, $project)
+    {
+        $this->runCommand(sprintf('remote add origin git@github.com:%s/%s.git', $username, $project));
+
+        return $this;
+    }
+
+    protected function runCommand($command)
+    {
+        $proc = new Process($this->gitBin . ' ' . $command, $this->workDir);
+
+        $proc->run();
+
+        if ($proc->isSuccessful()) {
+           return $proc->getOutput();
+        }
     }
 }
