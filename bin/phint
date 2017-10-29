@@ -1,0 +1,17 @@
+#!/usr/bin/env php
+<?php
+
+if (file_exists(__DIR__ . '/../../../autoload.php')) {
+    require __DIR__ . '/../../../autoload.php';
+} else {
+    require __DIR__ . '/../vendor/autoload.php';
+}
+
+$app = new Symfony\Component\Console\Application(
+  'Phint - PHP project initializer',
+  trim(file_get_contents(__DIR__ . '/../VERSION'))
+);
+
+$app->add(new Ahc\Phint\Console\InitCommand);
+
+$app->run();
