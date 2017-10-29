@@ -5,26 +5,14 @@ namespace Ahc\Phint\Util;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
 
-class Git
+class Git extends Executable
 {
     /** @var array */
     protected $gitConfig;
 
-    /** @var string Git binary executable */
-    protected $gitBin;
-
-    /** @var string */
-    protected $workDir;
-
-    public function __construct($workDir = null, $gitBin = null)
+    public function __construct($workDir = null, $binary = null)
     {
-        if (!$gitBin) {
-            $finder = new ExecutableFinder();
-            $gitBin = $finder->find('git') ?: 'git';
-        }
-
-        $this->workDir = $workDir;
-        $this->gitBin  = '"' . $gitBin . '"';
+        parent::__construct($workDir, $binary ?: 'git');
     }
 
     /**
@@ -75,16 +63,5 @@ class Git
         $this->runCommand(sprintf('remote add origin git@github.com:%s/%s.git', $username, $project));
 
         return $this;
-    }
-
-    protected function runCommand($command)
-    {
-        $proc = new Process($this->gitBin . ' ' . $command, $this->workDir);
-
-        $proc->run();
-
-        if ($proc->isSuccessful()) {
-            return $proc->getOutput();
-        }
     }
 }
