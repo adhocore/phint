@@ -2,8 +2,10 @@
 
 namespace Ahc\Phint\Console;
 
+use Ahc\Phint\Generator\CollisionHandler;
 use Ahc\Phint\Generator\TwigGenerator;
 use Ahc\Phint\Util\Git;
+use Ahc\Phint\Util\Composer;
 use Ahc\Phint\Util\Inflector;
 use Ahc\Phint\Util\Path;
 use Symfony\Component\Console\Input\InputArgument;
@@ -35,10 +37,9 @@ class InitCommand extends BaseCommand
             )
             ->addOption('email', 'e', InputArgument::OPTIONAL, 'Vendor email, defaults to git email')
             ->addOption('namespace', 's', InputArgument::OPTIONAL, 'Root namespace')
-            ->addOption('year', 'y', InputArgument::OPTIONAL, 'License Year, defaults to date("Y")',
-                date('Y'))
-            ->addOption('type', 't', InputArgument::OPTIONAL, 'Project type, defaults to library',
-                'library');
+            ->addOption('year', 'y', InputArgument::OPTIONAL, 'License Year', date('Y'))
+            ->addOption('type', 't', InputArgument::OPTIONAL, 'Project type', 'library')
+            ->addOption('using', 'z', InputArgument::OPTIONAL, 'Packagist name of reference project (eg: laravel/lumen)');
     }
 
     /**
@@ -59,16 +60,27 @@ class InitCommand extends BaseCommand
         $projectPath = $this->prepareProjectPath();
         $this->git   = new Git($projectPath);
         $parameters  = $this->collectParameters();
+        $composer    = new Composer;
 
-        $output->writeln('<comment>Generating files ...</comment>');
+        if (null !== $using = $this->input->getOption('using')) {
+            $this->output->writeln('Using <comment>' . $using . '</comment> to create project');
+
+            $composer->withOutput($this->output)->createProject($projectPath, $using);
+        }
+
+        $this->output->writeln('<comment>Generating files ...</comment>');
 
         $this->generate($projectPath, $parameters);
 
-        $output->writeln('<info>Setting up git</info>');
+        $this->output->writeln('Setting up <info>git</info>');
 
         $this->git->init()->addRemote($parameters['username'], $parameters['project']);
 
         $output->writeln('<comment>Done</comment>');
+
+        $this->output->writeln('Setting up <info>composer</info>');
+
+        $composer->withWorkDir($projectPath)->install();
     }
 
     protected function prepareProjectPath()
@@ -76,17 +88,19 @@ class InitCommand extends BaseCommand
         $path = $this->input->getArgument('project');
 
         if (!(new Path)->isAbsolute($path)) {
-            $path = getcwd() . '/' . $path;
+            $path = \getcwd() . '/' . $path;
         }
 
-        if (file_exists($path)) {
+        if (\file_exists($path)) {
             if (!$this->input->getOption('force')) {
                 throw new \InvalidArgumentException('Something with the same name already exists!');
             }
 
-            $this->output->writeln('<error>You have set force flag, existing files will be overwritten</error>');
+            if (!$this->input->getOption('using')) {
+                $this->output->writeln('<error>You have set force flag, existing files will be overwritten</error>');
+            }
         } else {
-            mkdir($path, 0777, true);
+            \mkdir($path, 0777, true);
         }
 
         return $path;
@@ -116,10 +130,10 @@ class InitCommand extends BaseCommand
             $namespace
         );
 
-        $namespace = str_replace('/', '\\\\', $namespace);
+        $namespace = \str_replace('/', '\\\\', $namespace);
         $keywords  = ['php', $project];
 
-        return compact(
+        return \compact(
             'year', 'project', 'vendorName', 'vendorEmail', 'description',
             'username', 'namespace', 'keywords', 'Project', 'type'
         );
@@ -132,6 +146,6 @@ class InitCommand extends BaseCommand
 
         $generator = new TwigGenerator($templatePath, $cachePath);
 
-        $generator->generate($projectPath, $parameters);
+        $generator->generate($projectPath, $parameters, new CollisionHandler);
     }
 }
