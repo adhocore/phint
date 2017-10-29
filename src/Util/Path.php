@@ -29,4 +29,26 @@ class Path
         // Hmm!
         return $fullPath;
     }
+
+    public function ensureDir($dir)
+    {
+        if (!\is_dir($dir)) {
+            \mkdir($dir, 0777, true);
+        }
+    }
+
+    public function getExtension($filePath)
+    {
+        return pathinfo($filePath, PATHINFO_EXTENSION);
+    }
+
+    public function readAsJson($filePath, $asArray = true)
+    {
+        return json_decode(file_get_contents($filePath), true) ?: [];
+    }
+
+    public function writeFile($file, $content, $mode = null)
+    {
+        file_put_contents($file, $content, $mode);
+    }
 }

@@ -26,7 +26,10 @@ class TwigGenerator implements GeneratorInterface
         $this->pathUtil     = new Path;
     }
 
-    public function generate($targetPath, array $parameters)
+    /**
+     * {@inheritdoc}
+     */
+    public function generate($targetPath, array $parameters, CollisionHandler $handler = null)
     {
         if (!$this->twig) {
             $this->initTwig();
@@ -34,15 +37,13 @@ class TwigGenerator implements GeneratorInterface
 
         $templates = $this->findTemplates($this->templatePath);
         foreach ($templates as $template) {
-            $this->doGenerate($template, $targetPath, $parameters);
+            $this->doGenerate($template, $targetPath, $parameters, $handler);
         }
     }
 
     protected function initTwig()
     {
-        if (!is_dir($this->cachePath)) {
-            mkdir($this->cachePath, 0777, true);
-        }
+        $this->pathUtil->ensureDir($this->cachePath);
 
         $options = [
             'auto_reload' => true,
@@ -61,7 +62,7 @@ class TwigGenerator implements GeneratorInterface
         $templates = [];
 
         $finder->files()->ignoreDotFiles(false)->filter(function ($file) {
-            return substr($file, -5) === '.twig';
+            return \substr($file, -5) === '.twig';
         });
 
         foreach ($finder->in($templatePath) as $file) {
@@ -71,19 +72,21 @@ class TwigGenerator implements GeneratorInterface
         return $templates;
     }
 
-    protected function doGenerate($template, $targetPath, array $parameters)
+    protected function doGenerate($template, $targetPath, array $parameters, CollisionHandlerInterface $handler = null)
     {
         $relativePath = $this->pathUtil->getRelativePath($template, $this->templatePath);
         $targetFile   = $targetPath . '/' . str_replace('.twig', '', $relativePath);
-        $targetDir    = dirname($targetFile);
+        $targetDir    = \dirname($targetFile);
+        $content      = $this->twig->render($relativePath, $parameters);
 
-        if (!is_dir($targetDir)) {
-            mkdir($targetDir, 0777, true);
+        if (\is_file($targetFile) && $handler) {
+            $handler->handle($targetFile, $content, $parameters);
+
+            return;
         }
 
-        $content = $this->twig->render($relativePath, $parameters);
+        $this->pathUtil->ensureDir($targetDir);
 
-        // What could be easier?
-        file_put_contents($targetFile, $content);
+        $this->pathUtil->writeFile($targetFile, $content);
     }
 }
