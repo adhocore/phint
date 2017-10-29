@@ -19,9 +19,9 @@ class Composer extends Executable
         return $this;
     }
 
-    public function install($project)
+    public function install()
     {
-        $this->runCommand(sprintf('create-project %s %s', $using, $project));
+        $this->runCommand('install --prefer-dist --optimize-autoloader');
 
         return $this;
     }
