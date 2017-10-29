@@ -30,6 +30,7 @@ It can be used to quickly spin off new  project containing all basic and default
 # See options/arguments
 phint help init
 
+# Below command inits a brand new PHP project in `project-name` folder in current dir
 # Missing arguments are interactively collected
-phint init project
+phint init project-name
 ```
