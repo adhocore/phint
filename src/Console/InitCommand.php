@@ -2,13 +2,13 @@
 
 namespace Ahc\Phint\Console;
 
-use Ahc\Phint\Util\Git;
-use Ahc\Phint\Util\Path;
-use Ahc\Phint\Util\Inflector;
 use Ahc\Phint\Generator\TwigGenerator;
-use Symfony\Component\Console\Input\InputOption;
+use Ahc\Phint\Util\Git;
+use Ahc\Phint\Util\Inflector;
+use Ahc\Phint\Util\Path;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class InitCommand extends BaseCommand
@@ -38,8 +38,7 @@ class InitCommand extends BaseCommand
             ->addOption('year', 'y', InputArgument::OPTIONAL, 'License Year, defaults to date("Y")',
                 date('Y'))
             ->addOption('type', 't', InputArgument::OPTIONAL, 'Project type, defaults to library',
-                'library')
-        ;
+                'library');
     }
 
     /**
