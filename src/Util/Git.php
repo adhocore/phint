@@ -2,8 +2,8 @@
 
 namespace Ahc\Phint\Util;
 
-use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ExecutableFinder;
+use Symfony\Component\Process\Process;
 
 class Git
 {
@@ -13,7 +13,7 @@ class Git
     /** @var string Git binary executable */
     protected $gitBin;
 
-        /** @var string */
+    /** @var string */
     protected $workDir;
 
     public function __construct($workDir = null, $gitBin = null)
@@ -84,7 +84,7 @@ class Git
         $proc->run();
 
         if ($proc->isSuccessful()) {
-           return $proc->getOutput();
+            return $proc->getOutput();
         }
     }
 }
