@@ -2,6 +2,7 @@
 
 namespace Ahc\Phint\Generator;
 
+use Ahc\Phint\Util\Arr;
 use Ahc\Phint\Util\Path;
 
 class CollisionHandler implements CollisionHandlerInterface
@@ -28,11 +29,11 @@ class CollisionHandler implements CollisionHandlerInterface
     {
         $oldJson = $this->pathUtil->readAsJson($targetFile);
         $newJson = \json_decode($newContent, true);
-        $merged  = \array_merge($oldJson, $newJson);
+        $merged  = Arr::mergeRecursive($oldJson, $newJson);
 
         $this->pathUtil->writeFile(
             $targetFile,
-            \json_encode($merged, \JSON_PRETTY_PRINT)
+            \json_encode($merged, \JSON_PRETTY_PRINT) . "\n"
         );
     }
 }
