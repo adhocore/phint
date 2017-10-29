@@ -13,6 +13,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 class InitCommand extends BaseCommand
 {
+    /** @var Git */
+    protected $git;
+
     /**
      * Configure the command options.
      *
@@ -55,11 +58,16 @@ class InitCommand extends BaseCommand
         $output->writeln('<info>Preparing ...</info>');
 
         $projectPath = $this->prepareProjectPath();
+        $this->git   = new Git($projectPath);
         $parameters  = $this->collectParameters();
 
         $output->writeln('<comment>Generating files ...</comment>');
 
         $this->generate($projectPath, $parameters);
+
+        $output->writeln('<info>Setting up git</info>');
+
+        $this->git->init()->addRemote($parameters['username'], $parameters['project']);
 
         $output->writeln('<comment>Done</comment>');
     }
@@ -87,14 +95,13 @@ class InitCommand extends BaseCommand
 
     protected function collectParameters()
     {
-        $git         = new Git;
         $inflector   = new Inflector;
         $project     = $this->input->getArgument('project');
         $Project     = $inflector->words($project);
         $year        = $this->input->getOption('year');
         $type        = $this->input->getOption('type');
-        $vendorName  = $this->input->getOption('name') ?: $git->getConfig('user.name');
-        $vendorEmail = $this->input->getOption('email') ?: $git->getConfig('user.email');
+        $vendorName  = $this->input->getOption('name') ?: $this->git->getConfig('user.name');
+        $vendorEmail = $this->input->getOption('email') ?: $this->git->getConfig('user.email');
 
         $description = $this->input->getOption('description') ?: $this->prompt(
             'Project description [<comment>A brief intro about this project</comment>]: '
