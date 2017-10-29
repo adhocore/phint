@@ -12,7 +12,7 @@ class Arr
      *
      * @return array
      */
-    public function mergeRecursive(array $array1, array $array2)
+    public static function mergeRecursive(array $array1, array $array2)
     {
         $merged = $array1;
 

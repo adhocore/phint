@@ -11,7 +11,7 @@ class BaseCommand extends Command
     /** @var InputInterface */
     protected $input;
 
-    /** @var InputInterface */
+    /** @var OutputInterface */
     protected $output;
 
     protected function prompt($prompt, $default = null, callable $validator = null)
