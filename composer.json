@@ -1,0 +1,43 @@
+{
+    "name": "adhocore/phint",
+    "description": "Initializes new PHP project with sane defaults using templates",
+    "type": "library",
+    "keywords": [
+        "php-project-scaffolding", "php-project-init", "bootstrap", "template", "init-project"
+    ],
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Jitendra Adhikari",
+            "email": "jiten.adhikary@gmail.com"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "Ahc\\Phint\\": "src/"
+        }
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "Ahc\\Phint\\Test\\": "tests/"
+        }
+    },
+    "require": {
+        "symfony/console": "^3.3.0",
+        "symfony/filesystem": "^3.3.0",
+        "symfony/process": "^3.3.0",
+        "symfony/finder": "^3.3.0",
+        "twig/twig":  "~2.4.0"
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^5.7.0"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": {
+            "*": "dist"
+        }
+    },
+    "scripts": {
+    }
+}
