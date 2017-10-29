@@ -9,10 +9,10 @@
   processIsolation="false"
   stopOnFailure="false"
   syntaxCheck="false"
-  bootstrap="vendor/autoload.php"
+  bootstrap="tests/bootstrap.php"
 >
   <testsuites>
-    <testsuite name="Cron Expr Suite">
+    <testsuite name="Phint Test Suite">
       <directory>./tests/</directory>
     </testsuite>
   </testsuites>
