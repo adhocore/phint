@@ -76,11 +76,11 @@ class InitCommand extends BaseCommand
 
         $this->git->init()->addRemote($parameters['username'], $parameters['project']);
 
-        $output->writeln('<comment>Done</comment>');
-
         $this->output->writeln('Setting up <info>composer</info>');
 
         $composer->withWorkDir($projectPath)->install();
+
+        $output->writeln('<comment>Done</comment>');
     }
 
     protected function prepareProjectPath()
