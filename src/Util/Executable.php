@@ -2,9 +2,9 @@
 
 namespace Ahc\Phint\Util;
 
+use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
-use Symfony\Component\Console\Output\OutputInterface;
 
 abstract class Executable
 {

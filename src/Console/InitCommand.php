@@ -4,8 +4,8 @@ namespace Ahc\Phint\Console;
 
 use Ahc\Phint\Generator\CollisionHandler;
 use Ahc\Phint\Generator\TwigGenerator;
-use Ahc\Phint\Util\Git;
 use Ahc\Phint\Util\Composer;
+use Ahc\Phint\Util\Git;
 use Ahc\Phint\Util\Inflector;
 use Ahc\Phint\Util\Path;
 use Symfony\Component\Console\Input\InputArgument;

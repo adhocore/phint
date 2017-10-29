@@ -18,7 +18,7 @@ class Arr
 
         foreach ($array2 as $key => &$value) {
             if (\is_array($value) && isset($merged[$key]) && \is_array($merged[$key])) {
-                $merged[$key] = Arr::mergeRecursive($merged[$key], $value);
+                $merged[$key] = self::mergeRecursive($merged[$key], $value);
             } else {
                 $merged[$key] = $value;
             }
@@ -26,5 +26,4 @@ class Arr
 
         return $merged;
     }
-
 }

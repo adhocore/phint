@@ -2,9 +2,6 @@
 
 namespace Ahc\Phint\Util;
 
-use Symfony\Component\Process\ExecutableFinder;
-use Symfony\Component\Process\Process;
-
 class Git extends Executable
 {
     /** @var array */
