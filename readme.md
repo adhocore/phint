@@ -26,7 +26,6 @@ source ~/.zshrc
 
 It can be used to quickly spin off new  project containing all basic and default stuffs. The quick steps are as follows:
 
-## Usage
 ```bash
 # See options/arguments
 phint help init
