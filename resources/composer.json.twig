@@ -1,0 +1,40 @@
+{
+    "name": "{{username}}/{{project}}",
+    "description": "{{description}}",
+    "type": "{{type}}",
+    "keywords": {{keywords|json_encode|raw}},
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "{{vendorName}}",
+            "email": "{{vendorEmail}}"
+        }
+    ],
+    "autoload": {
+        "psr-4": {
+            "{{namespace}}\\": "src/"
+        },
+        "files": []
+    },
+    "autoload-dev": {
+        "psr-4": {
+            "{{namespace}}\\Test\\": "tests/"
+        }
+    },
+    "require": {
+    },
+    "require-dev": {
+        "phpunit/phpunit": "^5.7.0"
+    },
+    "config": {
+        "optimize-autoloader": true,
+        "preferred-install": {
+            "*": "dist"
+        }
+    },
+    "scripts": {
+        "post-root-package-install": [
+        ],
+        "test": "vendor/bin/phpunit"
+    }
+}
