@@ -30,6 +30,13 @@ abstract class Executable
         return $this;
     }
 
+    public function withWorkDir($workDir = null)
+    {
+        $this->workDir = $workDir;
+
+        return $this;
+    }
+
     protected function findBinary($binary)
     {
         if (\is_executable($binary)) {
