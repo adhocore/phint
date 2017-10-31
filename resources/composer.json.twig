@@ -6,8 +6,8 @@
     "license": "MIT",
     "authors": [
         {
-            "name": "{{vendorName}}",
-            "email": "{{vendorEmail}}"
+            "name": "{{name}}",
+            "email": "{{email}}"
         }
     ],
     "autoload": {
@@ -22,9 +22,10 @@
         }
     },
     "require": {
+        "php": ">={{php}}.0"
     },
     "require-dev": {
-        "phpunit/phpunit": "^5.7.0"
+        "phpunit/phpunit": "^4.8.0|^5.7.0"
     },
     "config": {
         "optimize-autoloader": true,
@@ -34,7 +35,13 @@
     },
     "scripts": {
         "post-root-package-install": [
+{%if type == 'project' %}
+            "@env"
+{% endif %}
         ],
+{%if type == 'project' %}
+        "@env": "php -r \"is_file('.env') || copy('.env.example', '.env');\"",
+{% endif %}
         "test": "vendor/bin/phpunit"
     }
 }
