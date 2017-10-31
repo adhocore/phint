@@ -3,6 +3,6 @@
 /.env
 /.idea/
 /vendor/
-{% if ignoreLock %}
+{% if type == 'library' %}
 composer.lock
 {% endif %}
