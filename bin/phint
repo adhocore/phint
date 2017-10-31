@@ -8,7 +8,7 @@ if (file_exists(__DIR__ . '/../../../autoload.php')) {
 }
 
 $app = new Symfony\Component\Console\Application(
-  'Phint - PHP project initializer',
+  'Phint - PHP project scaffolding',
   trim(file_get_contents(__DIR__ . '/../VERSION'))
 );
 
