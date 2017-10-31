@@ -16,8 +16,14 @@ class BaseCommand extends Command
 
     protected function prompt($prompt, $default = null, callable $validator = null)
     {
+        $prompt = '<info>' . $prompt . '</info>';
+
+        if ($default !== null) {
+            $prompt .= ' [<comment>' . $default . '</comment>]';
+        }
+
         $helper   = $this->getHelper('question');
-        $question = new Question($prompt, $default);
+        $question = new Question($prompt . ': ', $default);
 
         $question->setValidator($validator ?: function ($value) {
             if (empty($value)) {
