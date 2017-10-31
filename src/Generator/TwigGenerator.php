@@ -21,8 +21,7 @@ class TwigGenerator implements GeneratorInterface
 
     /** @var array Templates required for type 'project' only */
     protected $projectTemplates = [
-        'env.example'  => true,
-        'package.json' => true,
+        '.env.example' => true,
         'package.json' => true,
     ];
 
