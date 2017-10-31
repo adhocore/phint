@@ -14,7 +14,7 @@ class BaseCommand extends Command
     /** @var OutputInterface */
     protected $output;
 
-    protected function prompt($prompt, $default = null, callable $validator = null)
+    protected function prompt($prompt, $default = null, $validator = null)
     {
         $prompt = '<info>' . $prompt . '</info>';
 
@@ -25,9 +25,19 @@ class BaseCommand extends Command
         $helper   = $this->getHelper('question');
         $question = new Question($prompt . ': ', $default);
 
-        $question->setValidator($validator ?: function ($value) {
+        $values = [];
+        if (is_array($validator)) {
+            $values    = $validator;
+            $validator = null;
+        }
+
+        $question->setValidator($validator ?: function ($value) use ($values) {
             if (empty($value)) {
                 throw new \InvalidArgumentException('Please provide non empty value');
+            }
+
+            if (!empty($values) && !in_array($value, $values)) {
+                throw new \InvalidArgumentException('Value should be one of: ' . implode(', ', $values));
             }
 
             return $value;
