@@ -27,19 +27,28 @@ class InitCommand extends BaseCommand
     {
         $this
             ->setName('init')
-            ->setDescription('Create a bare new PHP project')
-            ->addArgument('project', InputArgument::REQUIRED, 'The project name')
-            ->addOption('force', 'f', InputOption::VALUE_NONE, 'Force initialization even if the project exists')
-            ->addOption('description', 'd', InputArgument::OPTIONAL, 'Project description')
-            ->addOption('name', 'm', InputArgument::OPTIONAL, 'Vendor full name, defaults to git name')
-            ->addOption('username', 'u', InputArgument::OPTIONAL, 'Vendor handle or username',
-                getenv('GITHUB_USERNAME')
-            )
-            ->addOption('email', 'e', InputArgument::OPTIONAL, 'Vendor email, defaults to git email')
-            ->addOption('namespace', 's', InputArgument::OPTIONAL, 'Root namespace')
-            ->addOption('year', 'y', InputArgument::OPTIONAL, 'License Year', date('Y'))
-            ->addOption('type', 't', InputArgument::OPTIONAL, 'Project type', 'library')
-            ->addOption('using', 'z', InputArgument::OPTIONAL, 'Packagist name of reference project (eg: laravel/lumen)');
+            ->setDescription('Scaffold a bare new PHP project')
+            ->addArgument('project', InputArgument::REQUIRED, 'The project name without slashes')
+            ->addOption('path', null, InputOption::VALUE_NONE, 'The project path (Auto resolved)')
+            ->addOption('force', 'f', InputOption::VALUE_NONE, 'Run even if the project exists')
+            ->addOption('description', 'd', InputOption::VALUE_OPTIONAL, 'Project description')
+            ->addOption('name', 'm', InputOption::VALUE_OPTIONAL, 'Vendor full name, defaults to git name')
+            ->addOption('username', 'u', InputOption::VALUE_OPTIONAL, 'Vendor handle/username')
+            ->addOption('email', 'e', InputOption::VALUE_OPTIONAL, 'Vendor email, defaults to git email')
+            ->addOption('namespace', 's', InputOption::VALUE_OPTIONAL, 'Root namespace')
+            ->addOption('year', 'y', InputOption::VALUE_OPTIONAL, 'License Year', date('Y'))
+            ->addOption('type', 't', InputOption::VALUE_OPTIONAL, 'Project type')
+            ->addOption('using', 'z', InputOption::VALUE_OPTIONAL, 'Packagist name of reference project (eg: laravel/lumen)')
+            ->addOption('keywords', 'l', InputOption::VALUE_OPTIONAL, 'Project Keywords')
+            ->setHelp(<<<EOT
+The <info>init</info> command creates a new project with all basic files and
+structures in the <project-name> directory. See some examples below:
+
+<info>phint init</info> project-name <comment>--force --description "My awesome project" --name "Your Name" --email "you@domain.com"</comment>
+<info>phint init</info> project-name <comment>--using laravel/lumen --namespace Project/Api --type project</comment>
+
+EOT
+            );
     }
 
     /**
@@ -52,15 +61,10 @@ class InitCommand extends BaseCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $this->input  = $input;
-        $this->output = $output;
-
         $output->writeln('<info>Preparing ...</info>');
 
-        $projectPath = $this->prepareProjectPath();
-        $this->git   = new Git($projectPath);
-        $parameters  = $this->collectParameters();
-        $composer    = new Composer;
+        $composer   = new Composer;
+        $parameters = $this->input->getOptions() + $this->input->getArguments();
 
         if (null !== $using = $this->input->getOption('using')) {
             $this->output->writeln('Using <comment>' . $using . '</comment> to create project');
@@ -70,15 +74,16 @@ class InitCommand extends BaseCommand
 
         $this->output->writeln('<comment>Generating files ...</comment>');
 
-        $this->generate($projectPath, $parameters);
+        $this->generate($parameters['path'], $parameters);
 
         $this->output->writeln('Setting up <info>git</info>');
 
-        $this->git->init()->addRemote($parameters['username'], $parameters['project']);
+        $this->git->withWorkDir($parameters['path'])->init()
+            ->addRemote($parameters['username'], $parameters['project']);
 
         $this->output->writeln('Setting up <info>composer</info>');
 
-        $composer->withWorkDir($projectPath)->install();
+        $composer->withWorkDir($parameters['path'])->install();
 
         $output->writeln('<comment>Done</comment>');
     }
@@ -106,37 +111,64 @@ class InitCommand extends BaseCommand
         return $path;
     }
 
-    protected function collectParameters()
+    protected function interact(InputInterface $input, OutputInterface $output)
     {
-        $inflector   = new Inflector;
-        $project     = $this->input->getArgument('project');
-        $Project     = $inflector->words($project);
-        $year        = $this->input->getOption('year');
-        $type        = $this->input->getOption('type');
-        $vendorName  = $this->input->getOption('name') ?: $this->git->getConfig('user.name');
-        $vendorEmail = $this->input->getOption('email') ?: $this->git->getConfig('user.email');
+        $this->input  = $input;
+        $this->output = $output;
 
-        $description = $this->input->getOption('description') ?: $this->prompt(
-            'Project description [<comment>A brief intro about this project</comment>]: '
-        );
+        $project = $input->getArgument('project');
 
-        $username = $this->input->getOption('username') ?: $this->prompt(
-            'Vendor Handle [<comment>Often your github username, set GITHUB_USERNAME env variable to automate</comment>]: '
-        );
+        if (empty($project) || !preg_match('/[a-z0-9_-]/i', $project)) {
+            throw new \InvalidArgumentException('Project argument is required and should only contain [a-z0-9_-]');
+        }
 
-        $namespace = $inflector->stuldyCase($username) . '/' . $inflector->stuldyCase($project);
+        $this->input->setOption('path', $this->prepareProjectPath());
+
+        $this->git = new Git;
+        $inflector = new Inflector;
+
+        $this->output->writeln('<info>Phint Setup</info>');
+        $this->output->writeln('<comment>Just press ENTER if you want to use the [default] or skip<comment>');
+        $this->output->writeln('');
+
+        $this->input->setOption('type', $this->input->getOption('type') ?: $this->prompt(
+            'Project type (project/library)',
+            'library'
+        ));
+
+        $this->input->setOption('name', $this->input->getOption('name') ?: $this->prompt(
+            'Vendor full name',
+            $this->git->getConfig('user.name')
+        ));
+
+        $this->input->setOption('email', $this->input->getOption('email') ?: $this->prompt(
+            'Vendor email',
+             $this->git->getConfig('user.email')
+        ));
+
+        $this->input->setOption('description', $this->input->getOption('description') ?: $this->prompt(
+            'Brief project description'
+        ));
+
+        $this->input->setOption('username', $username = $this->input->getOption('username') ?: $this->prompt(
+            'Vendor handle (often github username)',
+            getenv('VENDOR_USERNAME') ?: null
+        ));
+
         $namespace = $this->input->getOption('namespace') ?: $this->prompt(
-            'Root Namespace [<comment>Defaults to ' . $namespace . '</comment>]: ',
-            $namespace
+            'Project root namespace (forward slashes are auto fixed)',
+            (getenv('VENDOR_NAMESPACE') ?: $inflector->stuldyCase($username))
+                . '/' . $inflector->stuldyCase($project)
         );
 
-        $namespace = \str_replace('/', '\\\\', $namespace);
-        $keywords  = ['php', $project];
+        $this->input->setOption('namespace', \str_replace('/', '\\\\', $namespace));
 
-        return \compact(
-            'year', 'project', 'vendorName', 'vendorEmail', 'description',
-            'username', 'namespace', 'keywords', 'Project', 'type'
+        $keywords = $this->input->getOption('keywords') ?: $this->prompt(
+            'Project keywords (CSV)',
+            "php, $project"
         );
+
+        $this->input->setOption('keywords', array_map('trim', explode(',', $keywords)));
     }
 
     protected function generate($projectPath, array $parameters)
