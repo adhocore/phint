@@ -29,7 +29,7 @@ class TwigGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate($targetPath, array $parameters, CollisionHandler $handler = null)
+    public function generate($targetPath, array $parameters, CollisionHandlerInterface $handler = null)
     {
         if (!$this->twig) {
             $this->initTwig();
