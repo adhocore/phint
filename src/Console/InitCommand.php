@@ -40,6 +40,7 @@ class InitCommand extends BaseCommand
             ->addOption('type', 't', InputOption::VALUE_OPTIONAL, 'Project type')
             ->addOption('using', 'z', InputOption::VALUE_OPTIONAL, 'Packagist name of reference project (eg: laravel/lumen)')
             ->addOption('keywords', 'l', InputOption::VALUE_OPTIONAL, 'Project Keywords')
+            ->addOption('php', 'p', InputOption::VALUE_OPTIONAL, 'Minimum PHP version project needs')
             ->setHelp(<<<EOT
 The <info>init</info> command creates a new project with all basic files and
 structures in the <project-name> directory. See some examples below:
@@ -105,7 +106,7 @@ EOT
                 $this->output->writeln('<error>You have set force flag, existing files will be overwritten</error>');
             }
         } else {
-            \mkdir($path, 0777, true);
+            \mkdir(\rtrim($path, '/') . '/src', 0777, true);
         }
 
         return $path;
@@ -133,7 +134,8 @@ EOT
 
         $this->input->setOption('type', $this->input->getOption('type') ?: $this->prompt(
             'Project type (project/library)',
-            'library'
+            'library',
+            ['project', 'library', 'composer-plugin']
         ));
 
         $this->input->setOption('name', $this->input->getOption('name') ?: $this->prompt(
@@ -169,6 +171,12 @@ EOT
         );
 
         $this->input->setOption('keywords', array_map('trim', explode(',', $keywords)));
+
+        $this->input->setOption('php', $this->input->getOption('php') ?: $this->prompt(
+            'Minimum PHP version project needs',
+            PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION,
+            ['5.4', '5.5', '5.6', '7.0', '7.1']
+        ));
     }
 
     protected function generate($projectPath, array $parameters)
