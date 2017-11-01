@@ -1,19 +1,19 @@
 language: php
 
 php:
-{% if php == '5.4' %}
+{% if php <= 5.4 %}
   - 5.4
 {% endif %}
-{% if php == '5.5' %}
+{% if php <= 5.5 %}
   - 5.5
 {% endif %}
-{% if php == '5.6' %}
+{% if php <= 5.6 %}
   - 5.6
 {% endif %}
-{% if php == '7.0' %}
+{% if php <= 7.0 %}
   - 7.0
 {% endif %}
-{% if php == '7.1' %}
+{% if php <= 7.1 %}
   - 7.1
 {% endif %}
 
