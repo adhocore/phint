@@ -34,24 +34,26 @@ class InitCommand extends BaseCommand
             ->addArgument('project', InputArgument::REQUIRED, 'The project name without slashes')
             ->addOption('path', null, InputOption::VALUE_NONE, 'The project path (Auto resolved)')
             ->addOption('force', 'f', InputOption::VALUE_NONE, 'Run even if the project exists')
-            ->addOption('description', 'd', InputOption::VALUE_OPTIONAL, 'Project description')
+            ->addOption('description', 'i', InputOption::VALUE_OPTIONAL, 'Project description')
             ->addOption('name', 'm', InputOption::VALUE_OPTIONAL, 'Vendor full name, defaults to git name')
             ->addOption('username', 'u', InputOption::VALUE_OPTIONAL, 'Vendor handle/username')
             ->addOption('email', 'e', InputOption::VALUE_OPTIONAL, 'Vendor email, defaults to git email')
             ->addOption('namespace', 's', InputOption::VALUE_OPTIONAL, 'Root namespace')
             ->addOption('year', 'y', InputOption::VALUE_OPTIONAL, 'License Year', date('Y'))
             ->addOption('type', 't', InputOption::VALUE_OPTIONAL, 'Project type')
-            ->addOption('using', 'z', InputOption::VALUE_OPTIONAL, 'Packagist name of reference project (eg: laravel/lumen)')
+            ->addOption('using', 'z', InputOption::VALUE_OPTIONAL, 'Reference package name (eg: laravel/lumen)')
             ->addOption('keywords', 'l', InputOption::VALUE_OPTIONAL, 'Project Keywords')
             ->addOption('php', 'p', InputOption::VALUE_OPTIONAL, 'Minimum PHP version project needs')
             ->addOption('config', 'c', InputOption::VALUE_OPTIONAL, 'JSON filepath to read config from')
+            ->addOption('req', 'r', InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Required packages', [])
+            ->addOption('dev', 'd', InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Developer packages', [])
             ->setHelp(<<<'EOT'
 The <info>init</info> command creates a new project with all basic files and
 structures in the <project-name> directory. See some examples below:
 
 <info>phint init</info> project-name <comment>--force --description "My awesome project" --name "Your Name" --email "you@domain.com"</comment>
 <info>phint init</info> project-name <comment>--using laravel/lumen --namespace Project/Api --type project</comment>
-
+<info>phint init</info> project-name <comment>--php 5.6 --config /path/to/json --dev mockery/mockery --req doctrine/dbal --req symfony/console</comment>
 EOT
             );
     }
@@ -181,6 +183,8 @@ EOT
             PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION,
             ['5.4', '5.5', '5.6', '7.0', '7.1']
         )));
+
+        $this->collectPackages();
     }
 
     protected function generate($projectPath, array $parameters)
@@ -227,6 +231,46 @@ EOT
             if ($key === 'vendor_namespace') {
                 putenv('VENDOR_NAMESPACE=' . $value);
             }
+        }
+    }
+
+    protected function collectPackages()
+    {
+        $fn = function ($pkg) {
+            if (!empty($pkg) && strpos($pkg, '/') === false)  {
+                throw new \InvalidArgumentException(
+                    'Package name format should be vendor/package:version (version can be omitted)'
+                );
+            }
+
+            return $pkg;
+        };
+
+        foreach (['req' => 'Required', 'dev' => 'Developer'] as $key => $label) {
+
+            $pkgs = $this->input->getOption($key);
+
+            if (!$pkgs) {
+                do {
+                    $pkgs[] = $this->prompt($label . ' package (press ENTER to skip)', null, $fn);
+
+                    if (!end($pkgs)) {
+                        array_pop($pkgs);
+
+                        break;
+                    }
+                } while (true);
+            }
+
+            foreach ($pkgs as &$pkg) {
+                if (strpos($pkg, ':') === false) {
+                    $pkg .= ':@stable';
+                }
+
+                $pkg = array_combine(['name', 'version'], explode(':', $pkg, 2));
+            }
+
+            $this->input->setOption($key, $pkgs);
         }
     }
 }
