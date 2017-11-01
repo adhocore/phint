@@ -22,10 +22,14 @@
         }
     },
     "require": {
-        "php": ">={{php}}.0"
+        "php": ">={{php}}.0"{%for pkg in req %},
+        "{{pkg.name}}": "{{pkg.version}}"{% endfor %}
+
     },
     "require-dev": {
-        "phpunit/phpunit": "^4.8.0|^5.7.0"
+        "phpunit/phpunit": "^4.8.0|^5.7.0"{%for pkg in dev %},
+        "{{pkg.name}}": "{{pkg.version}}"{% endfor %}
+
     },
     "config": {
         "optimize-autoloader": true,
