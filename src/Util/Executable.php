@@ -60,6 +60,8 @@ abstract class Executable
         $self = $this;
         $proc = new Process($this->binary . ' ' . $command, $this->workDir, null, null, null);
 
+        $proc->setPty(true);
+
         $proc->run(!$this->output ? null : function ($type, $buffer) use ($self) {
             $self->output->write($buffer);
         });
