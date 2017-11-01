@@ -62,15 +62,12 @@ EOT
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('<info>Preparing ...</info>');
-
-        $composer   = new Composer;
         $parameters = $this->input->getOptions() + $this->input->getArguments();
 
-        if (null !== $using = $this->input->getOption('using')) {
+        if (null !== $using = $parameters['using']) {
             $this->output->writeln('Using <comment>' . $using . '</comment> to create project');
 
-            $composer->withOutput($this->output)->createProject($projectPath, $using);
+            $this->composer->createProject($parameters['path'], $using);
         }
 
         $this->output->writeln('<comment>Generating files ...</comment>');
@@ -79,12 +76,11 @@ EOT
 
         $this->output->writeln('Setting up <info>git</info>');
 
-        $this->git->withWorkDir($parameters['path'])->init()
-            ->addRemote($parameters['username'], $parameters['project']);
+        $this->git->init()->addRemote($parameters['username'], $parameters['project']);
 
         $this->output->writeln('Setting up <info>composer</info>');
 
-        $composer->withWorkDir($parameters['path'])->install();
+        $this->composer->install();
 
         $output->writeln('<comment>Done</comment>');
     }
@@ -123,10 +119,10 @@ EOT
             throw new \InvalidArgumentException('Project argument is required and should only contain [a-z0-9_-]');
         }
 
-        $this->input->setOption('path', $this->prepareProjectPath());
+        $this->input->setOption('path', $path = $this->prepareProjectPath());
 
-        $this->git = new Git;
-        $inflector = new Inflector;
+        $this->git      = (new Git)->withOutput($this->output)->withWorkDir($path);
+        $this->composer = (new Composer)->withOutput($this->output)->withWorkDir($path);
 
         $this->output->writeln('<info>Phint Setup</info>');
         $this->output->writeln('<comment>Just press ENTER if you want to use the [default] or skip<comment>');
@@ -157,6 +153,8 @@ EOT
             getenv('VENDOR_USERNAME') ?: null
         ));
 
+        $inflector = new Inflector;
+
         $namespace = $this->input->getOption('namespace') ?: $this->prompt(
             'Project root namespace (forward slashes are auto fixed)',
             (getenv('VENDOR_NAMESPACE') ?: $inflector->stuldyCase($username))
@@ -172,11 +170,11 @@ EOT
 
         $this->input->setOption('keywords', array_map('trim', explode(',', $keywords)));
 
-        $this->input->setOption('php', $this->input->getOption('php') ?: $this->prompt(
+        $this->input->setOption('php', floatval($this->input->getOption('php') ?: $this->prompt(
             'Minimum PHP version project needs',
             PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION,
             ['5.4', '5.5', '5.6', '7.0', '7.1']
-        ));
+        )));
     }
 
     protected function generate($projectPath, array $parameters)
