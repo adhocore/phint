@@ -237,7 +237,7 @@ EOT
     protected function collectPackages()
     {
         $fn = function ($pkg) {
-            if (!empty($pkg) && strpos($pkg, '/') === false)  {
+            if (!empty($pkg) && strpos($pkg, '/') === false) {
                 throw new \InvalidArgumentException(
                     'Package name format should be vendor/package:version (version can be omitted)'
                 );
