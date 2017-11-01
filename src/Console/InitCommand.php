@@ -18,6 +18,9 @@ class InitCommand extends BaseCommand
     /** @var Git */
     protected $git;
 
+    /** @var Composer */
+    protected $composer;
+
     /**
      * Configure the command options.
      *
@@ -41,6 +44,7 @@ class InitCommand extends BaseCommand
             ->addOption('using', 'z', InputOption::VALUE_OPTIONAL, 'Packagist name of reference project (eg: laravel/lumen)')
             ->addOption('keywords', 'l', InputOption::VALUE_OPTIONAL, 'Project Keywords')
             ->addOption('php', 'p', InputOption::VALUE_OPTIONAL, 'Minimum PHP version project needs')
+            ->addOption('config', 'c', InputOption::VALUE_OPTIONAL, 'JSON filepath to read config from')
             ->setHelp(<<<'EOT'
 The <info>init</info> command creates a new project with all basic files and
 structures in the <project-name> directory. See some examples below:
@@ -119,6 +123,8 @@ EOT
             throw new \InvalidArgumentException('Project argument is required and should only contain [a-z0-9_-]');
         }
 
+        $this->loadConfig($this->input->getOption('config'));
+
         $this->input->setOption('path', $path = $this->prepareProjectPath());
 
         $this->git      = (new Git)->withOutput($this->output)->withWorkDir($path);
@@ -185,5 +191,42 @@ EOT
         $generator = new TwigGenerator($templatePath, $cachePath);
 
         $generator->generate($projectPath, $parameters, new CollisionHandler);
+    }
+
+    protected function loadConfig($path = null)
+    {
+        if (empty($path)) {
+            return;
+        }
+
+        $pathUtil = new Path;
+
+        if (!$pathUtil->isAbsolute($path)) {
+            $path = getcwd() . '/' . $path;
+        }
+
+        if (!is_file($path)) {
+            $this->output->writeln('<error>Invalid path specified for config</error>');
+
+            return;
+        }
+
+        $config = (new Path)->readAsJson($path);
+
+        if (empty($config)) {
+            return;
+        }
+
+        unset($config['path']);
+
+        foreach ($config as $key => $value) {
+            if ($this->input->hasOption($key)) {
+                $this->input->setOption($key, $value);
+            }
+
+            if ($key === 'vendor_namespace') {
+                putenv('VENDOR_NAMESPACE='.$value);
+            }
+        }
     }
 }
