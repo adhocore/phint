@@ -22,4 +22,11 @@ class Composer extends Executable
 
         return $this;
     }
+
+    public function update()
+    {
+        $this->runCommand('update --prefer-dist --optimize-autoloader --no-suggest');
+
+        return $this;
+    }
 }
