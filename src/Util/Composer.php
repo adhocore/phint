@@ -18,7 +18,14 @@ class Composer extends Executable
 
     public function install()
     {
-        $this->runCommand('install --prefer-dist --optimize-autoloader');
+        $this->runCommand('install --prefer-dist --optimize-autoloader --no-suggest');
+
+        return $this;
+    }
+
+    public function update()
+    {
+        $this->runCommand('update --prefer-dist --optimize-autoloader --no-suggest');
 
         return $this;
     }

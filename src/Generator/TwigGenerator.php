@@ -19,6 +19,12 @@ class TwigGenerator implements GeneratorInterface
     /** @var string */
     protected $cachePath;
 
+    /** @var array Templates required for type 'project' only */
+    protected $projectTemplates = [
+        '.env.example' => true,
+        'package.json' => true,
+    ];
+
     public function __construct($templatePath, $cachePath)
     {
         $this->templatePath = $templatePath;
@@ -29,7 +35,7 @@ class TwigGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate($targetPath, array $parameters, CollisionHandler $handler = null)
+    public function generate($targetPath, array $parameters, CollisionHandlerInterface $handler = null)
     {
         if (!$this->twig) {
             $this->initTwig();
@@ -37,7 +43,9 @@ class TwigGenerator implements GeneratorInterface
 
         $templates = $this->findTemplates($this->templatePath);
         foreach ($templates as $template) {
-            $this->doGenerate($template, $targetPath, $parameters, $handler);
+            if ($this->shouldGenerate($template, $parameters)) {
+                $this->doGenerate($template, $targetPath, $parameters, $handler);
+            }
         }
     }
 
@@ -88,5 +96,16 @@ class TwigGenerator implements GeneratorInterface
         $this->pathUtil->ensureDir($targetDir);
 
         $this->pathUtil->writeFile($targetFile, $content);
+    }
+
+    protected function shouldGenerate($template, array $parameters)
+    {
+        $name = basename($template, '.twig');
+
+        if (isset($this->projectTemplates[$name])) {
+            return $parameters['type'] === 'project';
+        }
+
+        return true;
     }
 }

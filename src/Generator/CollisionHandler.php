@@ -33,7 +33,7 @@ class CollisionHandler implements CollisionHandlerInterface
 
         $this->pathUtil->writeFile(
             $targetFile,
-            \json_encode($merged, \JSON_PRETTY_PRINT) . "\n"
+            \json_encode($merged, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES) . "\n"
         );
     }
 }

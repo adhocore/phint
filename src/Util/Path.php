@@ -44,7 +44,7 @@ class Path
 
     public function readAsJson($filePath, $asArray = true)
     {
-        return json_decode(file_get_contents($filePath), true) ?: [];
+        return json_decode(file_get_contents($filePath), $asArray) ?: [];
     }
 
     public function writeFile($file, $content, $mode = null)
