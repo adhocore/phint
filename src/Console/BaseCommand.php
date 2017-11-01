@@ -22,14 +22,13 @@ class BaseCommand extends Command
             $prompt .= ' [<comment>' . $default . '</comment>]';
         }
 
-        $helper   = $this->getHelper('question');
-        $question = new Question($prompt . ': ', $default);
-
         $values = [];
         if (is_array($validator)) {
             $values    = $validator;
             $validator = null;
         }
+
+        $question = new Question($prompt . ': ', $default);
 
         $question->setValidator($validator ?: function ($value) use ($values) {
             if (empty($value)) {
