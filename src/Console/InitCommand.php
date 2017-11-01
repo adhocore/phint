@@ -247,7 +247,6 @@ EOT
         };
 
         foreach (['req' => 'Required', 'dev' => 'Developer'] as $key => $label) {
-
             $pkgs = $this->input->getOption($key);
 
             if (!$pkgs) {
