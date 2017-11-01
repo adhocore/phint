@@ -41,7 +41,7 @@ class InitCommand extends BaseCommand
             ->addOption('using', 'z', InputOption::VALUE_OPTIONAL, 'Packagist name of reference project (eg: laravel/lumen)')
             ->addOption('keywords', 'l', InputOption::VALUE_OPTIONAL, 'Project Keywords')
             ->addOption('php', 'p', InputOption::VALUE_OPTIONAL, 'Minimum PHP version project needs')
-            ->setHelp(<<<EOT
+            ->setHelp(<<<'EOT'
 The <info>init</info> command creates a new project with all basic files and
 structures in the <project-name> directory. See some examples below:
 
