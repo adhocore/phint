@@ -225,7 +225,7 @@ EOT
             }
 
             if ($key === 'vendor_namespace') {
-                putenv('VENDOR_NAMESPACE='.$value);
+                putenv('VENDOR_NAMESPACE=' . $value);
             }
         }
     }
