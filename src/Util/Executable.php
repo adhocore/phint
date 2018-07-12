@@ -2,14 +2,14 @@
 
 namespace Ahc\Phint\Util;
 
-use Symfony\Component\Console\Output\OutputInterface;
+use Ahc\Cli\IO\Interactor;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
 
 abstract class Executable
 {
-    /** @var OutputInterface */
-    protected $output;
+    /** @var Interactor */
+    protected $io;
 
     /** @var string The binary executable */
     protected $binary;
@@ -17,21 +17,18 @@ abstract class Executable
     /** @var string */
     protected $workDir;
 
-    public function __construct($workDir = null, $binary = null)
+    public function __construct($binary = null)
     {
-        $this->workDir = $workDir;
-        $this->binary  = $binary ? '"' . $binary . '"' : $binary;
-    }
-
-    public function withOutput(OutputInterface $output = null)
-    {
-        $this->output = $output;
-
-        return $this;
+        $this->workDir = \getcwd();
+        $this->binary  = $binary ? '"' . $binary . '"' : $this->binary;
     }
 
     public function withWorkDir($workDir = null)
     {
+        if (!\is_dir($workDir)) {
+            throw new \InvalidArgumentException('Not a valid working dir: ' . $workDir);
+        }
+
         $this->workDir = $workDir;
 
         return $this;
@@ -60,11 +57,7 @@ abstract class Executable
         $self = $this;
         $proc = new Process($this->binary . ' ' . $command, $this->workDir, null, null, null);
 
-        $proc->setPty(true);
-
-        $proc->run(!$this->output ? null : function ($type, $buffer) use ($self) {
-            $self->output->write($buffer);
-        });
+        $proc->run();
 
         if ($proc->isSuccessful()) {
             return $proc->getOutput();
