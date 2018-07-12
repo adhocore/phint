@@ -28,9 +28,12 @@ It can be used to quickly spin off new  project containing all basic and default
 
 ```bash
 # See options/arguments
-phint help init
+phint init --help
 
 # Below command inits a brand new PHP project in `project-name` folder in current dir
 # Missing arguments are interactively collected
 phint init project-name
+
+# You can also use config file (with json) to read option values from
+phint init project-name --config phint.json
 ```
