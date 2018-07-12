@@ -7,10 +7,8 @@ class Git extends Executable
     /** @var array */
     protected $gitConfig;
 
-    public function __construct($workDir = null, $binary = null)
-    {
-        parent::__construct($workDir, $binary ?: 'git');
-    }
+    /** @var string The binary executable */
+    protected $binary = 'git';
 
     /**
      * Gets git config.
