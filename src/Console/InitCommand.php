@@ -8,7 +8,6 @@ use Ahc\Phint\Generator\CollisionHandler;
 use Ahc\Phint\Generator\TwigGenerator;
 use Ahc\Phint\Util\Composer;
 use Ahc\Phint\Util\Git;
-use Ahc\Phint\Util\Inflector;
 use Ahc\Phint\Util\Path;
 
 class InitCommand extends Command
@@ -125,8 +124,8 @@ EOT
         $this->loadConfig($this->config);
 
         $setup = [
-            'type' => ['choices' => ['project', 'library', 'composer-plugin']],
-            'php'  => ['choices' => ['5.4', '5.5', '5.6', '7.0', '7.1', '7.2']],
+            'type'   => ['choices' => ['project', 'library', 'composer-plugin']],
+            'php'    => ['choices' => ['5.4', '5.5', '5.6', '7.0', '7.1', '7.2']],
             'using'  => ['prompt' => 0],
         ];
 
@@ -145,7 +144,7 @@ EOT
             }
 
             if ($name === 'namespace' && \stripos($value, $project) === false) {
-                 $value .= '\\' . ucfirst($project);
+                $value .= '\\' . ucfirst($project);
             }
             if ($name === 'keywords') {
                 $value = \array_map('trim', \explode(',', $value));
