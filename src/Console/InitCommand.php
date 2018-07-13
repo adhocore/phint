@@ -30,6 +30,7 @@ class InitCommand extends Command
         $this->_git      = new Git;
         $this->_composer = new Composer;
         $this->_action   = [$this, 'execute'];
+        $colorizer       = $this->writer()->colorizer();
 
         $this
             ->argument('<project>', 'The project name without slashes')
@@ -38,24 +39,23 @@ class InitCommand extends Command
             ->option('-e --email', 'Vendor email', null, $this->_git->getConfig('user.email'))
             ->option('-u --username', 'Vendor handle/username')
             ->option('-N --namespace', 'Root namespace')
-            ->option('-k --keywords [words...]', 'Project Keywords')
+            ->option('-k --keywords [words...]', 'Project Keywords (`php`, `<project>` auto added)')
             ->option('-P --php', 'Minimum PHP version', null, PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION)
             ->option('-p --path', 'The project path (Auto resolved)')
-            ->option('-f --force', 'Run even if the project exists')
+            ->option('-f --force', 'Run even if the project exists', null, false)
             ->option('-d --descr', 'Project description')
             ->option('-y --year', 'License Year', null, date('Y'))
             ->option('-z --using', 'Reference package name')
             ->option('-c --config', 'JSON filepath to read config from')
             ->option('-r --req [pkgs...]', 'Required packages')
             ->option('-D --dev [pkgs...]', 'Developer packages')
-            ->usage(<<<'EOT'
-The <info>init</info> command creates a new project with all basic files and
-structures in the <project-name> directory. See some examples below:
-
-<info>phint init</info> project-name <comment>--force --description "My awesome project" --name "Your Name" --email "you@domain.com"</comment>
-<info>phint init</info> project-name <comment>--using laravel/lumen --namespace Project/Api --type project</comment>
-<info>phint init</info> project-name <comment>--php 5.6 --config /path/to/json --dev mockery/mockery --req doctrine/dbal --req symfony/console</comment>
-EOT
+            ->usage(
+$colorizer->bold('  phint init') . ' <project> '
+. $colorizer->comment('--force --description "My awesome project" --name "Your Name" --email "you@domain.com"') . PHP_EOL
+. $colorizer->bold('  phint init') . ' <project> '
+. $colorizer->comment('--using laravel/lumen --namespace Project/Api --type project') . PHP_EOL
+. $colorizer->bold('  phint init') . ' <project> '
+. $colorizer->comment('--php 7.0 --config /path/to/json --dev mockery/mockery --req adhocore/jwt --req adhocore/cli')
             );
     }
 
@@ -147,7 +147,7 @@ EOT
                 $value .= '\\' . ucfirst($project);
             }
             if ($name === 'keywords') {
-                $value = \array_map('trim', \explode(',', $value));
+                $value = \array_merge(['php', $project], \array_map('trim', \explode(',', $value)));
             }
 
             $this->set($name, $value);
