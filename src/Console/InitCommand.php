@@ -2,110 +2,106 @@
 
 namespace Ahc\Phint\Console;
 
+use Ahc\Cli\Input\Command;
+use Ahc\Cli\IO\Interactor;
 use Ahc\Phint\Generator\CollisionHandler;
 use Ahc\Phint\Generator\TwigGenerator;
 use Ahc\Phint\Util\Composer;
 use Ahc\Phint\Util\Git;
-use Ahc\Phint\Util\Inflector;
 use Ahc\Phint\Util\Path;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Console\Output\OutputInterface;
 
-class InitCommand extends BaseCommand
+class InitCommand extends Command
 {
     /** @var Git */
-    protected $git;
+    protected $_git;
 
     /** @var Composer */
-    protected $composer;
+    protected $_composer;
 
     /**
-     * Configure the command options.
+     * Configure the command options/arguments.
      *
      * @return void
      */
-    protected function configure()
+    public function __construct()
     {
-        $this
-            ->setName('init')
-            ->setDescription('Scaffold a bare new PHP project')
-            ->addArgument('project', InputArgument::REQUIRED, 'The project name without slashes')
-            ->addOption('path', null, InputOption::VALUE_NONE, 'The project path (Auto resolved)')
-            ->addOption('force', 'f', InputOption::VALUE_NONE, 'Run even if the project exists')
-            ->addOption('description', 'i', InputOption::VALUE_OPTIONAL, 'Project description')
-            ->addOption('name', 'm', InputOption::VALUE_OPTIONAL, 'Vendor full name, defaults to git name')
-            ->addOption('username', 'u', InputOption::VALUE_OPTIONAL, 'Vendor handle/username')
-            ->addOption('email', 'e', InputOption::VALUE_OPTIONAL, 'Vendor email, defaults to git email')
-            ->addOption('namespace', 's', InputOption::VALUE_OPTIONAL, 'Root namespace')
-            ->addOption('year', 'y', InputOption::VALUE_OPTIONAL, 'License Year', date('Y'))
-            ->addOption('type', 't', InputOption::VALUE_OPTIONAL, 'Project type')
-            ->addOption('using', 'z', InputOption::VALUE_OPTIONAL, 'Reference package name (eg: laravel/lumen)')
-            ->addOption('keywords', 'l', InputOption::VALUE_OPTIONAL, 'Project Keywords')
-            ->addOption('php', 'p', InputOption::VALUE_OPTIONAL, 'Minimum PHP version project needs')
-            ->addOption('config', 'c', InputOption::VALUE_OPTIONAL, 'JSON filepath to read config from')
-            ->addOption('req', 'r', InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Required packages', [])
-            ->addOption('dev', 'd', InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY, 'Developer packages', [])
-            ->setHelp(<<<'EOT'
-The <info>init</info> command creates a new project with all basic files and
-structures in the <project-name> directory. See some examples below:
+        parent::__construct('init', 'Create and Scaffold a bare new PHP project');
 
-<info>phint init</info> project-name <comment>--force --description "My awesome project" --name "Your Name" --email "you@domain.com"</comment>
-<info>phint init</info> project-name <comment>--using laravel/lumen --namespace Project/Api --type project</comment>
-<info>phint init</info> project-name <comment>--php 5.6 --config /path/to/json --dev mockery/mockery --req doctrine/dbal --req symfony/console</comment>
-EOT
+        $this->_git      = new Git;
+        $this->_composer = new Composer;
+        $this->_action   = [$this, 'execute'];
+        $colorizer       = $this->writer()->colorizer();
+
+        $this
+            ->argument('<project>', 'The project name without slashes')
+            ->option('-t --type', 'Project type', null, 'library')
+            ->option('-n --name', 'Vendor full name', null, $this->_git->getConfig('user.name'))
+            ->option('-e --email', 'Vendor email', null, $this->_git->getConfig('user.email'))
+            ->option('-u --username', 'Vendor handle/username')
+            ->option('-N --namespace', 'Root namespace')
+            ->option('-k --keywords [words...]', 'Project Keywords (`php`, `<project>` auto added)')
+            ->option('-P --php', 'Minimum PHP version', null, PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION)
+            ->option('-p --path', 'The project path (Auto resolved)')
+            ->option('-f --force', 'Run even if the project exists', null, false)
+            ->option('-d --descr', 'Project description')
+            ->option('-y --year', 'License Year', null, date('Y'))
+            ->option('-z --using', 'Reference package name')
+            ->option('-c --config', 'JSON filepath to read config from')
+            ->option('-r --req [pkgs...]', 'Required packages')
+            ->option('-D --dev [pkgs...]', 'Developer packages')
+            ->usage(
+$colorizer->bold('  phint init') . ' <project> '
+. $colorizer->comment('--force --description "My awesome project" --name "Your Name" --email "you@domain.com"') . PHP_EOL
+. $colorizer->bold('  phint init') . ' <project> '
+. $colorizer->comment('--using laravel/lumen --namespace Project/Api --type project') . PHP_EOL
+. $colorizer->bold('  phint init') . ' <project> '
+. $colorizer->comment('--php 7.0 --config /path/to/json --dev mockery/mockery --req adhocore/jwt --req adhocore/cli')
             );
     }
 
     /**
-     * Execute the command.
-     *
-     * @param InputInterface  $input
-     * @param OutputInterface $output
+     * Execute the command action.
      *
      * @return void
      */
-    protected function execute(InputInterface $input, OutputInterface $output)
+    public function execute()
     {
-        $parameters = $this->input->getOptions() + $this->input->getArguments();
+        $io = $this->app()->io();
 
-        if (null !== $using = $parameters['using']) {
-            $this->output->writeln('Using <comment>' . $using . '</comment> to create project');
+        if ($this->using) {
+            $io->write('Using ') . $io->comment($this->using) . $io->write(' to create project', true);
 
-            $this->composer->createProject($parameters['path'], $using);
+            $this->_composer->createProject($this->path, $this->using);
         }
 
-        $this->output->writeln('<comment>Generating files ...</comment>');
+        $io->comment('Generating files ...', true);
+        $this->generate($this->path, $this->values());
 
-        $this->generate($parameters['path'], $parameters);
+        $io->write('Setting up ')->cyanBold('git', true);
+        $this->_git->withWorkDir($this->path)->init()->addRemote($this->username, $this->project);
 
-        $this->output->writeln('Setting up <info>git</info>');
+        $io->write('Setting up ')->cyanBold('composer')->comment(' (takes some time)', true);
+        $this->_composer->withWorkDir($this->path)->install();
 
-        $this->git->init()->addRemote($parameters['username'], $parameters['project']);
-
-        $this->output->writeln('Setting up <info>composer</info>');
-
-        $this->composer->install();
-
-        $output->writeln('<comment>Done</comment>');
+        $io->ok('Done', true);
     }
 
     protected function prepareProjectPath()
     {
-        $path = $this->input->getArgument('project');
+        $path = $this->project;
+        $io   = $this->app()->io();
 
         if (!(new Path)->isAbsolute($path)) {
             $path = \getcwd() . '/' . $path;
         }
 
-        if (\file_exists($path)) {
-            if (!$this->input->getOption('force')) {
+        if (\is_dir($path)) {
+            if (!$this->force) {
                 throw new \InvalidArgumentException('Something with the same name already exists!');
             }
 
-            if (!$this->input->getOption('using')) {
-                $this->output->writeln('<error>You have set force flag, existing files will be overwritten</error>');
+            if (!$this->using) {
+                $io->error('You have set force flag, existing files will be overwritten', true);
             }
         } else {
             \mkdir(\rtrim($path, '/') . '/src', 0777, true);
@@ -114,75 +110,48 @@ EOT
         return $path;
     }
 
-    protected function interact(InputInterface $input, OutputInterface $output)
+    public function interact(Interactor $io)
     {
-        $this->input  = $input;
-        $this->output = $output;
+        $project = $this->project;
 
-        $project = $input->getArgument('project');
-
-        if (empty($project) || !preg_match('/[a-z0-9_-]/i', $project)) {
-            throw new \InvalidArgumentException('Project argument is required and should only contain [a-z0-9_-]');
+        if (!\preg_match('/[a-z0-9_-]/i', $project)) {
+            throw new \InvalidArgumentException('Project argument should only contain [a-z0-9_-]');
         }
 
-        $this->loadConfig($this->input->getOption('config'));
+        $io->okBold('Phint Setup', true);
 
-        $this->input->setOption('path', $path = $this->prepareProjectPath());
+        $this->set('path', $path = $this->prepareProjectPath());
+        $this->loadConfig($this->config);
 
-        $this->git      = (new Git)->withOutput($this->output)->withWorkDir($path);
-        $this->composer = (new Composer)->withOutput($this->output)->withWorkDir($path);
+        $setup = [
+            'type'   => ['choices' => ['project', 'library', 'composer-plugin']],
+            'php'    => ['choices' => ['5.4', '5.5', '5.6', '7.0', '7.1', '7.2']],
+            'using'  => ['prompt' => 0],
+        ];
 
-        $this->output->writeln('<info>Phint Setup</info>');
-        $this->output->writeln('<comment>Just press ENTER if you want to use the [default] or skip<comment>');
-        $this->output->writeln('');
+        $options = $this->userOptions();
+        foreach ($options as $name => $option) {
+            $default = $option->default();
+            if ($this->$name !== null || \in_array($name, ['req', 'dev', 'config'])) {
+                continue;
+            }
 
-        $this->input->setOption('type', $this->input->getOption('type') ?: $this->prompt(
-            'Project type (project/library)',
-            'library',
-            ['project', 'library', 'composer-plugin']
-        ));
+            $set = $setup[$name] ?? [];
+            if ($set['choices'] ?? null) {
+                $value = $io->choice($option->desc(), $set['choices'], $default);
+            } else {
+                $value = $io->prompt($option->desc(), $default, null, $set['prompt'] ?? 1);
+            }
 
-        $this->input->setOption('name', $this->input->getOption('name') ?: $this->prompt(
-            'Vendor full name',
-            $this->git->getConfig('user.name')
-        ));
+            if ($name === 'namespace' && \stripos($value, $project) === false) {
+                $value .= '\\' . ucfirst($project);
+            }
+            if ($name === 'keywords') {
+                $value = \array_merge(['php', $project], \array_map('trim', \explode(',', $value)));
+            }
 
-        $this->input->setOption('email', $this->input->getOption('email') ?: $this->prompt(
-            'Vendor email',
-             $this->git->getConfig('user.email')
-        ));
-
-        $this->input->setOption('description', $this->input->getOption('description') ?: $this->prompt(
-            'Brief project description'
-        ));
-
-        $this->input->setOption('username', $username = $this->input->getOption('username') ?: $this->prompt(
-            'Vendor handle (often github username)',
-            getenv('VENDOR_USERNAME') ?: null
-        ));
-
-        $inflector = new Inflector;
-
-        $namespace = $this->input->getOption('namespace') ?: $this->prompt(
-            'Project root namespace (forward slashes are auto fixed)',
-            (getenv('VENDOR_NAMESPACE') ?: $inflector->stuldyCase($username))
-                . '/' . $inflector->stuldyCase($project)
-        );
-
-        $this->input->setOption('namespace', \str_replace('/', '\\\\', $namespace));
-
-        $keywords = $this->input->getOption('keywords') ?: $this->prompt(
-            'Project keywords (CSV)',
-            "php, $project"
-        );
-
-        $this->input->setOption('keywords', array_map('trim', explode(',', $keywords)));
-
-        $this->input->setOption('php', floatval($this->input->getOption('php') ?: $this->prompt(
-            'Minimum PHP version project needs',
-            PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION,
-            ['5.4', '5.5', '5.6', '7.0', '7.1']
-        )));
+            $this->set($name, $value);
+        }
 
         $this->collectPackages();
     }
@@ -206,31 +175,20 @@ EOT
         $pathUtil = new Path;
 
         if (!$pathUtil->isAbsolute($path)) {
-            $path = getcwd() . '/' . $path;
+            $path = \getcwd() . '/' . $path;
         }
 
-        if (!is_file($path)) {
-            $this->output->writeln('<error>Invalid path specified for config</error>');
+        if (!\is_file($path)) {
+            $this->app()->io()->error('Invalid path specified for config');
 
             return;
         }
 
-        $config = (new Path)->readAsJson($path);
-
-        if (empty($config)) {
-            return;
-        }
-
+        $config = $pathUtil->readAsJson($path);
         unset($config['path']);
 
         foreach ($config as $key => $value) {
-            if ($this->input->hasOption($key)) {
-                $this->input->setOption($key, $value);
-            }
-
-            if ($key === 'vendor_namespace') {
-                putenv('VENDOR_NAMESPACE=' . $value);
-            }
+            $this->set($key, $value);
         }
     }
 
@@ -246,12 +204,14 @@ EOT
             return $pkg;
         };
 
+        $io = $this->app()->io();
+
         foreach (['req' => 'Required', 'dev' => 'Developer'] as $key => $label) {
-            $pkgs = $this->input->getOption($key);
+            $pkgs = $this->$key;
 
             if (!$pkgs) {
                 do {
-                    $pkgs[] = $this->prompt($label . ' package (press ENTER to skip)', null, $fn);
+                    $pkgs[] = $io->prompt($label . ' package (press ENTER to skip)', null, $fn, 0);
 
                     if (!end($pkgs)) {
                         array_pop($pkgs);
@@ -269,7 +229,7 @@ EOT
                 $pkg = array_combine(['name', 'version'], explode(':', $pkg, 2));
             }
 
-            $this->input->setOption($key, $pkgs);
+            $this->set($key, $pkgs);
         }
     }
 }
