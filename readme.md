@@ -30,6 +30,9 @@ It can be used to quickly spin off new  project containing all basic and default
 # See options/arguments
 phint init --help
 
+# OR (shortcut)
+phint i -h
+
 # Below command inits a brand new PHP project in `project-name` folder in current dir
 # Missing arguments are interactively collected
 phint init project-name
@@ -37,3 +40,24 @@ phint init project-name
 # You can also use config file (with json) to read option values from
 phint init project-name --config phint.json
 ```
+
+![Phint Init Help](https://i.imgur.com/Ovjq5Dc.png "Phint Init")
+
+## Example config
+
+Anything in config will have higher precedence
+
+```
+{
+  "type": "library",
+  "namespace": "Ahc",
+  "username": "adhocore",
+  "name": "Jitendra Adhikari",
+  "email": "jiten.adhikary@gmail.com",
+  "php": "7.0"
+}
+```
+
+## Todo
+
+- [ ] Test files generator
