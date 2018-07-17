@@ -27,4 +27,7 @@ $app = new Ahc\Cli\Application(
 // Aliased as `i`
 $app->add(new Ahc\Phint\Console\InitCommand, 'i');
 
-$app->logo($logo)->handle($_SERVER['argv']);
+// Show help as a default when no command provided.
+$argv = $_SERVER['argv'] + [null, '--help'];
+
+$app->logo($logo)->handle($argv);

@@ -13,5 +13,5 @@ interface GeneratorInterface
      *
      * @return void
      */
-    public function generate($targetPath, array $parameters, CollisionHandlerInterface $handler = null);
+    public function generate(string $targetPath, array $parameters, CollisionHandlerInterface $handler = null);
 }
