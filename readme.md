@@ -86,7 +86,7 @@ Options:
 Legend: <required> [optional]
 
 Usage Examples:
-  phint init <project> --force --description "My awesome project" --name "Your Name" --email "you@domain.com"
+  phint init <project> --force --descr "My awesome project" --name "Your Name" --email "you@domain.com"
   phint init <project> --using laravel/lumen --namespace Project/Api --type project
   phint init <project> --php 7.0 --config /path/to/json --dev mockery/mockery --req adhocore/jwt --req adhocore/cli
 ```

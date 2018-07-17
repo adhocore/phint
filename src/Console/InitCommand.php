@@ -58,7 +58,7 @@ class InitCommand extends Command
         $this->usage(
             $colorizer->bold('  phint init') . ' <project> '
             . $colorizer->comment(
-                '--force --description "My awesome project" --name "Your Name" --email "you@domain.com"'
+                '--force --descr "My awesome project" --name "Your Name" --email "you@domain.com"'
             )
             . PHP_EOL . $colorizer->bold('  phint init') . ' <project> '
             . $colorizer->comment('--using laravel/lumen --namespace Project/Api --type project')
