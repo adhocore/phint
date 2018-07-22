@@ -10,11 +10,9 @@ install:
 
 before_script:
   - for P in src tests; do find $P -type f -name '*.php' -exec php -l {} \;; done
-  - travis_retry wget "https://github.com/humbug/box/releases/download/${BOX_VERSION:-3.0.0-beta.4}/box.phar"
 
 script:
   - vendor/bin/phpunit --coverage-text --coverage-clover=coverage.xml
-  - php box.phar compile
 
 after_success:
   - bash <(curl -s https://codecov.io/bash)
