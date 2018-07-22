@@ -1,0 +1,14 @@
+{
+    "chmod": "0755",
+
+    "banner": [
+        "Phint is a PHP project scaffolding tool"
+    ],
+
+    "files-bin": [
+        "VERSION"
+    ],
+
+    "compression": "GZ",
+    "datetime": "release-date"
+}
