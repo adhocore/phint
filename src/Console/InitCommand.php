@@ -235,7 +235,6 @@ class InitCommand extends Command
             }
 
             $pkgs[] = \strpos($pkg, ':') === false ? "{$pkg}:@stable" : $pkg;
-
         } while (true);
 
         return $pkgs;
