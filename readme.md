@@ -1,5 +1,9 @@
 ## adhocore/phint
 
+Initializes new PHP project with sane defaults using templates.
+It scaffolds PHP library &/or project to boost your productivity and save time.
+It helps you be even more lazier! `phint` is work in progress and the plan is to make it [big](#todo).
+
 [![Latest Version](https://img.shields.io/github/release/adhocore/phint.svg?style=flat-square)](https://github.com/adhocore/phint/releases)
 [![Travis Build](https://img.shields.io/travis/adhocore/phint/master.svg?style=flat-square)](https://travis-ci.org/adhocore/phint?branch=master)
 [![Scrutinizer CI](https://img.shields.io/scrutinizer/g/adhocore/phint.svg?style=flat-square)](https://scrutinizer-ci.com/g/adhocore/phint/?branch=master)
@@ -41,11 +45,60 @@ phint init project-name
 phint init project-name --config phint.json
 ```
 
+## Commands
+
+### init
+
+> alias i
+
+Help output:
+
+```
+Command init, version 0.0.3
+
+Create and Scaffold a bare new PHP project
+
+Usage: init [OPTIONS...] [ARGUMENTS...]
+
+Arguments:
+  <project>    The project name without slashes
+
+Options:
+  [-c|--config]         JSON filepath to read config from
+  [-d|--descr]          Project description
+  [-D|--dev]            Developer packages
+  [-e|--email]          Vendor email
+  [-f|--force]          Run even if the project exists
+  [-h|--help]           Show help
+  [-k|--keywords]       Project Keywords (`php`, `<project>` auto added)
+  [-n|--name]           Vendor full name
+  [-N|--namespace]      Root namespace
+  [-p|--path]           The project path (Auto resolved)
+  [-P|--php]            Minimum PHP version
+  [-r|--req]            Required packages
+  [-t|--type]           Project type
+  [-u|--username]       Vendor handle/username
+  [-z|--using]          Reference package
+  [-v|--verbosity]      Verbosity level
+  [-V|--version]        Show version
+  [-y|--year]           License Year
+
+Legend: <required> [optional]
+
+Usage Examples:
+  phint init <project> --force --descr "My awesome project" --name "Your Name" --email "you@domain.com"
+  phint init <project> --using laravel/lumen --namespace Project/Api --type project
+  phint init <project> --php 7.0 --config /path/to/json --dev mockery/mockery --req adhocore/jwt --req adhocore/cli
+```
+
+
 ![Phint Init Help](https://i.imgur.com/Ovjq5Dc.png "Phint Init")
 
 ## Example config
 
-Anything in config will have higher precedence
+Parameters sent via command args will have higher precedence than values from config file.
+
+What can you put in config? Anything but we suggest you put only known options (check `$ phint init --help`)
 
 ```
 {
@@ -60,4 +113,8 @@ Anything in config will have higher precedence
 
 ## Todo
 
+Including but not limited to:
+
+- [ ] Readme.md generator
 - [ ] Test files generator
+- [ ] Specify template path (with fallback to current)
