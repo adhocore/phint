@@ -8,6 +8,7 @@ use Ahc\Phint\Generator\CollisionHandler;
 use Ahc\Phint\Generator\TwigGenerator;
 use Ahc\Phint\Util\Composer;
 use Ahc\Phint\Util\Git;
+use Ahc\Phint\Util\Inflector;
 use Ahc\Phint\Util\Path;
 
 class InitCommand extends Command
@@ -29,8 +30,6 @@ class InitCommand extends Command
 
         $this->_git      = new Git;
         $this->_composer = new Composer;
-        $this->_action   = [$this, 'execute'];
-        $colorizer       = $this->writer()->colorizer();
 
         $this
             ->argument('<project>', 'The project name without slashes')
@@ -40,23 +39,24 @@ class InitCommand extends Command
             ->option('-u --username', 'Vendor handle/username')
             ->option('-N --namespace', 'Root namespace')
             ->option('-k --keywords [words...]', 'Project Keywords (`php`, `<project>` auto added)')
-            ->option('-P --php', 'Minimum PHP version', null, PHP_MAJOR_VERSION . '.' . PHP_MINOR_VERSION)
+            ->option('-P --php', 'Minimum PHP version', 'floatval')
             ->option('-p --path', 'The project path (Auto resolved)')
             ->option('-f --force', 'Run even if the project exists', null, false)
             ->option('-d --descr', 'Project description')
             ->option('-y --year', 'License Year', null, date('Y'))
-            ->option('-z --using', 'Reference package name')
+            ->option('-z --using', 'Reference package')
             ->option('-c --config', 'JSON filepath to read config from')
             ->option('-r --req [pkgs...]', 'Required packages')
             ->option('-D --dev [pkgs...]', 'Developer packages')
-            ->usage(
-$colorizer->bold('  phint init') . ' <project> '
-. $colorizer->comment('--force --description "My awesome project" --name "Your Name" --email "you@domain.com"') . PHP_EOL
-. $colorizer->bold('  phint init') . ' <project> '
-. $colorizer->comment('--using laravel/lumen --namespace Project/Api --type project') . PHP_EOL
-. $colorizer->bold('  phint init') . ' <project> '
-. $colorizer->comment('--php 7.0 --config /path/to/json --dev mockery/mockery --req adhocore/jwt --req adhocore/cli')
-            );
+            ->action([$this, 'execute'])
+            ->usage($this->writer()->colorizer()->colors(''
+                . '<bold>  phint init</end> <line><project></end> '
+                . '<comment>--force --descr "Awesome project" --name "YourName" --email you@domain.com</end><eol/>'
+                . '<bold>  phint init</end> <line><project></end> '
+                . '<comment>--using laravel/lumen --namespace Project/Api --type project</comment><eol/>'
+                . '<bold>  phint init</end> <line><project></end> '
+                . '<comment>--php 7.0 --config /path/to/json --dev mockery/mockery --req adhocore/cli</end><eol/>'
+            ));
     }
 
     /**
@@ -68,8 +68,8 @@ $colorizer->bold('  phint init') . ' <project> '
     {
         $io = $this->app()->io();
 
-        if ($this->using) {
-            $io->write('Using ') . $io->comment($this->using) . $io->write(' to create project', true);
+        if ($using = $this->using) {
+            $io->colors("Using <comment>$using</end> to create project <comment>(takes some time)</end><eol/>");
 
             $this->_composer->createProject($this->path, $this->using);
         }
@@ -77,37 +77,17 @@ $colorizer->bold('  phint init') . ' <project> '
         $io->comment('Generating files ...', true);
         $this->generate($this->path, $this->values());
 
-        $io->write('Setting up ')->cyanBold('git', true);
+        $io->colors('Setting up <cyanBold>git</end><eol/>');
         $this->_git->withWorkDir($this->path)->init()->addRemote($this->username, $this->project);
 
-        $io->write('Setting up ')->cyanBold('composer')->comment(' (takes some time)', true);
-        $this->_composer->withWorkDir($this->path)->install();
+        $io->colors('Setting up <cyanBold>composer</end> <comment>(takes some time)</end><eol>');
+        if ($using) {
+            $this->_composer->withWorkDir($this->path)->update();
+        } else {
+            $this->_composer->withWorkDir($this->path)->install();
+        }
 
         $io->ok('Done', true);
-    }
-
-    protected function prepareProjectPath()
-    {
-        $path = $this->project;
-        $io   = $this->app()->io();
-
-        if (!(new Path)->isAbsolute($path)) {
-            $path = \getcwd() . '/' . $path;
-        }
-
-        if (\is_dir($path)) {
-            if (!$this->force) {
-                throw new \InvalidArgumentException('Something with the same name already exists!');
-            }
-
-            if (!$this->using) {
-                $io->error('You have set force flag, existing files will be overwritten', true);
-            }
-        } else {
-            \mkdir(\rtrim($path, '/') . '/src', 0777, true);
-        }
-
-        return $path;
     }
 
     public function interact(Interactor $io)
@@ -123,50 +103,37 @@ $colorizer->bold('  phint init') . ' <project> '
         $this->set('path', $path = $this->prepareProjectPath());
         $this->loadConfig($this->config);
 
-        $setup = [
-            'type'   => ['choices' => ['project', 'library', 'composer-plugin']],
-            'php'    => ['choices' => ['5.4', '5.5', '5.6', '7.0', '7.1', '7.2']],
-            'using'  => ['prompt' => 0],
-        ];
+        $this->collectMissing($io);
+        $this->collectPackages($io);
+    }
 
-        $options = $this->userOptions();
-        foreach ($options as $name => $option) {
-            $default = $option->default();
-            if ($this->$name !== null || \in_array($name, ['req', 'dev', 'config'])) {
-                continue;
-            }
+    protected function prepareProjectPath(): string
+    {
+        $path = $this->project;
+        $io   = $this->app()->io();
 
-            $set = $setup[$name] ?? [];
-            if ($set['choices'] ?? null) {
-                $value = $io->choice($option->desc(), $set['choices'], $default);
-            } else {
-                $value = $io->prompt($option->desc(), $default, null, $set['prompt'] ?? 1);
-            }
-
-            if ($name === 'namespace' && \stripos($value, $project) === false) {
-                $value .= '\\' . ucfirst($project);
-            }
-            if ($name === 'keywords') {
-                $value = \array_merge(['php', $project], \array_map('trim', \explode(',', $value)));
-            }
-
-            $this->set($name, $value);
+        if (!(new Path)->isAbsolute($path)) {
+            $path = \getcwd() . '/' . $path;
         }
 
-        $this->collectPackages();
+        if (\is_dir($path)) {
+            if (!$this->force) {
+                throw new \InvalidArgumentException(
+                    \sprintf('Something with the name "%s" already exists!', \basename($path))
+                );
+            }
+
+            if (!$this->using) {
+                $io->error('You have set force flag, existing files will be overwritten', true);
+            }
+        } else {
+            \mkdir($path, 0777, true);
+        }
+
+        return $path;
     }
 
-    protected function generate($projectPath, array $parameters)
-    {
-        $templatePath = __DIR__ . '/../../resources';
-        $cachePath    = __DIR__ . '/../../.cache';
-
-        $generator = new TwigGenerator($templatePath, $cachePath);
-
-        $generator->generate($projectPath, $parameters, new CollisionHandler);
-    }
-
-    protected function loadConfig($path = null)
+    protected function loadConfig(string $path = null)
     {
         if (empty($path)) {
             return;
@@ -184,52 +151,115 @@ $colorizer->bold('  phint init') . ' <project> '
             return;
         }
 
-        $config = $pathUtil->readAsJson($path);
-        unset($config['path']);
-
-        foreach ($config as $key => $value) {
-            $this->set($key, $value);
+        foreach ($pathUtil->readAsJson($path) as $key => $value) {
+            $this->$key ?? $this->set($key, $value);
         }
     }
 
-    protected function collectPackages()
+    protected function collectMissing(Interactor $io)
     {
-        $fn = function ($pkg) {
-            if (!empty($pkg) && strpos($pkg, '/') === false) {
-                throw new \InvalidArgumentException(
-                    'Package name format should be vendor/package:version (version can be omitted)'
-                );
+        $setup = [
+            'type'     => ['choices' => ['project', 'library', 'composer-plugin']],
+            'php'      => ['choices' => ['5.4', '5.5', '5.6', '7.0', '7.1', '7.2']],
+            'using'    => ['prompt' => 0, 'extra' => ' (ENTER to skip)'],
+            'keywords' => ['prompt' => 0, 'extra' => ' (ENTER to skip)'],
+        ];
+
+        foreach ($this->userOptions() as $name => $option) {
+            $default = $option->default();
+            if ($this->$name !== null || \in_array($name, ['req', 'dev', 'config'])) {
+                continue;
             }
 
-            return $pkg;
-        };
+            $set = $setup[$name] ?? [];
+            if ($set['choices'] ?? null) {
+                $value = $io->choice($option->desc(), $set['choices'], $default);
+            } else {
+                $value = $io->prompt($option->desc() . ($set['extra'] ?? ''), $default, null, $set['prompt'] ?? 1);
+            }
 
+            if ($name === 'namespace') {
+                $value = $this->makeNamespace($value);
+            } elseif ($name === 'keywords') {
+                $value = $this->makeKeywords($value);
+            }
+
+            $this->set($name, $value);
+        }
+    }
+
+    protected function makeNamespace(string $value): string
+    {
+        $in = new Inflector;
+
+        $project = $this->project;
+        $value   = $in->stuldyCase(\str_replace([' ', '/', '\\'], '-', $value));
+        $project = $in->stuldyCase(\str_replace([' ', '/', '\\'], '-', $project));
+
+        if (\stripos($value, $project) === false) {
+            $value .= '\\' . $project;
+        }
+
+        return $value;
+    }
+
+    protected function makeKeywords(string $value): array
+    {
+        $value = $value ? \array_map('trim', \explode(',', $value)) : [];
+
+        return \array_merge(['php', $this->project], $value);
+    }
+
+    protected function collectPackages(Interactor $io)
+    {
         $io = $this->app()->io();
 
         foreach (['req' => 'Required', 'dev' => 'Developer'] as $key => $label) {
-            $pkgs = $this->$key;
-
-            if (!$pkgs) {
-                do {
-                    $pkgs[] = $io->prompt($label . ' package (press ENTER to skip)', null, $fn, 0);
-
-                    if (!end($pkgs)) {
-                        array_pop($pkgs);
-
-                        break;
-                    }
-                } while (true);
-            }
+            $pkgs = $this->$key ?: $this->promptPackages($label, $io);
 
             foreach ($pkgs as &$pkg) {
-                if (strpos($pkg, ':') === false) {
-                    $pkg .= ':@stable';
-                }
-
-                $pkg = array_combine(['name', 'version'], explode(':', $pkg, 2));
+                $pkg = \array_combine(['name', 'version'], \explode(':', $pkg, 2));
             }
 
             $this->set($key, $pkgs);
         }
+    }
+
+    public function promptPackages(string $label, Interactor $io): array
+    {
+        $pkgs = [];
+
+        do {
+            if (!$pkg = $io->prompt($label . ' package (ENTER to skip)', null, [$this, 'validatePackage'], 0)) {
+                break;
+            }
+
+            $pkgs[] = \strpos($pkg, ':') === false ? "{$pkg}:@stable" : $pkg;
+
+        } while (true);
+
+        return $pkgs;
+    }
+
+    public function validatePackage(string $pkg): string
+    {
+        $pkg = \trim($pkg);
+
+        if ($pkg && \strpos($pkg, '/') === false) {
+            throw new \InvalidArgumentException(
+                'Package name format should be vendor/package:version (version can be omitted)'
+            );
+        }
+
+        return $pkg;
+    }
+
+    protected function generate(string $projectPath, array $parameters)
+    {
+        $templatePath = __DIR__ . '/../../resources';
+        $cachePath    = __DIR__ . '/../../.cache';
+        $generator    = new TwigGenerator($templatePath, $cachePath);
+
+        $generator->generate($projectPath, $parameters, new CollisionHandler);
     }
 }
