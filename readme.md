@@ -11,20 +11,31 @@ It helps you be even more lazier! `phint` is work in progress and the plan is to
 [![StyleCI](https://styleci.io/repos/108550679/shield)](https://styleci.io/repos/108550679)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
 
+- Requires PHP7.
 
 ## Installation
 
+### Manual
+
+Download `phint.phar` from [latest release](https://github.com/adhocore/phint/releases/latest).
+And use it like so `php /path/to/phint.phar [opts] [args]`. Hmm not cool. See Command section below.
+
+### Command
+
 ```bash
-composer global require adhocore/phint
+# get latest version (you need `jq`)
+LATEST_PHINT=`curl --silent "https://api.github.com/repos/adhocore/phint/releases/latest" | jq -r .tag_name`
+
+# download latest phint
+wget "https://github.com/adhocore/phint/releases/download/$LATEST_PHINT/phint.phar"
+
+# make executable
+chmod +x phint.phar
+sudo mv phint.phar /usr/local/bin/phint
+
+# check
+phint --help
 ```
-
-Make sure to place `$HOME/.composer/vendor/bin` in system PATH environment variable. Below is an example with zsh:
-
-```bash
-echo 'export PATH=$HOME/.composer/vendor/bin:$PATH' >> ~/.zshrc
-source ~/.zshrc
-```
-
 
 ## Usage
 
