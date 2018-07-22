@@ -16,6 +16,14 @@ php:
 {% if php <= 7.1 %}
   - 7.1
 {% endif %}
+{% if php <= 7.2 %}
+  - 7.2
+{% endif %}
+  - nightly
+
+matrix:
+  allow_failures:
+    - php: nightly
 
 install:
   - composer install --prefer-dist
