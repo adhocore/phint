@@ -69,7 +69,7 @@ class InitCommand extends Command
         $io = $this->app()->io();
 
         if ($using = $this->using) {
-            $io->colors("Using <comment>$using</end> to create project <comment>(takes some time)</end><eol/>");
+            $io->colors("Using <cyanBold>$using</end> to create project <comment>(takes some time)</end><eol/>");
 
             $this->_composer->createProject($this->path, $this->using);
         }
