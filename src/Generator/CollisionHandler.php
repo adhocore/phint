@@ -15,25 +15,30 @@ class CollisionHandler implements CollisionHandlerInterface
     /**
      * {@inheritdoc}
      */
-    public function handle($targetFile, $newContent, array $parameters = null)
+    public function handle(string $targetFile, string $newContent, array $parameters = null)
     {
         switch ($this->pathUtil->getExtension($targetFile)) {
             case 'json':
                 $this->mergeJson($targetFile, $newContent);
+                break;
 
+            case 'md':
+                $this->appendFile($targetFile, "\n---\n" . $newContent);
                 break;
         }
     }
 
-    protected function mergeJson($targetFile, $newContent)
+    protected function mergeJson(string $targetFile, string $newContent)
     {
         $oldJson = $this->pathUtil->readAsJson($targetFile);
         $newJson = \json_decode($newContent, true);
         $merged  = Arr::mergeRecursive($oldJson, $newJson);
 
-        $this->pathUtil->writeFile(
-            $targetFile,
-            \json_encode($merged, \JSON_PRETTY_PRINT | \JSON_UNESCAPED_SLASHES) . "\n"
-        );
+        $this->pathUtil->writeFile($targetFile, $merged);
+    }
+
+    protected function appendFile(string $targetFile, string $newContent)
+    {
+        $this->pathUtil->writeFile($targetFile, $newContent, \FILE_APPEND);
     }
 }

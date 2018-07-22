@@ -25,7 +25,7 @@ class TwigGenerator implements GeneratorInterface
         'package.json' => true,
     ];
 
-    public function __construct($templatePath, $cachePath)
+    public function __construct(string $templatePath, string $cachePath)
     {
         $this->templatePath = $templatePath;
         $this->cachePath    = $cachePath;
@@ -35,7 +35,7 @@ class TwigGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate($targetPath, array $parameters, CollisionHandlerInterface $handler = null)
+    public function generate(string $targetPath, array $parameters, CollisionHandlerInterface $handler = null)
     {
         if (!$this->twig) {
             $this->initTwig();
@@ -64,10 +64,10 @@ class TwigGenerator implements GeneratorInterface
         );
     }
 
-    protected function findTemplates($templatePath)
+    protected function findTemplates(string $templatePath)
     {
-        $finder    = new Finder;
         $templates = [];
+        $finder    = new Finder;
 
         $finder->files()->ignoreDotFiles(false)->filter(function ($file) {
             return \substr($file, -5) === '.twig';
@@ -80,27 +80,31 @@ class TwigGenerator implements GeneratorInterface
         return $templates;
     }
 
-    protected function doGenerate($template, $targetPath, array $parameters, CollisionHandlerInterface $handler = null)
+    protected function doGenerate(string $template, string $targetPath, array $parameters, CollisionHandlerInterface $handler = null)
     {
         $relativePath = $this->pathUtil->getRelativePath($template, $this->templatePath);
-        $targetFile   = $targetPath . '/' . str_replace('.twig', '', $relativePath);
+        $targetFile   = $targetPath . '/' . \str_replace('.twig', '', $relativePath);
+        $fileExists   = \is_file($targetFile);
         $targetDir    = \dirname($targetFile);
         $content      = $this->twig->render($relativePath, $parameters);
 
-        if (\is_file($targetFile) && $handler) {
+        if ($handler && $fileExists) {
             $handler->handle($targetFile, $content, $parameters);
 
             return;
         }
 
-        $this->pathUtil->ensureDir($targetDir);
+        // If using reference package then we dont overwrite!
+        if ($parameters['using'] && $fileExists) {
+            return;
+        }
 
         $this->pathUtil->writeFile($targetFile, $content);
     }
 
-    protected function shouldGenerate($template, array $parameters)
+    protected function shouldGenerate(string $template, array $parameters)
     {
-        $name = basename($template, '.twig');
+        $name = \basename($template, '.twig');
 
         if (isset($this->projectTemplates[$name])) {
             return $parameters['type'] === 'project';

@@ -1,8 +1,18 @@
+/*
+ * Surprised to see JSON with comment?
+ * check: https://github.com/adhocore/json-comment
+ */
 {
+  // library
   "type": "library",
+  // root namespace (project name is auto appended). auto inflected to StuldyCas
   "namespace": "Ahc",
+  // vendor's vcs username (github handle)
   "username": "adhocore",
+  // vendor's name
   "name": "Jitendra Adhikari",
+  // vendor's email
   "email": "jiten.adhikary@gmail.com",
+  // min php version
   "php": "7.0"
 }

@@ -13,5 +13,5 @@ interface CollisionHandlerInterface
      *
      * @return void
      */
-    public function handle($targetFile, $newContent, array $parameters = null);
+    public function handle(string $targetFile, string $newContent, array $parameters = null);
 }
