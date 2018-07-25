@@ -129,7 +129,6 @@ class UpdateCommand extends Command
     protected function getPharPathFor(string $version = null): string
     {
         $thisPhint = $_SERVER['argv'][0];
-        $thisPhint = '/home/adhocore/phint.phar';
 
         if ($version === null) {
             return $thisPhint;
