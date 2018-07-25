@@ -45,7 +45,7 @@ class UpdateCommand extends Command
 
         $latest = $release->tag_name;
 
-        if (!\version_compare($this->_version, $latest, '<')) {
+        if (!\version_compare(\str_replace('v', '', $this->_version), \str_replace('v', '', $latest), '<')) {
             $io->bgGreen('You seem to have latest version already', true);
         } else {
             $this->updateTo($latest, $release->assets[0]->size);
