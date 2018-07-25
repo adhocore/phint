@@ -18,6 +18,9 @@ class CollisionHandlerTest extends TestCase
         $collisionHandler = new CollisionHandler();
         $collisionHandler->handle($targetjsonFile, \json_encode(['key' => 'value']));
 
-        $this->assertArrayHasKey('key', \json_decode(\file_get_contents($targetjsonFile), true));
+        $content = \json_decode(\file_get_contents($targetjsonFile), true);
+
+        $this->assertArrayHasKey('type', $content);
+        $this->assertArrayHasKey('key', $content);
     }
 }

@@ -48,7 +48,7 @@ class PathTest extends TestCase
     {
         $path = new Path;
 
-        $this->assertArrayHasKey('require', $path->readAsJson(__DIR__ . '/../fixtures/example.json'));
+        $this->assertArrayHasKey('name', $path->readAsJson(__DIR__ . '/../fixtures/example.json'));
     }
 
     public function testWriteFile()
