@@ -27,11 +27,11 @@ And use it like so `php /path/to/phint.phar [opts] [args]`. Hmm not cool. See Co
 LATEST_PHINT=`curl --silent "https://api.github.com/repos/adhocore/phint/releases/latest" | jq -r .tag_name`
 
 # download latest phint
-wget "https://github.com/adhocore/phint/releases/download/$LATEST_PHINT/phint.phar"
+curl -sSLo ~/phint.phar "https://github.com/adhocore/phint/releases/download/$LATEST_PHINT/phint.phar"
 
 # make executable
-chmod +x phint.phar
-sudo mv phint.phar /usr/local/bin/phint
+chmod +x ~/phint.phar
+sudo ln -s ~/phint.phar /usr/local/bin/phint
 
 # check
 phint --help
@@ -65,28 +65,28 @@ phint init project-name --config phint.json
 Help output:
 
 ```
-Command init, version 0.0.3
+Command init, version 0.0.7
 
 Create and Scaffold a bare new PHP project
 
 Usage: init [OPTIONS...] [ARGUMENTS...]
 
 Arguments:
-  <project>    The project name without slashes
+  <project>  The project name without slashes
 
 Options:
   [-c|--config]         JSON filepath to read config from
   [-d|--descr]          Project description
-  [-D|--dev]            Developer packages
+  [-D|--dev...]         Developer packages
   [-e|--email]          Vendor email
   [-f|--force]          Run even if the project exists
   [-h|--help]           Show help
-  [-k|--keywords]       Project Keywords (`php`, `<project>` auto added)
+  [-k|--keywords...]    Project Keywords (`php`, `<project>` auto added)
   [-n|--name]           Vendor full name
   [-N|--namespace]      Root namespace
   [-p|--path]           The project path (Auto resolved)
   [-P|--php]            Minimum PHP version
-  [-r|--req]            Required packages
+  [-r|--req...]         Required packages
   [-t|--type]           Project type
   [-u|--username]       Vendor handle/username
   [-z|--using]          Reference package
@@ -94,16 +94,44 @@ Options:
   [-V|--version]        Show version
   [-y|--year]           License Year
 
-Legend: <required> [optional]
+Legend: <required> [optional] variadic...
 
 Usage Examples:
-  phint init <project> --force --descr "My awesome project" --name "Your Name" --email "you@domain.com"
-  phint init <project> --using laravel/lumen --namespace Project/Api --type project
-  phint init <project> --php 7.0 --config /path/to/json --dev mockery/mockery --req adhocore/jwt --req adhocore/cli
+  phint init <project> --force --descr "Awesome project" --name "YourName" --email you@domain.com
+  phint init <project> --using laravel/lumen --namespace Project/Api --type project</comment>
+  phint init <project> --php 7.0 --config /path/to/json --dev mockery/mockery --req adhocore/cli
 ```
 
+## update
 
-![Phint Init Help](https://i.imgur.com/Ovjq5Dc.png "Phint Init")
+> alias u
+
+Help output:
+
+```
+Command update, version 0.0.7
+
+Update Phint to lastest version
+
+Usage: update [OPTIONS...] [ARGUMENTS...]
+
+Arguments:
+  (n/a)
+
+Options:
+  [-h|--help]         Show help
+  [-r|--rollback]     Rollback to earlier version
+  [-v|--verbosity]    Verbosity level
+  [-V|--version]      Show version
+
+Legend: <required> [optional] variadic...
+
+Usage Examples:
+  phint update        Updates to latest version
+  phint u             Also updates to latest version
+  phint update -r     Rolls back to prev version
+  phint u --rollback  Also rolls back to prev version
+```
 
 ## Example config
 
