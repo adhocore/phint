@@ -27,11 +27,11 @@ And use it like so `php /path/to/phint.phar [opts] [args]`. Hmm not cool. See Co
 LATEST_PHINT=`curl --silent "https://api.github.com/repos/adhocore/phint/releases/latest" | jq -r .tag_name`
 
 # download latest phint
-wget "https://github.com/adhocore/phint/releases/download/$LATEST_PHINT/phint.phar"
+curl -sSLo ~/phint.phar "https://github.com/adhocore/phint/releases/download/$LATEST_PHINT/phint.phar"
 
 # make executable
-chmod +x phint.phar
-sudo mv phint.phar /usr/local/bin/phint
+chmod +x ~/phint.phar
+sudo ln -s ~/phint.phar /usr/local/bin/phint
 
 # check
 phint --help
