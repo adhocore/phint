@@ -3,13 +3,7 @@
 namespace Ahc\Phint\Console;
 
 use Ahc\Cli\Input\Command;
-use Ahc\Cli\IO\Interactor;
-use Ahc\Phint\Generator\CollisionHandler;
-use Ahc\Phint\Generator\TwigGenerator;
 use Ahc\Phint\Util\Composer;
-use Ahc\Phint\Util\Git;
-use Ahc\Phint\Util\Inflector;
-use Ahc\Phint\Util\Path;
 
 /**
  * Some ideas related to phar taken from `composer selfupdate`.
@@ -134,7 +128,7 @@ class UpdateCommand extends Command
             return $thisPhint;
         }
 
-        $pathTemplate = "%s.%s.phar";
+        $pathTemplate = '%s.%s.phar';
 
         return \sprintf($pathTemplate, \str_replace('.phar', '', $thisPhint), $version);
     }
