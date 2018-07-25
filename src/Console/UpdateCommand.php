@@ -40,7 +40,7 @@ class UpdateCommand extends Command
         $io = $this->app()->io();
         $io->bold('Fetching latest version ...', true);
 
-        $release = \shell_exec('curl https://api.github.com/repos/adhocore/phint/releases/latest');
+        $release = \shell_exec('curl -sSL https://api.github.com/repos/adhocore/phint/releases/latest');
         $release = \json_decode($release);
 
         if (\JSON_ERROR_NONE !== \json_last_error() || empty($release->assets[0])) {
@@ -51,7 +51,7 @@ class UpdateCommand extends Command
 
         $latest = $release->tag_name;
 
-        if (!\version_compare($this->version, $latest, '<')) {
+        if (!\version_compare($this->_version, $latest, '<')) {
             $io->bgGreen('You seem to have latest version already', true);
         } else {
             $this->updateTo($latest, $release->assets[0]->size);
