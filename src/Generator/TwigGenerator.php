@@ -95,7 +95,7 @@ class TwigGenerator implements GeneratorInterface
         }
 
         // If using reference package then we dont overwrite!
-        if ($parameters['using'] && $fileExists) {
+        if (isset($parameters['using']) && $fileExists) {
             return;
         }
 
