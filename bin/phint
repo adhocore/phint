@@ -1,8 +1,16 @@
 #!/usr/bin/env php
 <?php
 
+if (\PHP_VERSION_ID < 70000) {
+    echo "Phint requires PHP7\n";
+
+    exit(1);
+}
+
 if (\file_exists(__DIR__ . '/../../../autoload.php')) {
     require __DIR__ . '/../../../autoload.php';
+} elseif (\file_exists(__DIR__ . '/../../autoload.php')) {
+    require __DIR__ . '/../../autoload.php';
 } else {
     require __DIR__ . '/../vendor/autoload.php';
 }
@@ -20,8 +28,8 @@ PHP Project Scaffolding Tool
 ";
 
 $app = new Ahc\Cli\Application(
-  'Phint',
-  \trim(\file_get_contents(__DIR__ . '/../VERSION'))
+    'Phint',
+    \trim(\file_get_contents(__DIR__ . '/../VERSION'))
 );
 
 // Aliased as `i`
