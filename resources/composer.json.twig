@@ -12,22 +12,22 @@
     ],
     "autoload": {
         "psr-4": {
-            "{{namespace}}\\": "src/"
+            "{{namespace|replace({'\\': '\\\\'})}}\\": "src/"
         },
         "files": []
     },
     "autoload-dev": {
         "psr-4": {
-            "{{namespace}}\\Test\\": "tests/"
+            "{{namespace|replace({'\\': '\\\\'})}}\\Test\\": "tests/"
         }
     },
     "require": {
-        "php": ">={{php}}.0"{%for pkg in req %},
+        "php": ">={{php}}.0"{% for pkg in req %},
         "{{pkg.name}}": "{{pkg.version}}"{% endfor %}
 
     },
     "require-dev": {
-        "phpunit/phpunit": "^4.8 || ^5.7 || ^6.5"{%for pkg in dev %},
+        "phpunit/phpunit": "^4.8 || ^5.7 || ^6.5"{% for pkg in dev %},
         "{{pkg.name}}": "{{pkg.version}}"{% endfor %}
 
     },
