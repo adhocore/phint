@@ -62,5 +62,7 @@ abstract class Executable
         if ($proc->isSuccessful()) {
             return $proc->getOutput();
         }
+
+        return false;
     }
 }
