@@ -2,6 +2,7 @@
 
 namespace Ahc\Phint\Console;
 
+use Ahc\Cli\ExceptionInvalidArgumentException;
 use Ahc\Cli\Input\Command;
 use Ahc\Cli\IO\Interactor;
 use Ahc\Phint\Generator\CollisionHandler;
@@ -19,6 +20,9 @@ class InitCommand extends Command
     /** @var Composer */
     protected $_composer;
 
+    /** @var Path */
+    protected $_pathUtil;
+
     /**
      * Configure the command options/arguments.
      *
@@ -29,6 +33,7 @@ class InitCommand extends Command
         parent::__construct('init', 'Create and Scaffold a bare new PHP project');
 
         $this->_git      = new Git;
+        $this->_pathUtil = new Path;
         $this->_composer = new Composer;
 
         $this
@@ -101,7 +106,7 @@ class InitCommand extends Command
         $project = $this->project;
 
         if (!\preg_match('/[a-z0-9_-]/i', $project)) {
-            throw new \InvalidArgumentException('Project argument should only contain [a-z0-9_-]');
+            throw new InvalidArgumentException('Project argument should only contain [a-z0-9_-]');
         }
 
         $io->okBold('Phint Setup', true);
@@ -118,13 +123,13 @@ class InitCommand extends Command
         $path = $this->project;
         $io   = $this->app()->io();
 
-        if (!(new Path)->isAbsolute($path)) {
+        if (!$this->_pathUtil->isAbsolute($path)) {
             $path = \getcwd() . '/' . $path;
         }
 
         if (\is_dir($path)) {
             if (!$this->force) {
-                throw new \InvalidArgumentException(
+                throw new InvalidArgumentException(
                     \sprintf('Something with the name "%s" already exists!', \basename($path))
                 );
             }
@@ -145,9 +150,7 @@ class InitCommand extends Command
             return;
         }
 
-        $pathUtil = new Path;
-
-        if (!$pathUtil->isAbsolute($path)) {
+        if (!$this->_pathUtil->isAbsolute($path)) {
             $path = \getcwd() . '/' . $path;
         }
 
@@ -157,7 +160,7 @@ class InitCommand extends Command
             return;
         }
 
-        foreach ($pathUtil->readAsJson($path) as $key => $value) {
+        foreach ($this->_pathUtil->readAsJson($path) as $key => $value) {
             $this->$key ?? $this->set($key, $value);
         }
     }
@@ -223,7 +226,7 @@ class InitCommand extends Command
         $pkg = \trim($pkg);
 
         if ($pkg && \strpos($pkg, '/') === false) {
-            throw new \InvalidArgumentException(
+            throw new InvalidArgumentException(
                 'Package name format should be vendor/package:version (version can be omitted)'
             );
         }
@@ -250,17 +253,7 @@ class InitCommand extends Command
             return __DIR__ . '/../../.cache';
         }
 
-        if (false !== $home = ($_SERVER['HOME'] ?? \getenv('HOME'))) {
-            $path = $home . '/.phint';
-
-            if (!\is_dir($path)) {
-                return @\mkdir($path, 0777) ? $path : '';
-            }
-
-            return $path;
-        }
-
-        return '';
+        return $this->_pathUtil->getPhintPath('.cache');
     }
 
     protected function makeNamespace(string $value): string
