@@ -1,12 +1,28 @@
 {
     "chmod": "0755",
 
+    "check-requirements": false,
+
     "banner": [
         "Phint is a PHP project scaffolding tool"
     ],
 
+    "files": [
+        "vendor/twig/twig/lib/Twig/Test.php",
+        "vendor/twig/twig/lib/Twig/SimpleTest.php",
+        "vendor/twig/twig/src/TwigTest.php"
+    ],
+
     "files-bin": [
-        "VERSION"
+        "VERSION",
+        "resources/.editorconfig.twig",
+        "resources/.env.example.twig",
+        "resources/.gitignore.twig",
+        "resources/.travis.yml.twig"
+    ],
+
+    "directories-bin": [
+        "resources"
     ],
 
     "compression": "GZ",

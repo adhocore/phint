@@ -24,7 +24,7 @@
     },
     "require": {
         "php": ">=7.0",
-        "adhocore/cli": "^0.0.9",
+        "adhocore/cli": "^0.1",
         "adhocore/json-comment": "^0.0.3",
         "symfony/process": "^3.3.0",
         "symfony/finder": "^3.3.0",

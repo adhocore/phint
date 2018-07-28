@@ -14,5 +14,7 @@
   // vendor's email
   "email": "jiten.adhikary@gmail.com",
   // min php version
-  "php": "7.0"
+  "php": "7.0",
+  // license (mit/apache/gnulgpl/bsd)
+  "license": "m"
 }

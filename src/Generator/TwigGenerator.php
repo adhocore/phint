@@ -51,12 +51,15 @@ class TwigGenerator implements GeneratorInterface
 
     protected function initTwig()
     {
-        $this->pathUtil->ensureDir($this->cachePath);
-
         $options = [
             'auto_reload' => true,
-            'cache'       => $this->cachePath,
+            'cache'       => false,
         ];
+
+        if ($this->cachePath) {
+            $this->pathUtil->ensureDir($this->cachePath);
+            $options['cache'] = $this->cachePath;
+        }
 
         $this->twig = new \Twig_Environment(
             new \Twig_Loader_Filesystem($this->templatePath),
