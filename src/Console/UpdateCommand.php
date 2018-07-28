@@ -2,8 +2,10 @@
 
 namespace Ahc\Phint\Console;
 
+use Ahc\Cli\Exception\RuntimeException;
 use Ahc\Cli\Input\Command;
 use Ahc\Phint\Util\Composer;
+use Ahc\Phint\Util\Path;
 
 /**
  * Some ideas related to phar taken from `composer selfupdate`.
@@ -12,12 +14,18 @@ class UpdateCommand extends Command
 {
     const PHAR_URL = 'https://github.com/adhocore/phint/releases/download/{version}/phint.phar';
 
+    /** @var Path */
+    protected $_pathUtil;
+
     public function __construct()
     {
         parent::__construct('update', 'Update Phint to lastest version');
 
+        $this->_pathUtil = new Path;
+
         $this
-            ->option('-r --rollback', 'Rollback to earlier version', 'boolval', false)->on([$this, 'rollback'])
+            ->option('-r --rollback', 'Rollback to earlier version', 'boolval', false)
+                ->on([$this, 'rollback'])
             ->usage(
                 '<bold>  phint update</end>        Updates to latest version<eol/>' .
                 '<bold>  phint u</end>             Also updates to latest version<eol/>' .
@@ -69,7 +77,7 @@ class UpdateCommand extends Command
         $oldPhar  = $thisPhar . '.old';
 
         if (!\is_file($oldPhar)) {
-            throw new \RuntimeException('No old version locally available');
+            throw new RuntimeException('No old version locally available');
         }
 
         $oldPerms = \fileperms($thisPhar);
@@ -91,13 +99,15 @@ class UpdateCommand extends Command
         $versionPhar  = $this->getPharPathFor($version);
         $sourceUrl    = \str_replace('{version}', $version, static::PHAR_URL);
 
+        $io->bold("Downloading phar $version ...", true);
+
         // Create new $version phar
         $saved = @\file_put_contents($versionPhar, \shell_exec("curl -sSL $sourceUrl"));
 
         if ($saved < $size) {
             @\unlink($versionPhar);
 
-            throw new \RuntimeException("Couldnt download the phar for $version");
+            throw new RuntimeException("Couldnt download the phar for $version");
         }
 
         try {
@@ -122,9 +132,15 @@ class UpdateCommand extends Command
 
     protected function getPharPathFor(string $version = null): string
     {
-        $thisPhint = $_SERVER['argv'][0];
+        if (false === $thisPhint = \realpath($_SERVER['argv'][0])) {
+            $thisPhint = $this->_pathUtil->getPhintPath('phint.phar');
+        }
 
-        if ($version === null) {
+        if (empty($thisPhint)) {
+            throw new RuntimeException('Couldnt locate phint path, make sure you have HOME in the env vars');
+        }
+
+        if (empty($version)) {
             return $thisPhint;
         }
 
