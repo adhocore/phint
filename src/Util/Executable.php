@@ -8,6 +8,9 @@ use Symfony\Component\Process\Process;
 
 abstract class Executable
 {
+    /** @var bool Last command successful? */
+    protected $isSuccessful = true;
+
     /** @var Interactor */
     protected $io;
 
@@ -34,6 +37,11 @@ abstract class Executable
         return $this;
     }
 
+    public function successful(): bool
+    {
+        return $this->isSuccessful;
+    }
+
     protected function findBinary($binary)
     {
         if (\is_executable($binary)) {
@@ -54,15 +62,12 @@ abstract class Executable
      */
     protected function runCommand($command)
     {
-        $self = $this;
         $proc = new Process($this->binary . ' ' . $command, $this->workDir, null, null, null);
 
         $proc->run();
 
-        if ($proc->isSuccessful()) {
-            return $proc->getOutput();
-        }
+        $this->isSuccessful = $proc->isSuccessful();
 
-        return false;
+        return $proc->getOutput();
     }
 }
