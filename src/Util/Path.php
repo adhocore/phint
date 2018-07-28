@@ -6,6 +6,9 @@ use Ahc\Json\Comment;
 
 class Path
 {
+    /** @var string */
+    protected $phintPath;
+
     /**
      * Platform agnostic absolute path detection.
      *
@@ -60,5 +63,33 @@ class Path
         }
 
         return \file_put_contents($file, $content, $mode) > 0;
+    }
+
+    public function getPhintPath(string $subpath = ''): string
+    {
+        $this->initPhintPath();
+
+        if ($subpath && $this->phintPath) {
+            return $this->phintPath . '/' . \ltrim($subpath, '/');
+        }
+
+        return $this->phintPath;
+    }
+
+    protected function initPhintPath()
+    {
+        if (null !== $this->phintPath) {
+            return;
+        }
+
+        $this->phintPath = '';
+
+        if (false !== $home = ($_SERVER['HOME'] ?? \getenv('HOME'))) {
+            $path = \rtrim($home, '/') . '/.phint';
+
+            if ($this->ensureDir($path)) {
+                $this->phintPath = $path;
+            }
+        }
     }
 }
