@@ -86,12 +86,14 @@ class InitCommand extends Command
 
         $io->colors('Setting up <cyanBold>composer</end> <comment>(takes some time)</end><eol>');
         if ($using) {
-            $status = $this->_composer->withWorkDir($this->path)->update();
+            $this->_composer->withWorkDir($this->path)->update();
         } else {
-            $status = $this->_composer->withWorkDir($this->path)->install();
+            $this->_composer->withWorkDir($this->path)->install();
         }
 
-        $status === false ? $io->error('Composer setup failed', true) : $io->ok('Done', true);
+        $success = $this->_composer->successful();
+
+        $success ? $io->ok('Done', true) : $io->error('Composer setup failed', true);
     }
 
     public function interact(Interactor $io)
@@ -189,8 +191,6 @@ class InitCommand extends Command
 
     protected function collectPackages(Interactor $io)
     {
-        $io = $this->app()->io();
-
         foreach (['req' => 'Required', 'dev' => 'Developer'] as $key => $label) {
             $pkgs = $this->$key ?: $this->promptPackages($label, $io);
 
