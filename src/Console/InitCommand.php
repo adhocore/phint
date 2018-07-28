@@ -86,12 +86,12 @@ class InitCommand extends Command
 
         $io->colors('Setting up <cyanBold>composer</end> <comment>(takes some time)</end><eol>');
         if ($using) {
-            $this->_composer->withWorkDir($this->path)->update();
+            $status = $this->_composer->withWorkDir($this->path)->update();
         } else {
-            $this->_composer->withWorkDir($this->path)->install();
+            $status = $this->_composer->withWorkDir($this->path)->install();
         }
 
-        $io->ok('Done', true);
+        $status === false ? $io->error('Composer setup failed', true) : $io->ok('Done', true);
     }
 
     public function interact(Interactor $io)
@@ -183,36 +183,8 @@ class InitCommand extends Command
                 $value = $io->prompt($option->desc() . ($set['extra'] ?? ''), $default, null, $set['prompt'] ?? 1);
             }
 
-            if ($name === 'namespace') {
-                $value = $this->makeNamespace($value);
-            } elseif ($name === 'keywords') {
-                $value = $this->makeKeywords($value);
-            }
-
             $this->set($name, $value);
         }
-    }
-
-    protected function makeNamespace(string $value): string
-    {
-        $in = new Inflector;
-
-        $project = $this->project;
-        $value   = $in->stuldyCase(\str_replace([' ', '/'], '\\', $value));
-        $project = $in->stuldyCase(\str_replace([' ', '/', '\\'], '-', $project));
-
-        if (\stripos($value, $project) === false) {
-            $value .= '\\' . $project;
-        }
-
-        return $value;
-    }
-
-    protected function makeKeywords(string $value): array
-    {
-        $value = $value ? \array_map('trim', \explode(',', $value)) : [];
-
-        return \array_merge(['php', $this->project], $value);
     }
 
     protected function collectPackages(Interactor $io)
@@ -223,6 +195,7 @@ class InitCommand extends Command
             $pkgs = $this->$key ?: $this->promptPackages($label, $io);
 
             foreach ($pkgs as &$pkg) {
+                $pkg = \strpos($pkg, ':') === false ? "{$pkg}:@stable" : $pkg;
                 $pkg = \array_combine(['name', 'version'], \explode(':', $pkg, 2));
             }
 
@@ -239,7 +212,7 @@ class InitCommand extends Command
                 break;
             }
 
-            $pkgs[] = \strpos($pkg, ':') === false ? "{$pkg}:@stable" : $pkg;
+            $pkgs[] = $pkg;
         } while (true);
 
         return $pkgs;
@@ -264,7 +237,9 @@ class InitCommand extends Command
         $generator    = new TwigGenerator($templatePath, $this->getCachePath());
 
         // Normalize license (default MIT)
-        $parameters['license'] = \strtolower($parameters['license'][0] ?? 'm');
+        $parameters['license']   = \strtolower($parameters['license'][0] ?? 'm');
+        $parameters['namespace'] = $this->makeNamespace($parameters['namespace']);
+        $parameters['keywords']  = $this->makeKeywords($parameters['keywords']);
 
         $generator->generate($projectPath, $parameters, new CollisionHandler);
     }
@@ -286,5 +261,35 @@ class InitCommand extends Command
         }
 
         return '';
+    }
+
+    protected function makeNamespace(string $value): string
+    {
+        $in = new Inflector;
+
+        $project = $this->project;
+        $value   = $in->stuldyCase(\str_replace([' ', '/'], '\\', $value));
+        $project = $in->stuldyCase(\str_replace([' ', '/', '\\'], '-', $project));
+
+        if (\stripos($value, $project) === false) {
+            $value .= '\\' . $project;
+        }
+
+        return $value;
+    }
+
+    protected function makeKeywords($value): array
+    {
+        $default = ['php', $this->project];
+
+        if (empty($value)) {
+            return $default;
+        }
+
+        if (\is_string($value)) {
+            $value = \array_map('trim', \explode(',', $value));
+        }
+
+        return \array_values(\array_unique(\array_merge($default, $value)));
     }
 }
