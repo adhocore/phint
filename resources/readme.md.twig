@@ -1,11 +1,19 @@
 ## {{username}}/{{project}}
 
 [![Latest Version](https://img.shields.io/github/release/adhocore/{{project}}.svg?style=flat-square)](https://github.com/adhocore/{{project}}/releases)
+{% if travis %}
 [![Travis Build](https://img.shields.io/travis/adhocore/{{project}}/master.svg?style=flat-square)](https://travis-ci.org/adhocore/{{project}}?branch=master)
+{% endif %}
+{% if scrutinizer %}
 [![Scrutinizer CI](https://img.shields.io/scrutinizer/g/adhocore/{{project}}.svg?style=flat-square)](https://scrutinizer-ci.com/g/adhocore/{{project}}/?branch=master)
+{% endif %}
+{% if codecov %}
 [![Codecov branch](https://img.shields.io/codecov/c/github/adhocore/{{project}}/master.svg?style=flat-square)](https://codecov.io/gh/adhocore/{{project}})
+{% endif %}
+{% if styleci %}
 [![StyleCI](https://styleci.io/repos/{styleci}/shield)](https://styleci.io/repos/{styleci})
-[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
+{% endif %}
+[![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](./LICENSE)
 
 
 ## Installation
@@ -16,6 +24,6 @@ composer require {{username}}/{{project}}
 
 ## Usage
 ```php
-use {{namespace|replace({'\\\\': '\\'})}};
+use {{namespace}};
 
 ```
