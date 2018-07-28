@@ -2,7 +2,7 @@
 
 namespace Ahc\Phint\Console;
 
-use Ahc\Cli\ExceptionInvalidArgumentException;
+use Ahc\Cli\Exception\InvalidArgumentException;
 use Ahc\Cli\Input\Command;
 use Ahc\Cli\IO\Interactor;
 use Ahc\Phint\Generator\CollisionHandler;
