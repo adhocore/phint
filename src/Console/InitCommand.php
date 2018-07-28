@@ -33,27 +33,31 @@ class InitCommand extends Command
 
         $this
             ->argument('<project>', 'The project name without slashes')
-            ->option('-t --type', 'Project type', null, 'library')
+            ->option('-T --type', 'Project type', null, 'library')
             ->option('-n --name', 'Vendor full name', null, $this->_git->getConfig('user.name'))
             ->option('-e --email', 'Vendor email', null, $this->_git->getConfig('user.email'))
             ->option('-u --username', 'Vendor handle/username')
-            ->option('-N --namespace', 'Root namespace')
-            ->option('-k --keywords [words...]', 'Project Keywords (`php`, `<project>` auto added)')
+            ->option('-N --namespace', 'Root namespace (use `/` separator)')
+            ->option('-w --keywords [words...]', 'Project Keywords (`php`, `<project>` auto added)')
             ->option('-P --php', 'Minimum PHP version', 'floatval')
             ->option('-p --path', 'The project path (Auto resolved)')
             ->option('-f --force', 'Run even if the project exists', null, false)
             ->option('-d --descr', 'Project description')
             ->option('-y --year', 'License Year', null, date('Y'))
             ->option('-z --using', 'Reference package')
-            ->option('-c --config', 'JSON filepath to read config from')
-            ->option('-r --req [pkgs...]', 'Required packages')
+            ->option('-C --config', 'JSON filepath to read config from')
+            ->option('-R --req [pkgs...]', 'Required packages')
             ->option('-D --dev [pkgs...]', 'Developer packages')
-            ->action([$this, 'execute'])
+            ->option('-t --no-travis', 'Disable travis')
+            ->option('-c --no-codecov', 'Disable codecov')
+            ->option('-s --no-scrutinizer', 'Disable scrutinizer')
+            ->option('-l --no-styleci', 'Disable StyleCI')
+            ->option('-L --license', 'License')
             ->usage($this->writer()->colorizer()->colors(''
                 . '<bold>  phint init</end> <line><project></end> '
                 . '<comment>--force --descr "Awesome project" --name "YourName" --email you@domain.com</end><eol/>'
                 . '<bold>  phint init</end> <line><project></end> '
-                . '<comment>--using laravel/lumen --namespace Project/Api --type project</comment><eol/>'
+                . '<comment>--using laravel/lumen --namespace Project/Api --type project</end><eol/>'
                 . '<bold>  phint init</end> <line><project></end> '
                 . '<comment>--php 7.0 --config /path/to/json --dev mockery/mockery --req adhocore/cli</end><eol/>'
             ));
@@ -160,6 +164,7 @@ class InitCommand extends Command
     {
         $setup = [
             'type'     => ['choices' => ['project', 'library', 'composer-plugin']],
+            'license'  => ['choices' => ['m' => 'MIT', 'g' => 'GNU LGPL', 'a' => 'Apache 2', 'b' => 'BSD Simplified']],
             'php'      => ['choices' => ['5.4', '5.5', '5.6', '7.0', '7.1', '7.2']],
             'using'    => ['prompt' => 0, 'extra' => ' (ENTER to skip)'],
             'keywords' => ['prompt' => 0, 'extra' => ' (ENTER to skip)'],
@@ -193,7 +198,7 @@ class InitCommand extends Command
         $in = new Inflector;
 
         $project = $this->project;
-        $value   = $in->stuldyCase(\str_replace([' ', '/', '\\'], '-', $value));
+        $value   = $in->stuldyCase(\str_replace([' ', '/'], '\\', $value));
         $project = $in->stuldyCase(\str_replace([' ', '/', '\\'], '-', $project));
 
         if (\stripos($value, $project) === false) {
@@ -256,9 +261,30 @@ class InitCommand extends Command
     protected function generate(string $projectPath, array $parameters)
     {
         $templatePath = __DIR__ . '/../../resources';
-        $cachePath    = __DIR__ . '/../../.cache';
-        $generator    = new TwigGenerator($templatePath, $cachePath);
+        $generator    = new TwigGenerator($templatePath, $this->getCachePath());
+
+        // Normalize license (default MIT)
+        $parameters['license'] = \strtolower($parameters['license'][0] ?? 'm');
 
         $generator->generate($projectPath, $parameters, new CollisionHandler);
+    }
+
+    protected function getCachePath(): string
+    {
+        if (!\Phar::running(false)) {
+            return __DIR__ . '/../../.cache';
+        }
+
+        if (false !== $home = ($_SERVER['HOME'] ?? \getenv('HOME'))) {
+            $path = $home . '/.phint';
+
+            if (!\is_dir($path)) {
+                return @\mkdir($path, 0777) ? $path : '';
+            }
+
+            return $path;
+        }
+
+        return '';
     }
 }
