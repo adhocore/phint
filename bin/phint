@@ -7,6 +7,12 @@ if (\PHP_VERSION_ID < 70000) {
     exit(1);
 }
 
+if (\Phar::running() && !\extension_loaded('zlib')) {
+    echo "Phint.phar requires 'zlib' extension\n(OR you can compile phar with `compression: NONE` in box.json)\n";
+
+    exit(1);
+}
+
 if (\file_exists(__DIR__ . '/../../../autoload.php')) {
     require __DIR__ . '/../../../autoload.php';
 } elseif (\file_exists(__DIR__ . '/../../autoload.php')) {
