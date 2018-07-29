@@ -15,9 +15,6 @@ class TestCommand extends BaseCommand
     /** @var string Command description */
     protected $_desc = 'Generate test stubs';
 
-    /** @var Composer */
-    protected $_composer;
-
     /** @var string Current working dir */
     protected $_workDir;
 
@@ -35,7 +32,7 @@ class TestCommand extends BaseCommand
             ->option('-s --no-setup', 'Dont add setup method')
             ->option('-n --naming', 'Test method naming format')
             ->option('-p --phpunit [classFqcn]', 'Base PHPUnit class to extend from')
-            ->option('-d --dump-autoload', 'Base PHPUnit class to extend from', null, false);
+            ->option('-d --dump-autoload', 'Force composer dumpautoload (slow)', null, false);
     }
 
     public function interact(Interactor $io)
