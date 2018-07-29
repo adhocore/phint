@@ -32,7 +32,11 @@ class TestCommand extends BaseCommand
             ->option('-s --no-setup', 'Dont add setup method')
             ->option('-n --naming', 'Test method naming format')
             ->option('-p --phpunit [classFqcn]', 'Base PHPUnit class to extend from')
-            ->option('-d --dump-autoload', 'Force composer dumpautoload (slow)', null, false);
+            ->option('-d --dump-autoload', 'Force composer dumpautoload (slow)', null, false)
+            ->usage(
+                '<bold>  phint test</end> <comment>-n i</end>        With `it_` naming<eol/>' .
+                '<bold>  phint t</end> <comment>--no-teardown</end>  Without `tearDown()`<eol/>'
+            );
     }
 
     public function interact(Interactor $io)
