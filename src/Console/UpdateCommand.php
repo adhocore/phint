@@ -10,19 +10,18 @@ use Ahc\Phint\Util\Path;
 /**
  * Some ideas related to phar taken from `composer selfupdate`.
  */
-class UpdateCommand extends Command
+class UpdateCommand extends BaseCommand
 {
     const PHAR_URL = 'https://github.com/adhocore/phint/releases/download/{version}/phint.phar';
 
-    /** @var Path */
-    protected $_pathUtil;
+    /** @var string Command name */
+    protected $_name = 'update';
 
-    public function __construct()
+    /** @var string Command description */
+    protected $_desc = 'Update Phint to lastest version';
+
+    protected function onConstruct()
     {
-        parent::__construct('update', 'Update Phint to lastest version');
-
-        $this->_pathUtil = new Path;
-
         $this
             ->option('-r --rollback', 'Rollback to earlier version', 'boolval', false)
                 ->on([$this, 'rollback'])
