@@ -75,24 +75,29 @@ Arguments:
   <project>  The project name without slashes
 
 Options:
-  [-c|--config]         JSON filepath to read config from
-  [-d|--descr]          Project description
-  [-D|--dev...]         Developer packages
-  [-e|--email]          Vendor email
-  [-f|--force]          Run even if the project exists
-  [-h|--help]           Show help
-  [-k|--keywords...]    Project Keywords (`php`, `<project>` auto added)
-  [-n|--name]           Vendor full name
-  [-N|--namespace]      Root namespace
-  [-p|--path]           The project path (Auto resolved)
-  [-P|--php]            Minimum PHP version
-  [-r|--req...]         Required packages
-  [-t|--type]           Project type
-  [-u|--username]       Vendor handle/username
-  [-z|--using]          Reference package
-  [-v|--verbosity]      Verbosity level
-  [-V|--version]        Show version
-  [-y|--year]           License Year
+  [-c|--no-codecov]        Disable codecov
+  [-C|--config]            JSON filepath to read config from
+  [-d|--descr]             Project description
+  [-D|--dev...]            Developer packages
+  [-e|--email]             Vendor email
+  [-f|--force]             Run even if the project exists
+  [-h|--help]              Show help
+  [-w|--keywords...]       Project Keywords (`php`, `<project>` auto added)
+  [-L|--license]           License
+  [-n|--name]              Vendor full name
+  [-N|--namespace]         Root namespace (use `/` separator)
+  [-p|--path]              The project path (Auto resolved)
+  [-P|--php]               Minimum PHP version
+  [-R|--req...]            Required packages
+  [-s|--no-scrutinizer]    Disable scrutinizer
+  [-l|--no-styleci]        Disable StyleCI
+  [-t|--no-travis]         Disable travis
+  [-T|--type]              Project type
+  [-u|--username]          Vendor handle/username
+  [-z|--using]             Reference package
+  [-v|--verbosity]         Verbosity level
+  [-V|--version]           Show version
+  [-y|--year]              License Year
 
 Legend: <required> [optional] variadic...
 
@@ -146,7 +151,8 @@ What can you put in config? Anything but we suggest you put only known options (
   "username": "adhocore",
   "name": "Jitendra Adhikari",
   "email": "jiten.adhikary@gmail.com",
-  "php": "7.0"
+  "php": "7.0",
+  "codecov": false
 }
 ```
 
