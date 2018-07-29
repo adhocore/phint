@@ -11,7 +11,7 @@ class Inflector
      *
      * @return string
      */
-    public function stuldyCase($string)
+    public function stuldyCase(string $string): string
     {
         return str_replace(' ', '', ucwords(str_replace(['-', '_'], ' ', $string)));
     }
@@ -23,8 +23,22 @@ class Inflector
      *
      * @return string
      */
-    public function words($string)
+    public function words(string $string): string
     {
         return ucwords(str_replace(['-', '_'], ' ', $string));
+    }
+
+    /**
+     * Snakeize.
+     *
+     * @param string $path
+     *
+     * @return string
+     */
+    public function snakeCase(string $string): string
+    {
+        $string = \str_replace([' ', '-'], '_', $string);
+
+        return \ltrim(\strtolower(\preg_replace('/[A-Z]([A-Z](?![a-z]))*/', '_$0', $string)), '_');
     }
 }
