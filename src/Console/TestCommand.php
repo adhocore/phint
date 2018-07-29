@@ -2,12 +2,10 @@
 
 namespace Ahc\Phint\Console;
 
-use Ahc\Cli\Exception\RuntimeException;
 use Ahc\Cli\Input\Command;
 use Ahc\Cli\IO\Interactor;
 use Ahc\Phint\Generator\TwigGenerator;
 use Ahc\Phint\Util\Composer;
-use Ahc\Phint\Util\Path;
 
 class TestCommand extends Command
 {

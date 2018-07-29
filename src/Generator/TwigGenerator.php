@@ -2,8 +2,8 @@
 
 namespace Ahc\Phint\Generator;
 
-use Ahc\Phint\Util\Path;
 use Ahc\Phint\Util\Inflector;
+use Ahc\Phint\Util\Path;
 use Symfony\Component\Finder\Finder;
 
 class TwigGenerator implements GeneratorInterface
