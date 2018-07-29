@@ -2,25 +2,33 @@
 
 namespace Ahc\Phint\Console;
 
-use Ahc\Cli\Input\Command;
+use Ahc\Cli\Exception\RuntimeException;
 use Ahc\Cli\IO\Interactor;
 use Ahc\Phint\Generator\TwigGenerator;
 use Ahc\Phint\Util\Composer;
 
-class TestCommand extends Command
+class TestCommand extends BaseCommand
 {
+    /** @var string Command name */
+    protected $_name = 'test';
+
+    /** @var string Command description */
+    protected $_desc = 'Generate test stubs';
+
     /** @var Composer */
     protected $_composer;
 
     /** @var string Current working dir */
     protected $_workDir;
 
-    public function __construct()
+    /**
+     * Configure the command options/arguments.
+     *
+     * @return void
+     */
+    protected function onConstruct()
     {
-        parent::__construct('test', 'Generate test stubs');
-
         $this->_workDir  = \realpath(\getcwd());
-        $this->_composer = (new Composer)->withWorkDir($this->_workDir);
 
         $this
             ->option('-t --no-teardown', 'Dont add teardown method')
@@ -32,7 +40,7 @@ class TestCommand extends Command
 
     public function interact(Interactor $io)
     {
-        $setup = [
+        $promptConfig = [
             'naming' => [
                 'choices' => ['t' => 'testMethod', 'i' => 'it_tests_', 'm' => 'test_method'],
                 'default' => 't',
@@ -44,20 +52,7 @@ class TestCommand extends Command
             ],
         ];
 
-        foreach ($this->userOptions() as $name => $option) {
-            if ($this->$name !== null) {
-                continue;
-            }
-
-            $default = $setup[$name]['default'];
-            if ($setup[$name]['choices'] ?? null) {
-                $value = $io->choice($option->desc(), $setup[$name]['choices'], $default);
-            } else {
-                $value = $io->prompt($option->desc(), $default);
-            }
-
-            $this->set($name, $value);
-        }
+        $this->promptAll($io, $promptConfig);
     }
 
     /**
@@ -134,12 +129,40 @@ class TestCommand extends Command
                     continue;
                 }
 
-                $testMeta[] = $this->getClassMetadata($classFqcn)
-                    + $this->convertToTest(\compact('classFqcn', 'classPath', 'ns', 'nsPath'), $testNs);
+                if ([] === $meta = $this->getClassMetadata($classFqcn)) {
+                    continue;
+                }
+
+                $data       = \compact('classFqcn', 'classPath', 'ns', 'nsPath');
+                $testMeta[] = $meta + $this->convertToTest($data, $testNs);
             }
         }
 
         return $testMeta;
+    }
+
+    protected function getClassMetadata(string $classFqcn)
+    {
+        $reflex = new \ReflectionClass($classFqcn);
+
+        if ($reflex->isInterface() || $reflex->isAbstract()) {
+            return [];
+        }
+
+        $methods = [];
+        $isTrait = $reflex->isTrait();
+        $newable = $reflex->isInstantiable();
+        $exclude = ['__construct', '__destruct'];
+
+        foreach ($reflex->getMethods(\ReflectionMethod::IS_PUBLIC) as $m) {
+            if ($m->class !== $classFqcn || \in_array($m->name, $exclude) || $m->isAbstract()) {
+                continue;
+            }
+
+            $methods[\ltrim($m->name, '_')] = ['static' => $m->isStatic()];
+        }
+
+        return \compact('classFqcn', 'isTrait', 'newable', 'methods');
     }
 
     private function convertToTest(array $metadata, array $testNs): array
@@ -158,27 +181,10 @@ class TestCommand extends Command
         return compact('className', 'testFqns', 'testFqcn', 'testPath');
     }
 
-    protected function getClassMetadata(string $classFqcn)
-    {
-        $methods = [];
-        $reflex  = new \ReflectionClass($classFqcn);
-        $newable = $reflex->isInstantiable();
-
-        foreach ($reflex->getMethods(\ReflectionMethod::IS_PUBLIC) as $m) {
-            if ($m->isAbstract() || $m->isDestructor()) {
-                continue;
-            }
-
-            $methods[$m->name] = ['static' => $m->isStatic()];
-        }
-
-        return \compact('classFqcn', 'newable', 'methods');
-    }
-
     protected function generate(array $testMetadata): int
     {
         $templatePath = __DIR__ . '/../../resources';
-        $generator    = new TwigGenerator($templatePath, '');
+        $generator    = new TwigGenerator($templatePath, $this->getCachePath());
 
         return $generator->generateTests($testMetadata, $this->values());
     }
