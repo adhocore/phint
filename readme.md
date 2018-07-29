@@ -62,15 +62,11 @@ phint init project-name --config phint.json
 
 > alias i
 
-Help output:
+Create and Scaffold a bare new PHP project.
+
+***Parameters:***
 
 ```
-Command init, version 0.0.7
-
-Create and Scaffold a bare new PHP project
-
-Usage: init [OPTIONS...] [ARGUMENTS...]
-
 Arguments:
   <project>  The project name without slashes
 
@@ -83,10 +79,10 @@ Options:
   [-f|--force]             Run even if the project exists
   [-h|--help]              Show help
   [-w|--keywords...]       Project Keywords (`php`, `<project>` auto added)
-  [-L|--license]           License
+  [-L|--license]           License [m: mit | g: gnulgpl | b: bsd | a: apache2]. EG: `-L a`
   [-n|--name]              Vendor full name
-  [-N|--namespace]         Root namespace (use `/` separator)
-  [-p|--path]              The project path (Auto resolved)
+  [-N|--namespace]         Root namespace (use `/` separator). EG: `-N ahc/phint`
+  [-p|--path]              The project path (Auto resolved) [Deprecated]
   [-P|--php]               Minimum PHP version
   [-R|--req...]            Required packages
   [-s|--no-scrutinizer]    Disable scrutinizer
@@ -99,8 +95,6 @@ Options:
   [-V|--version]           Show version
   [-y|--year]              License Year
 
-Legend: <required> [optional] variadic...
-
 Usage Examples:
   phint init <project> --force --descr "Awesome project" --name "YourName" --email you@domain.com
   phint init <project> --using laravel/lumen --namespace Project/Api --type project</comment>
@@ -111,15 +105,11 @@ Usage Examples:
 
 > alias u
 
-Help output:
+Update Phint to lastest version or rollback to earlier locally installed version.
+
+***Parameters:***
 
 ```
-Command update, version 0.0.7
-
-Update Phint to lastest version
-
-Usage: update [OPTIONS...] [ARGUMENTS...]
-
 Arguments:
   (n/a)
 
@@ -136,6 +126,33 @@ Usage Examples:
   phint u             Also updates to latest version
   phint update -r     Rolls back to prev version
   phint u --rollback  Also rolls back to prev version
+```
+
+## test
+
+> alias t
+
+Generate test files with proper classes and test methods analogous to their source counterparts.
+
+***Parameters:***
+
+```
+Arguments:
+  (n/a)
+
+Options:
+  [-d|--dump-autoload]    Force composer dumpautoload (slow)
+  [-h|--help]             Show help
+  [-n|--naming]           Test method naming format [t: testMethod | m: test_method | i: it_tests_]
+  [-p|--phpunit]          Base PHPUnit class to extend from
+  [-s|--no-setup]         Dont add setup method
+  [-t|--no-teardown]      Dont add teardown method
+  [-v|--verbosity]        Verbosity level
+  [-V|--version]          Show version
+
+Usage Examples:
+  phint test -n i        With `it_` naming
+  phint t --no-teardown  Without `tearDown()`
 ```
 
 ## Example config
