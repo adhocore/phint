@@ -53,4 +53,13 @@ abstract class BaseCommand extends Command
             return null === $this->$name && false !== ($config[$name] ?? null);
         }, \ARRAY_FILTER_USE_KEY);
     }
+
+    protected function getCachePath(): string
+    {
+        if (!\Phar::running(false)) {
+            return __DIR__ . '/../../.cache';
+        }
+
+        return $this->_pathUtil->getPhintPath('.cache');
+    }
 }
