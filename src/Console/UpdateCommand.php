@@ -39,7 +39,9 @@ class UpdateCommand extends BaseCommand
     public function execute()
     {
         $io = $this->app()->io();
-        $io->bold('Fetching latest version ...', true);
+
+        $io->cyan("Current version {$this->_version}", true);
+        $io->comment('Fetching latest version ...', true);
 
         $release = \shell_exec('curl -sSL https://api.github.com/repos/adhocore/phint/releases/latest');
         $release = \json_decode($release);
@@ -58,7 +60,7 @@ class UpdateCommand extends BaseCommand
             $this->updateTo($latest, $release->assets[0]->size);
 
             if (\is_file($this->getPharPathFor(null) . '.old')) {
-                $io->colors('You can run <comment>phint selfupdate --rollback</end> to revert<eol/>');
+                $io->colors('You can run <comment>phint update --rollback</end> to revert<eol/>');
             }
         }
     }
@@ -70,7 +72,8 @@ class UpdateCommand extends BaseCommand
     {
         $io = $this->app()->io();
 
-        $io->bold('Rolling back to earlier version ...', true);
+        $io->cyan("Current version {$this->_version}", true);
+        $io->comment('Rolling back to earlier version ...', true);
 
         $thisPhar = $this->getPharPathFor(null);
         $oldPhar  = $thisPhar . '.old';
@@ -98,7 +101,7 @@ class UpdateCommand extends BaseCommand
         $versionPhar  = $this->getPharPathFor($version);
         $sourceUrl    = \str_replace('{version}', $version, static::PHAR_URL);
 
-        $io->bold("Downloading phar $version ...", true);
+        $io->comment("Downloading phar $version ...", true);
 
         // Create new $version phar
         $saved = @\file_put_contents($versionPhar, \shell_exec("curl -sSL $sourceUrl"));
@@ -108,6 +111,8 @@ class UpdateCommand extends BaseCommand
 
             throw new RuntimeException("Couldnt download the phar for $version");
         }
+
+        $io->comment("Updating to $version ...", true);
 
         try {
             @\chmod($versionPhar, \fileperms($currentPhar));
