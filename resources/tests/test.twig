@@ -1,0 +1,75 @@
+{{'<?php'}}
+
+namespace {{testFqns}};
+
+use {{classFqcn}};
+use {{phpunit}} as TestCase;
+
+{% if isTrait %}
+class Test{{className}}
+{
+    use {{className}};
+}
+
+{% elseif isAbstract %}
+class Test{{className}} extends {{className}}
+{
+    //
+}
+
+{% elseif isInterface %}
+class Test{{className}} implements {{className}}
+{
+    //
+}
+
+{% endif %}
+class {{className}}Test extends TestCase
+{
+{% if newable or isTrait %}
+    /**
+     * @var {{ isTrait or isAbstract or isInterface ? 'Test' : ''}}{{className}}
+     */
+    protected ${{className|lower}};
+
+{% endif %}
+{% if setup %}
+    public function setUp()
+    {
+        parent::setUp();
+
+{% if newable or isTrait or isAbstract or isInterface %}
+        $this->{{className|lower}} = new {{ isTrait or isAbstract or isInterface ? 'Test' : ''}}{{className}};
+{% endif %}
+    }
+{% endif %}
+{% if teardown %}
+
+    public function tearDown()
+    {
+        parent::tearDown();
+    }
+{% endif %}
+{% for method, attr in methods %}
+
+{% if naming == 't' %}
+    public function test{{method|capitalize}}
+{% elseif naming == 'm' %}
+    public function test_{{method|snake}}
+{% elseif naming == 'i' %}
+    /**
+     * @test
+     */
+    public function it_{{method}}
+{% endif %}
+    {
+{% if attr.static %}
+        {{className}}::{{method}}();
+{% else %}
+        $this->{{className|lower}}->{{method}}();
+{% endif %}
+
+        // $this->assert
+    }
+{% endfor %}
+}
