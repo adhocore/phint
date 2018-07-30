@@ -127,11 +127,11 @@ class TestCommand extends BaseCommand
 
         foreach ($classMap as $classFqcn => $classPath) {
             foreach ($namespaces as $ns => $nsPath) {
-                if (\strpos($classFqcn, $ns) !== 0) {
+                if (\strpos($classFqcn, $ns) !== 0 || \strpos($classFqcn, $testNs['ns']) === 0) {
                     continue;
                 }
 
-                if ([] === $meta = $this->getClassMetadata($classFqcn)) {
+                if ([] === $meta = $this->getClassMetadata($classFqcn, $testNs['ns'])) {
                     continue;
                 }
 
@@ -143,11 +143,11 @@ class TestCommand extends BaseCommand
         return $testMeta;
     }
 
-    protected function getClassMetadata(string $classFqcn)
+    protected function getClassMetadata(string $classFqcn): array
     {
         $reflex = new \ReflectionClass($classFqcn);
 
-        if (!$this->isAllowed($reflex)) {
+        if (!$this->shouldGenerateTest($reflex)) {
             return [];
         }
 
@@ -169,7 +169,7 @@ class TestCommand extends BaseCommand
         return \compact('classFqcn', 'isTrait', 'isAbstract', 'isInterface', 'newable', 'methods');
     }
 
-    protected function isAllowed(\ReflectionClass $class)
+    protected function shouldGenerateTest(\ReflectionClass $reflex): bool
     {
         if ($this->abstract) {
             return true;
