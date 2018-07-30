@@ -2,7 +2,6 @@
 
 namespace Ahc\Phint\Console;
 
-use Ahc\Cli\Exception\RuntimeException;
 use Ahc\Cli\IO\Interactor;
 use Ahc\Phint\Generator\TwigGenerator;
 use Ahc\Phint\Util\Composer;
@@ -31,11 +30,13 @@ class TestCommand extends BaseCommand
             ->option('-t --no-teardown', 'Dont add teardown method')
             ->option('-s --no-setup', 'Dont add setup method')
             ->option('-n --naming', 'Test method naming format')
+            ->option('-a --with-abstract', 'Create stub for abstract/interface class')
             ->option('-p --phpunit [classFqcn]', 'Base PHPUnit class to extend from')
             ->option('-d --dump-autoload', 'Force composer dumpautoload (slow)', null, false)
             ->usage(
                 '<bold>  phint test</end> <comment>-n i</end>        With `it_` naming<eol/>' .
-                '<bold>  phint t</end> <comment>--no-teardown</end>  Without `tearDown()`<eol/>'
+                '<bold>  phint t</end> <comment>--no-teardown</end>  Without `tearDown()`<eol/>' .
+                '<bold>  phint test</end> <comment>-a</end>          With stubs for abstract method<eol/>'
             );
     }
 
@@ -146,24 +147,35 @@ class TestCommand extends BaseCommand
     {
         $reflex = new \ReflectionClass($classFqcn);
 
-        if ($reflex->isInterface() || $reflex->isAbstract()) {
+        if (!$this->isAllowed($reflex)) {
             return [];
         }
 
-        $methods = [];
-        $isTrait = $reflex->isTrait();
-        $newable = $reflex->isInstantiable();
-        $exclude = ['__construct', '__destruct'];
+        $methods     = [];
+        $isTrait     = $reflex->isTrait();
+        $newable     = $reflex->isInstantiable();
+        $isAbstract  = $reflex->isAbstract();
+        $isInterface = $reflex->isInterface();
+        $excludes    = ['__construct', '__destruct'];
 
         foreach ($reflex->getMethods(\ReflectionMethod::IS_PUBLIC) as $m) {
-            if ($m->class !== $classFqcn || \in_array($m->name, $exclude) || $m->isAbstract()) {
+            if ($m->class !== $classFqcn || \in_array($m->name, $excludes)) {
                 continue;
             }
 
-            $methods[\ltrim($m->name, '_')] = ['static' => $m->isStatic()];
+            $methods[\ltrim($m->name, '_')] = ['static' => $m->isStatic(), 'abstract' => $m->isAbstract()];
         }
 
-        return \compact('classFqcn', 'isTrait', 'newable', 'methods');
+        return \compact('classFqcn', 'isTrait', 'isAbstract', 'isInterface', 'newable', 'methods');
+    }
+
+    protected function isAllowed(\ReflectionClass $class)
+    {
+        if ($this->abstract) {
+            return true;
+        }
+
+        return !$reflex->isInterface() && !$reflex->isAbstract();
     }
 
     private function convertToTest(array $metadata, array $testNs): array
