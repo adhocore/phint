@@ -172,7 +172,7 @@ Options:
 Usage Examples:
   phint test -n i        With `it_` naming
   phint t --no-teardown  Without `tearDown()`
-  phint test -a          With stubs for abstract method
+  phint test -a          With stubs for abstract/interface
 ```
 
 

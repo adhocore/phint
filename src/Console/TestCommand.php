@@ -36,7 +36,7 @@ class TestCommand extends BaseCommand
             ->usage(
                 '<bold>  phint test</end> <comment>-n i</end>        With `it_` naming<eol/>' .
                 '<bold>  phint t</end> <comment>--no-teardown</end>  Without `tearDown()`<eol/>' .
-                '<bold>  phint test</end> <comment>-a</end>          With stubs for abstract method<eol/>'
+                '<bold>  phint test</end> <comment>-a</end>          With stubs for abstract/interface<eol/>'
             );
     }
 
