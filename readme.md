@@ -101,6 +101,24 @@ Usage Examples:
   phint init <project> --php 7.0 --config /path/to/json --dev mockery/mockery --req adhocore/cli
 ```
 
+### Example config
+
+Parameters sent via command args will have higher precedence than values from config file (`-C --config`).
+
+What can you put in config? Anything but we suggest you put only known options (check `$ phint init --help`)
+
+```json
+{
+  "type": "library",
+  "namespace": "Ahc",
+  "username": "adhocore",
+  "name": "Jitendra Adhikari",
+  "email": "jiten.adhikary@gmail.com",
+  "php": "7.0",
+  "codecov": false
+}
+```
+
 ## update
 
 > alias u
@@ -157,28 +175,11 @@ Usage Examples:
   phint test -a          With stubs for abstract method
 ```
 
-## Example config
-
-Parameters sent via command args will have higher precedence than values from config file.
-
-What can you put in config? Anything but we suggest you put only known options (check `$ phint init --help`)
-
-```
-{
-  "type": "library",
-  "namespace": "Ahc",
-  "username": "adhocore",
-  "name": "Jitendra Adhikari",
-  "email": "jiten.adhikary@gmail.com",
-  "php": "7.0",
-  "codecov": false
-}
-```
 
 ## Todo
 
 Including but not limited to:
 
 - [ ] Readme.md generator
-- [ ] Test files generator
+- [x] Test files generator
 - [ ] Specify template path (with fallback to current)
