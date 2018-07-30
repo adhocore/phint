@@ -12,33 +12,24 @@ use Ahc\Phint\Util\Git;
 use Ahc\Phint\Util\Inflector;
 use Ahc\Phint\Util\Path;
 
-class InitCommand extends Command
+class InitCommand extends BaseCommand
 {
-    /** @var Git */
-    protected $_git;
+    /** @var string Command name */
+    protected $_name = 'init';
 
-    /** @var Composer */
-    protected $_composer;
-
-    /** @var Path */
-    protected $_pathUtil;
+    /** @var string Command description */
+    protected $_desc = 'Create and Scaffold a bare new PHP project';
 
     /**
      * Configure the command options/arguments.
      *
      * @return void
      */
-    public function __construct()
+    protected function onConstruct()
     {
-        parent::__construct('init', 'Create and Scaffold a bare new PHP project');
-
-        $this->_git      = new Git;
-        $this->_pathUtil = new Path;
-        $this->_composer = new Composer;
-
         $this
             ->argument('<project>', 'The project name without slashes')
-            ->option('-T --type', 'Project type', null, 'library')
+            ->option('-T --type', 'Project type')
             ->option('-n --name', 'Vendor full name', null, $this->_git->getConfig('user.name'))
             ->option('-e --email', 'Vendor email', null, $this->_git->getConfig('user.email'))
             ->option('-u --username', 'Vendor handle/username')
@@ -155,7 +146,7 @@ class InitCommand extends Command
         }
 
         if (!\is_file($path)) {
-            $this->app()->io()->error('Invalid path specified for config');
+            $this->app()->io()->error('Invalid path specified for config', true);
 
             return;
         }
@@ -167,29 +158,30 @@ class InitCommand extends Command
 
     protected function collectMissing(Interactor $io)
     {
-        $setup = [
-            'type'     => ['choices' => ['project', 'library', 'composer-plugin']],
-            'license'  => ['choices' => ['m' => 'MIT', 'g' => 'GNU LGPL', 'a' => 'Apache 2', 'b' => 'BSD Simplified']],
-            'php'      => ['choices' => ['5.4', '5.5', '5.6', '7.0', '7.1', '7.2']],
-            'using'    => ['prompt' => 0, 'extra' => ' (ENTER to skip)'],
-            'keywords' => ['prompt' => 0, 'extra' => ' (ENTER to skip)'],
+        $promptConfig = [
+            'type' => [
+                'choices' => ['p' => 'project', 'l' => 'library', 'c' => 'composer-plugin'],
+                'default' => 'l',
+                'restore' => true,
+            ],
+            'license' => [
+                'choices' => ['m' => 'MIT', 'g' => 'GNULGPL', 'a' => 'Apache2', 'b' => 'BSDSimple'],
+                'default' => 'm',
+            ],
+            'php' => [
+                'choices' => ['5.4', '5.5', '5.6', '7.0', '7.1', '7.2'],
+                'default' => '7.0',
+            ],
+            'using'    => ['retry' => 0, 'extra' => ' (ENTER to skip)'],
+            'keywords' => ['retry' => 0, 'extra' => ' (ENTER to skip)'],
+
+            // Donot promt these here!
+            'req'    => false,
+            'dev'    => false,
+            'config' => false,
         ];
 
-        foreach ($this->userOptions() as $name => $option) {
-            $default = $option->default();
-            if ($this->$name !== null || \in_array($name, ['req', 'dev', 'config'])) {
-                continue;
-            }
-
-            $set = $setup[$name] ?? [];
-            if ($set['choices'] ?? null) {
-                $value = $io->choice($option->desc(), $set['choices'], $default);
-            } else {
-                $value = $io->prompt($option->desc() . ($set['extra'] ?? ''), $default, null, $set['prompt'] ?? 1);
-            }
-
-            $this->set($name, $value);
-        }
+        $this->promptAll($io, $promptConfig);
     }
 
     protected function collectPackages(Interactor $io)
@@ -206,7 +198,7 @@ class InitCommand extends Command
         }
     }
 
-    public function promptPackages(string $label, Interactor $io): array
+    protected function promptPackages(string $label, Interactor $io): array
     {
         $pkgs = [];
 
@@ -245,15 +237,6 @@ class InitCommand extends Command
         $parameters['keywords']  = $this->makeKeywords($parameters['keywords']);
 
         $generator->generate($projectPath, $parameters, new CollisionHandler);
-    }
-
-    protected function getCachePath(): string
-    {
-        if (!\Phar::running(false)) {
-            return __DIR__ . '/../../.cache';
-        }
-
-        return $this->_pathUtil->getPhintPath('.cache');
     }
 
     protected function makeNamespace(string $value): string

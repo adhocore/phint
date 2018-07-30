@@ -62,39 +62,38 @@ phint init project-name --config phint.json
 
 > alias i
 
-Help output:
+Create and Scaffold a bare new PHP project.
+
+***Parameters:***
 
 ```
-Command init, version 0.0.7
-
-Create and Scaffold a bare new PHP project
-
-Usage: init [OPTIONS...] [ARGUMENTS...]
-
 Arguments:
   <project>  The project name without slashes
 
 Options:
-  [-c|--config]         JSON filepath to read config from
-  [-d|--descr]          Project description
-  [-D|--dev...]         Developer packages
-  [-e|--email]          Vendor email
-  [-f|--force]          Run even if the project exists
-  [-h|--help]           Show help
-  [-k|--keywords...]    Project Keywords (`php`, `<project>` auto added)
-  [-n|--name]           Vendor full name
-  [-N|--namespace]      Root namespace
-  [-p|--path]           The project path (Auto resolved)
-  [-P|--php]            Minimum PHP version
-  [-r|--req...]         Required packages
-  [-t|--type]           Project type
-  [-u|--username]       Vendor handle/username
-  [-z|--using]          Reference package
-  [-v|--verbosity]      Verbosity level
-  [-V|--version]        Show version
-  [-y|--year]           License Year
-
-Legend: <required> [optional] variadic...
+  [-c|--no-codecov]        Disable codecov
+  [-C|--config]            JSON filepath to read config from
+  [-d|--descr]             Project description
+  [-D|--dev...]            Developer packages
+  [-e|--email]             Vendor email
+  [-f|--force]             Run even if the project exists
+  [-h|--help]              Show help
+  [-w|--keywords...]       Project Keywords (`php`, `<project>` auto added)
+  [-L|--license]           License [m: mit | g: gnulgpl | b: bsd | a: apache2]. EG: `-L a`
+  [-n|--name]              Vendor full name
+  [-N|--namespace]         Root namespace (use `/` separator). EG: `-N ahc/phint`
+  [-p|--path]              The project path (Auto resolved) [Deprecated]
+  [-P|--php]               Minimum PHP version
+  [-R|--req...]            Required packages
+  [-s|--no-scrutinizer]    Disable scrutinizer
+  [-l|--no-styleci]        Disable StyleCI
+  [-t|--no-travis]         Disable travis
+  [-T|--type]              Project type
+  [-u|--username]          Vendor handle/username
+  [-z|--using]             Reference package
+  [-v|--verbosity]         Verbosity level
+  [-V|--version]           Show version
+  [-y|--year]              License Year
 
 Usage Examples:
   phint init <project> --force --descr "Awesome project" --name "YourName" --email you@domain.com
@@ -106,15 +105,11 @@ Usage Examples:
 
 > alias u
 
-Help output:
+Update Phint to lastest version or rollback to earlier locally installed version.
+
+***Parameters:***
 
 ```
-Command update, version 0.0.7
-
-Update Phint to lastest version
-
-Usage: update [OPTIONS...] [ARGUMENTS...]
-
 Arguments:
   (n/a)
 
@@ -133,6 +128,35 @@ Usage Examples:
   phint u --rollback  Also rolls back to prev version
 ```
 
+## test
+
+> alias t
+
+Generate test files with proper classes and test methods analogous to their source counterparts.
+
+***Parameters:***
+
+```
+Arguments:
+  (n/a)
+
+Options:
+  [-a|--with-abstract]    Create stub for abstract/interface class
+  [-d|--dump-autoload]    Force composer dumpautoload (slow)
+  [-h|--help]             Show help
+  [-n|--naming]           Test method naming format [t: testMethod | m: test_method | i: it_tests_]
+  [-p|--phpunit]          Base PHPUnit class to extend from
+  [-s|--no-setup]         Dont add setup method
+  [-t|--no-teardown]      Dont add teardown method
+  [-v|--verbosity]        Verbosity level
+  [-V|--version]          Show version
+
+Usage Examples:
+  phint test -n i        With `it_` naming
+  phint t --no-teardown  Without `tearDown()`
+  phint test -a          With stubs for abstract method
+```
+
 ## Example config
 
 Parameters sent via command args will have higher precedence than values from config file.
@@ -146,7 +170,8 @@ What can you put in config? Anything but we suggest you put only known options (
   "username": "adhocore",
   "name": "Jitendra Adhikari",
   "email": "jiten.adhikary@gmail.com",
-  "php": "7.0"
+  "php": "7.0",
+  "codecov": false
 }
 ```
 

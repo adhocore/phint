@@ -41,5 +41,6 @@ $app = new Ahc\Cli\Application(
 // Aliased as `i`
 $app->add(new Ahc\Phint\Console\InitCommand,   'i');
 $app->add(new Ahc\Phint\Console\UpdateCommand, 'u');
+$app->add(new Ahc\Phint\Console\TestCommand,   't');
 
 $app->logo($logo)->handle($_SERVER['argv']);
