@@ -141,6 +141,7 @@ Arguments:
   (n/a)
 
 Options:
+  [-a|--with-abstract]    Create stub for abstract/interface class
   [-d|--dump-autoload]    Force composer dumpautoload (slow)
   [-h|--help]             Show help
   [-n|--naming]           Test method naming format [t: testMethod | m: test_method | i: it_tests_]
@@ -153,6 +154,7 @@ Options:
 Usage Examples:
   phint test -n i        With `it_` naming
   phint t --no-teardown  Without `tearDown()`
+  phint test -a          With stubs for abstract method
 ```
 
 ## Example config
