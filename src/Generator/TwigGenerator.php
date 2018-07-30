@@ -103,6 +103,10 @@ class TwigGenerator implements GeneratorInterface
         $this->twig->addFilter(new \Twig_SimpleFilter('snake', function ($x) {
             return $this->inflector->snakeCase($x);
         }));
+
+        $this->twig->addFilter(new \Twig_SimpleFilter('lcfirst', function ($x) {
+            return \lcfirst($x);
+        }));
     }
 
     protected function findTemplates(string $templatePath)
