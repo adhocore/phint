@@ -85,6 +85,31 @@ class Path
         return $this->phintPath;
     }
 
+    public function createBinaries(array $bins, string $basePath)
+    {
+        foreach ($bins as $bin) {
+            $bin = $this->join($basePath, $bin);
+
+            if ($this->writeFile($bin, "#!/usr/bin/env php\n<?php\n")) {
+                @\chmod($bin, 0755);
+            }
+        }
+    }
+
+    public function join(...$paths): string
+    {
+        if (\is_array($paths[0] ?? '')) {
+            $paths = $paths[0];
+        }
+
+        $join = '';
+        foreach ($paths as $i => &$path) {
+            $path = $i === 0 ? \rtrim($path, '\\/') : \trim($path, '\\/');
+        }
+
+        return \implode('/', $paths);
+    }
+
     protected function initPhintPath()
     {
         if (null !== $this->phintPath) {
