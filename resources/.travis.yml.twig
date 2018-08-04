@@ -34,5 +34,7 @@ before_script:
 script:
   - vendor/bin/phpunit --coverage-text --coverage-clover=coverage.xml
 
+{% if codecov %}
 after_success:
   - bash <(curl -s https://codecov.io/bash)
+{% endif %}
