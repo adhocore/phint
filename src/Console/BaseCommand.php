@@ -40,7 +40,7 @@ abstract class BaseCommand extends Command
 
         foreach ($this->missingOptions($promptConfig) as $name => $option) {
             $config  = ($promptConfig[$name] ?? []) + $template;
-            $default = $config['default'] ?? $option->default();
+            $default = ($config['default'] ?? $option->default()) ?: null;
 
             if ($config['choices']) {
                 $value = $io->choice($option->desc(), $config['choices'], $default);
@@ -59,7 +59,7 @@ abstract class BaseCommand extends Command
     protected function missingOptions(array $config)
     {
         return \array_filter($this->userOptions(), function ($name) use ($config) {
-            return null === $this->$name && false !== ($config[$name] ?? null);
+            return false !== ($config[$name] ?? null) && \in_array($this->$name, [null, []], true);
         }, \ARRAY_FILTER_USE_KEY);
     }
 
