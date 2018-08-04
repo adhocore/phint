@@ -43,12 +43,13 @@ class InitCommand extends BaseCommand
             ->option('-e --email', 'Vendor email', null, $this->_git->getConfig('user.email'))
             ->option('-u --username', 'Vendor handle/username')
             ->option('-N --namespace', 'Root namespace (use `/` separator)')
-            ->option('-w --keywords [words...]', 'Project Keywords (`php`, `<project>` auto added)')
             ->option('-P --php', 'Minimum PHP version', 'floatval')
             ->option('-p --path', 'The project path (Auto resolved)')
             ->option('-f --force', 'Run even if the project exists', null, false)
             ->option('-d --descr', 'Project description')
+            ->option('-w --keywords [words...]', 'Project Keywords')
             ->option('-y --year', 'License Year', null, date('Y'))
+            ->option('-b --bin [binaries...]', 'Executable binaries')
             ->option('-z --using', 'Reference package')
             ->option('-C --config', 'JSON filepath to read config from')
             ->option('-R --req [pkgs...]', 'Required packages')
@@ -182,7 +183,8 @@ class InitCommand extends BaseCommand
                 'default' => '7.0',
             ],
             'using'    => ['retry' => 0, 'extra' => ' (ENTER to skip)'],
-            'keywords' => ['retry' => 0, 'extra' => ' (ENTER to skip)'],
+            'keywords' => ['retry' => 0, 'extra' => ' (CSV, ENTER to skip)', 'default' => "php, {$this->project}"],
+            'bin'      => ['retry' => 0, 'extra' => ' (CSV, ENTER to skip)'],
 
             // Donot promt these here!
             'req'    => false,
@@ -243,9 +245,10 @@ class InitCommand extends BaseCommand
         // Normalize license (default MIT)
         $parameters['license']   = \strtolower($parameters['license'][0] ?? 'm');
         $parameters['namespace'] = $this->makeNamespace($parameters['namespace']);
-        $parameters['keywords']  = $this->makeKeywords($parameters['keywords']);
+        $parameters['keywords']  = $this->makeArray($parameters['keywords'], ['php', $this->project]);
+        $parameters['bin']       = $this->makeArray($parameters['bin']);
 
-        $generator->generate($projectPath, $parameters, new CollisionHandler);
+        $generator->generate($projectPath, $parameters, new CollisionHandler);die;
     }
 
     protected function makeNamespace(string $value): string
@@ -263,10 +266,8 @@ class InitCommand extends BaseCommand
         return $value;
     }
 
-    protected function makeKeywords($value): array
+    protected function makeArray($value, array $default = []): array
     {
-        $default = ['php', $this->project];
-
         if (empty($value)) {
             return $default;
         }
