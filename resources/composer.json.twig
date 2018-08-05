@@ -1,5 +1,5 @@
 {
-    "name": "{{username}}/{{project}}",
+    "name": "{{username}}/{{package}}",
     "description": "{{descr}}",
     "type": "{{type}}",
     "keywords": {{keywords|json_encode|raw}},
@@ -31,6 +31,14 @@
         "{{pkg.name}}": "{{pkg.version}}"{% endfor %}
 
     },
+{% if bin %}
+    "bin": [
+{% set binc = bin|length - 1 %}
+{% for i, bn in bin %}
+        "{{bn}}"{{ i < binc ? ',' : '' }}
+{% endfor %}
+    ],
+{% endif %}
     "config": {
         "optimize-autoloader": true,
         "preferred-install": {

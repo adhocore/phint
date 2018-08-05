@@ -66,6 +66,8 @@ class TwigGenerator implements GeneratorInterface
                 $this->doGenerate($template, $targetPath, $parameters, $handler);
             }
         }
+
+        $this->pathUtil->createBinaries($parameters['bin'] ?? [], $parameters['path'] ?? '');
     }
 
     public function generateTests(array $testMetadata, array $parameters): int

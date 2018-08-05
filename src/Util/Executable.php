@@ -29,9 +29,13 @@ abstract class Executable
     /** @var string */
     protected $workDir;
 
-    public function __construct($binary = null)
+    /** @var string Full path of log file */
+    protected $logFile;
+
+    public function __construct($binary = null, string $logFile = '')
     {
         $this->workDir = \getcwd();
+        $this->logFile = $logFile;
         $this->binary  = $binary ? '"' . $binary . '"' : $this->binary;
     }
 
@@ -73,7 +77,13 @@ abstract class Executable
     {
         $proc = new Process($this->binary . ' ' . $command, $this->workDir, null, null, null);
 
-        $proc->run();
+        $pathUtil = new Path;
+
+        $proc->run(function ($type, $data) use ($pathUtil) {
+            if ($this->logFile) {
+                $pathUtil->writeFile($this->logFile, $data, \FILE_APPEND);
+            }
+        });
 
         $this->isSuccessful = $proc->isSuccessful();
 
