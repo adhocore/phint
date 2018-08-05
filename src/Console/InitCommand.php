@@ -46,6 +46,7 @@ class InitCommand extends BaseCommand
             ->option('-P --php', 'Minimum PHP version', 'floatval')
             ->option('-p --path', 'The project path (Auto resolved)')
             ->option('-f --force', 'Run even if the project exists', null, false)
+            ->option('-g --package', 'Packagist name (Without vendor handle)')
             ->option('-d --descr', 'Project description')
             ->option('-w --keywords [words...]', 'Project Keywords')
             ->option('-y --year', 'License Year', null, date('Y'))
@@ -100,6 +101,8 @@ class InitCommand extends BaseCommand
         $success = $this->_composer->successful();
 
         $success ? $io->ok('Done', true) : $io->error('Composer setup failed', true);
+
+        $this->logging('end');
     }
 
     public function interact(Interactor $io)
@@ -111,6 +114,7 @@ class InitCommand extends BaseCommand
         }
 
         $io->okBold('Phint Setup', true);
+        $this->logging('start');
 
         $this->set('path', $path = $this->prepareProjectPath());
         $this->loadConfig($this->config);
@@ -174,6 +178,7 @@ class InitCommand extends BaseCommand
                 'default' => 'l',
                 'restore' => true,
             ],
+            'package' => ['default' => $this->project, 'retry' => 0],
             'license' => [
                 'choices' => ['m' => 'MIT', 'g' => 'GNULGPL', 'a' => 'Apache2', 'b' => 'BSDSimple'],
                 'default' => 'm',
@@ -248,14 +253,14 @@ class InitCommand extends BaseCommand
         $parameters['keywords']  = $this->makeArray($parameters['keywords'], ['php', $this->project]);
         $parameters['bin']       = $this->makeArray($parameters['bin']);
 
-        $generator->generate($projectPath, $parameters, new CollisionHandler);die;
+        $generator->generate($projectPath, $parameters, new CollisionHandler);
     }
 
     protected function makeNamespace(string $value): string
     {
         $in = new Inflector;
 
-        $project = $this->project;
+        $project = $this->package;
         $value   = $in->stuldyCase(\str_replace([' ', '/'], '\\', $value));
         $project = $in->stuldyCase(\str_replace([' ', '/', '\\'], '-', $project));
 
