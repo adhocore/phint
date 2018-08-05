@@ -63,6 +63,7 @@ class TestCommand extends BaseCommand
             ],
         ];
 
+        $this->logging('start');
         $this->promptAll($io, $promptConfig);
     }
 
@@ -98,6 +99,7 @@ class TestCommand extends BaseCommand
         }
 
         $io->ok('Done', true);
+        $this->logging('end');
     }
 
     protected function prepare(): array
