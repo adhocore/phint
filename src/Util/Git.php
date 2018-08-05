@@ -1,5 +1,14 @@
 <?php
 
+/*
+ * This file is part of the PHINT package.
+ *
+ * (c) Jitendra Adhikari <jiten.adhikary@gmail.com>
+ *     <https//:github.com/adhocore>
+ *
+ * Licensed under MIT license.
+ */
+
 namespace Ahc\Phint\Util;
 
 class Git extends Executable
