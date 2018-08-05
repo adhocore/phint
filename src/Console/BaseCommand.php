@@ -19,11 +19,17 @@ use Ahc\Phint\Util\Path;
 
 abstract class BaseCommand extends Command
 {
+    /** @var string Full path of log file */
+    protected $_logFile;
+
     public function __construct()
     {
-        $this->_git      = new Git;
+        $logFile = @\tempnam(\sys_get_temp_dir(), 'PHT') ?: '';
+
+        $this->_logFile  = $logFile;
         $this->_pathUtil = new Path;
-        $this->_composer = new Composer;
+        $this->_git      = new Git(null, $logFile);
+        $this->_composer = new Composer(null, $logFile);
 
         $this->defaults();
         $this->onConstruct();
@@ -70,5 +76,18 @@ abstract class BaseCommand extends Command
         }
 
         return $this->_pathUtil->getPhintPath('.cache');
+    }
+
+    protected function logging(string $mode = 'start')
+    {
+        if (!$logFile = $this->_logFile) {
+            return;
+        }
+
+        if ('end' === $mode) {
+            $this->app()->io()->comment("Check detailed logs at $logFile", true);
+        } else {
+            $this->app()->io()->comment("Logging to $logFile", true);
+        }
     }
 }
