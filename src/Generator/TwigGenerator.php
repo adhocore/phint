@@ -119,8 +119,16 @@ class TwigGenerator implements GeneratorInterface
             return \lcfirst($x);
         }));
 
+        $this->twig->addFilter(new \Twig_SimpleFilter('ucfirst', function ($x) {
+            return \ucfirst($x);
+        }));
+
         $this->twig->addFunction(new \Twig_Function('gmdate', function ($f = null) {
             return \gmdate($f ?? 'Y-m-d H:i:s');
+        }));
+
+        $this->twig->addFilter(new \Twig_SimpleFilter('call', function ($fn) {
+            return $fn(\array_slice(\func_get_args(), 1));
         }));
     }
 
