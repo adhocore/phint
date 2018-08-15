@@ -35,7 +35,7 @@ class Test{{className}} extends {{className}}
  */
 class {{className}}Test extends TestCase
 {
-{% if newable or special %}
+{% if (newable or special) and setup %}
     /**
      * @var {{ special ? 'Test' : ''}}{{className}}
      */
@@ -62,7 +62,7 @@ class {{className}}Test extends TestCase
 {% for method, attr in methods if not attr.abstract %}
 
 {% if naming == 't' %}
-    public function test{{method|capitalize}}()
+    public function test{{method|ucfirst}}()
 {% elseif naming == 'm' %}
     public function test_{{method|snake}}()
 {% elseif naming == 'i' %}
@@ -73,12 +73,16 @@ class {{className}}Test extends TestCase
 {% endif %}
     {
 {% if attr.static %}
-        {{className}}::{{method}}();
+        $actual = {{className}}::{{method}}();
+{% elseif setup %}
+        $actual = $this->{{className|lcfirst}}->{{method}}();
 {% else %}
-        $this->{{className|lcfirst}}->{{method}}();
+        ${{className|lcfirst}} = new {{ special ? 'Test' : ''}}{{className}};
+
+        $actual = ${{className|lcfirst}}->{{method}}();
 {% endif %}
 
-        // $this->assert
+        // $this->assertSame('', $actual);
     }
 {% endfor %}
 }
