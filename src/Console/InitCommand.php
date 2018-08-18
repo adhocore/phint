@@ -180,7 +180,7 @@ class InitCommand extends BaseCommand
             ],
             'package' => ['default' => $this->project, 'retry' => 0],
             'license' => [
-                'choices' => ['m' => 'MIT', 'g' => 'GNULGPL', 'a' => 'Apache2', 'b' => 'BSDSimple'],
+                'choices' => ['m' => 'MIT', 'g' => 'GNULGPL', 'a' => 'Apache2', 'b' => 'BSDSimple', 'i' => 'ISC'],
                 'default' => 'm',
             ],
             'php' => [
