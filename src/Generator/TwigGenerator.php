@@ -118,6 +118,10 @@ class TwigGenerator implements GeneratorInterface
         $this->twig->addFilter(new \Twig_SimpleFilter('lcfirst', function ($x) {
             return \lcfirst($x);
         }));
+
+        $this->twig->addFunction(new \Twig_Function('gmdate', function ($f = null) {
+            return \gmdate($f ?? 'Y-m-d H:i:s');
+        }));
     }
 
     protected function findTemplates(string $templatePath)
