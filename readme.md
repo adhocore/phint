@@ -11,9 +11,9 @@ It helps you be even more lazier! `phint` is work in progress and the plan is to
 [![StyleCI](https://styleci.io/repos/108550679/shield)](https://styleci.io/repos/108550679)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
 
-- Requires PHP7.
-
 ## Installation
+
+> Requires PHP7.
 
 ### Manual
 
@@ -36,6 +36,19 @@ sudo ln -s ~/phint.phar /usr/local/bin/phint
 # check
 phint --help
 ```
+
+## Features:
+
+- generate dot files the likes of `.gitignore, .travis.yml, . editorconfig` etc
+- generate `LICENSE`, `README.md`, `composer.json`
+- generate `CHANGELOG.md` stub, `CONTRIBUTING.md` guide, `ISSUE_TEMPLATE.md` and `PULL_REQUEST_TEMPLATE.md`
+- generate binaries if any
+- git init
+- interactively ask and install all the dev and prod deps
+- generate `phpunit.xml`, test `bootstrap.php` 
+- generate test stubs for all classes/methods corresponding to `src` (`phint test`)
+- update its own self (`phint update`)
+
 
 ## Usage
 
