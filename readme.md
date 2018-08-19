@@ -11,6 +11,8 @@ It helps you be even more lazier! `phint` is work in progress and the plan is to
 [![StyleCI](https://styleci.io/repos/108550679/shield)](https://styleci.io/repos/108550679)
 [![Software License](https://img.shields.io/badge/license-MIT-brightgreen.svg?style=flat-square)](LICENSE)
 
+![Phint Preview](https://imgur.com/gkidPSz.png "Phint Preview")
+
 ## Installation
 
 > Requires PHP7.
