@@ -12,6 +12,7 @@
 namespace Ahc\Phint\Util;
 
 use Ahc\Json\Comment;
+use Symfony\Component\Finder\Finder;
 
 class Path
 {
@@ -108,6 +109,28 @@ class Path
         }
 
         return \implode('/', $paths);
+    }
+
+    public function findFiles(array $inPaths, string $ext, bool $dotfiles = false): array
+    {
+        $finder = new Finder;
+        $ext    = '.' . \ltrim($ext, '.');
+        $len    = \strlen($ext);
+
+        $finder->files()->ignoreDotFiles($dotfiles)->filter(function ($file) use ($ext, $len) {
+            return \substr($file, -$len) === $ext);
+        });
+
+        foreach ($inPaths as $path) {
+            $finder->in($path);
+        }
+
+        $files = [];
+        foreach ($finder as $file) {
+            $files[] = (string) $file;
+        }
+
+        return $files;
     }
 
     protected function initPhintPath()
