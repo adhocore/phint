@@ -1,3 +1,8 @@
+## [v0.0.13] 2018-08-19 14:08:54 UTC
+
+- [e112041](https://github.com/adhocore/phint/commit/e112041) fix(tmpl): travis badge (Jitendra Adhikari)
+- [9d3cb55](https://github.com/adhocore/phint/commit/9d3cb55) docs: add features (Jitendra Adhikari)
+
 ## [v0.0.12] 2018-08-18 09:08:03 UTC
 
 - [3984dac](https://github.com/adhocore/phint/commit/3984dac) feat(tmpl): support PR template [closes #35]
