@@ -41,6 +41,7 @@ class TwigGenerator implements GeneratorInterface
     /** @var array Templates only loaded by some specific commands */
     protected $commandTemplates = [
         'test' => true,
+        'docs' => true,
     ];
 
     public function __construct(string $templatePath, string $cachePath)
