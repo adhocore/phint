@@ -47,7 +47,7 @@ phint --help
 - generate binaries if any
 - git init
 - interactively ask and install all the dev and prod deps
-- generate `phpunit.xml`, test `bootstrap.php` 
+- generate `phpunit.xml`, test `bootstrap.php`
 - generate test stubs for all classes/methods corresponding to `src` (`phint test`)
 - update its own self (`phint update`)
 
@@ -81,27 +81,37 @@ Create and Scaffold a bare new PHP project.
 
 ***Parameters:***
 
+Dont be intimidated by long list of parameters, you are not required to enter any of them
+as arguments as they are interactively collected when required.
+Also check [config](#exampleconfig) on how to create a reusable json config so you can use `phint` like a *pro*.
+
 ```
 Arguments:
   <project>  The project name without slashes
 
 Options:
+  [-b|--bin...]            Executable binaries
   [-c|--no-codecov]        Disable codecov
   [-C|--config]            JSON filepath to read config from
   [-d|--descr]             Project description
   [-D|--dev...]            Developer packages
   [-e|--email]             Vendor email
   [-f|--force]             Run even if the project exists
+  [-G|--gh-template]       Use `.github/` as template path
+                           By default uses `docs/`
   [-h|--help]              Show help
-  [-w|--keywords...]       Project Keywords (`php`, `<project>` auto added)
-  [-L|--license]           License [m: mit | g: gnulgpl | b: bsd | a: apache2]. EG: `-L a`
+  [-w|--keywords...]       Project Keywords
+  [-L|--license]           License
   [-n|--name]              Vendor full name
-  [-N|--namespace]         Root namespace (use `/` separator). EG: `-N ahc/phint`
-  [-p|--path]              The project path (Auto resolved) [Deprecated]
+  [-N|--namespace]         Root namespace (use `/` separator)
+  [-g|--package]           Packagist name (Without vendor handle)
+  [-p|--path]              The project path (Auto resolved)
   [-P|--php]               Minimum PHP version
   [-R|--req...]            Required packages
   [-s|--no-scrutinizer]    Disable scrutinizer
   [-l|--no-styleci]        Disable StyleCI
+  [-S|--sync]              Only create missing files
+                           Use with caution, take backup if needed
   [-t|--no-travis]         Disable travis
   [-T|--type]              Project type
   [-u|--username]          Vendor handle/username
@@ -130,7 +140,8 @@ What can you put in config? Anything but we suggest you put only known options (
   "name": "Jitendra Adhikari",
   "email": "jiten.adhikary@gmail.com",
   "php": "7.0",
-  "codecov": false
+  "codecov": false,
+  "...": "..."
 }
 ```
 
