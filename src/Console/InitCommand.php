@@ -45,6 +45,7 @@ class InitCommand extends BaseCommand
             ->option('-N --namespace', 'Root namespace (use `/` separator)')
             ->option('-P --php', 'Minimum PHP version', 'floatval')
             ->option('-p --path', 'The project path (Auto resolved)')
+            ->option('-S --sync', "Only create missing files\nUse with caution, take backup if needed", null, false)
             ->option('-f --force', 'Run even if the project exists', null, false)
             ->option('-g --package', 'Packagist name (Without vendor handle)')
             ->option('-d --descr', 'Project description')
@@ -134,7 +135,7 @@ class InitCommand extends BaseCommand
         }
 
         if (\is_dir($path)) {
-            if (!$this->force) {
+            if (!$this->force && !$this->sync) {
                 throw new InvalidArgumentException(
                     \sprintf('Something with the name "%s" already exists!', \basename($path))
                 );
