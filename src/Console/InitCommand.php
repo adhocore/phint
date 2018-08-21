@@ -135,20 +135,25 @@ class InitCommand extends BaseCommand
         }
 
         if (\is_dir($path)) {
-            if (!$this->force && !$this->sync) {
-                throw new InvalidArgumentException(
-                    \sprintf('Something with the name "%s" already exists!', \basename($path))
-                );
-            }
-
-            if (!$this->using) {
-                $io->error('You have set force flag, existing files will be overwritten', true);
-            }
+            $this->projectExists();
         } else {
             \mkdir($path, 0777, true);
         }
 
         return $path;
+    }
+
+    protected function projectExists()
+    {
+        if (!$this->force && !$this->sync) {
+            throw new InvalidArgumentException(
+                \sprintf('Something with the name "%s" already exists!', \basename($path))
+            );
+        }
+
+        if ($this->force && !$this->sync) {
+            $io->error('You have set --force flag, existing files will be overwritten', true);
+        }
     }
 
     protected function loadConfig(string $path = null)
