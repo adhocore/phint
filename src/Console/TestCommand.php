@@ -182,6 +182,10 @@ class TestCommand extends BaseCommand
 
     protected function shouldGenerateTest(\ReflectionClass $reflex): bool
     {
+        if ($reflex->isSubclassOf(\Throwable::class)) {
+            return false;
+        }
+
         if ($this->abstract) {
             return true;
         }
