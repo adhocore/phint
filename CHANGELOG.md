@@ -1,3 +1,15 @@
+## [v0.1.0] 2018-08-21 15:08:03 UTC
+
+- [5639cce](https://github.com/adhocore/phint/commit/5639cce) refactor(twig.gen): dont override on sync, use empty checks [closes #42] (Jitendra Adhikari)
+- [2669328](https://github.com/adhocore/phint/commit/2669328) feat(initcmd): add projectExists handler (Jitendra Adhikari)
+- [4569a86](https://github.com/adhocore/phint/commit/4569a86) feat(initcmd): sync mode (Jitendra Adhikari)
+- [b79cf7c](https://github.com/adhocore/phint/commit/b79cf7c) refactor(twig.generator): support path override for gh template, extract logic to methods [closes #39] (Jitendra Adhikari)
+- [5a8acff](https://github.com/adhocore/phint/commit/5a8acff) feat(initcmd): add gh-template path override opt (Jitendra Adhikari)
+- [8f51517](https://github.com/adhocore/phint/commit/8f51517) chore: bump adhocore/cli (Jitendra Adhikari)
+- [77cb89c](https://github.com/adhocore/phint/commit/77cb89c) fix(testcmd): skip exceptions [closes #37] (Jitendra Adhikari)
+- [eb4d5b1](https://github.com/adhocore/phint/commit/eb4d5b1) build(travis): cache composer [closes #38] (Jitendra Adhikari)
+- [fd95a34](https://github.com/adhocore/phint/commit/fd95a34) docs: add `$ phint` preview (Jitendra Adhikari)
+
 ## [v0.0.13] 2018-08-19 14:08:54 UTC
 
 - [e112041](https://github.com/adhocore/phint/commit/e112041) fix(tmpl): travis badge (Jitendra Adhikari)
