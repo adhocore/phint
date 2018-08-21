@@ -193,7 +193,11 @@ class TwigGenerator implements GeneratorInterface
         }
 
         // If using reference package then we dont overwrite!
-        if (isset($parameters['using'])) {
+        if (!empty($parameters['using'])) {
+            return false;
+        }
+
+        if (!empty($parameters['sync'])) {
             return false;
         }
 
