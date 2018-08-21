@@ -53,6 +53,7 @@ class InitCommand extends BaseCommand
             ->option('-b --bin [binaries...]', 'Executable binaries')
             ->option('-z --using', 'Reference package')
             ->option('-C --config', 'JSON filepath to read config from')
+            ->option('-G --gh-template', "Use `.github/` as template path\nBy default uses `docs/`", null, false)
             ->option('-R --req [pkgs...]', 'Required packages')
             ->option('-D --dev [pkgs...]', 'Developer packages')
             ->option('-t --no-travis', 'Disable travis')
