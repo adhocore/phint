@@ -143,7 +143,7 @@ class TwigGenerator implements GeneratorInterface
     protected function doGenerate(string $template, string $targetPath, array $parameters, CollisionHandlerInterface $handler = null)
     {
         $relativePath = $this->pathUtil->getRelativePath($template, $this->templatePath);
-        $targetFile   = $targetPath . '/' . \str_replace('.twig', '', $relativePath);
+        $targetFile   = $this->pathUtil->join($targetPath, $this->getRelativeTarget($parameters, $relativePath));
         $fileExists   = \is_file($targetFile);
         $targetDir    = \dirname($targetFile);
         $content      = $this->twig->render($relativePath, $parameters);
@@ -154,12 +154,21 @@ class TwigGenerator implements GeneratorInterface
             return;
         }
 
-        // If using reference package then we dont overwrite!
-        if (isset($parameters['using']) && $fileExists) {
-            return;
+        if ($this->mayOverride($fileExists, $parameters)) {
+            $this->pathUtil->writeFile($targetFile, $content);
+        }
+    }
+
+    protected function getRelativeTarget(array $parameters, string $relativePath): string
+    {
+        $fileName   = \basename($relativePath, '.twig');
+        $targetFile = \str_replace('.twig', '', $relativePath);
+
+        if (!empty($parameters['ghTemplate']) && \in_array($fileName, ['ISSUE_TEMPLATE.md', 'PULL_REQUEST_TEMPLATE.md'])) {
+            $targetFile = '.github/' . $fileName;
         }
 
-        $this->pathUtil->writeFile($targetFile, $content);
+        return $targetFile;
     }
 
     protected function shouldGenerate(string $template, array $parameters)
@@ -171,6 +180,20 @@ class TwigGenerator implements GeneratorInterface
         }
 
         if (isset($this->commandTemplates[$name])) {
+            return false;
+        }
+
+        return true;
+    }
+
+    protected function mayOverride(bool $fileExists, array $parameters)
+    {
+        if (!$fileExists) {
+            return true;
+        }
+
+        // If using reference package then we dont overwrite!
+        if (isset($parameters['using'])) {
             return false;
         }
 
