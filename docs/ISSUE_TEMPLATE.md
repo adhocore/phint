@@ -1,7 +1,8 @@
-## This is a
+## Introduction
 
-<-- Put a cross `x` in one of the below boxes -->
+**This is a**
 
+<!-- Put a cross `x` in one of the below boxes -->
 - [ ] Bug/Issue
 - [ ] Feature request
 - [ ] General stuff
