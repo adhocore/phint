@@ -20,7 +20,7 @@ interface CollisionHandlerInterface
      * @param string $newContent
      * @param array  $parameters
      *
-     * @return void
+     * @return bool
      */
-    public function handle(string $targetFile, string $newContent, array $parameters = null);
+    public function handle(string $targetFile, string $newContent, array $parameters = null): bool;
 }
