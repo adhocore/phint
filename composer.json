@@ -26,6 +26,7 @@
         "php": ">=7.0",
         "adhocore/cli": "^0.2",
         "adhocore/json-comment": "^0.0.3",
+        "crazyfactory/docblocks": "^2.2",
         "symfony/process": "^3.3.0",
         "symfony/finder": "^3.3.0",
         "twig/twig":  "^2.4.0"
@@ -41,5 +42,11 @@
         }
     },
     "scripts": {
-    }
+    },
+    "repositories": [
+        {
+            "type": "vcs",
+            "url": "https://github.com/crazyfactory/php-docblocks"
+        }
+    ]
 }
