@@ -54,19 +54,19 @@ class DocsCommand extends BaseCommand
         $io = $this->app()->io();
 
         $io->comment('Preparing metadata ...', true);
-        $metadata = $this->prepare();
+        $docsMetadata = $this->prepare();
 
-        if (empty($metadata)) {
+        if (empty($docsMetadata)) {
             $io->bgGreen('Looks like nothing to do here', true);
 
             return;
         }
 
-        $io->comment('Generating tests ...', true);
-        $generated = $this->generate($metadata);
+        $io->comment('Generating docs ...', true);
+        $generated = $this->generate($docsMetadata);
 
         if ($generated) {
-            $io->cyan("$generated test(s) generated", true);
+            $io->cyan("$generated doc(s) generated", true);
         }
 
         $io->ok('Done', true);
@@ -114,10 +114,9 @@ class DocsCommand extends BaseCommand
             return [];
         }
 
-        $methods     = [];
-        $isTrait     = $reflex->isTrait();
-        $isAbstract  = $reflex->isAbstract();
-        $isInterface = $reflex->isInterface();
+        $methods = [];
+        $isTrait = $reflex->isTrait();
+        $name    = $reflex->getShortName();
 
         foreach ($reflex->getMethods(\ReflectionMethod::IS_PUBLIC) as $m) {
             if ($m->class !== $classFqcn) {
@@ -134,7 +133,7 @@ class DocsCommand extends BaseCommand
         $texts = (new DocBlock($reflex))->texts();
         $title = \array_shift($texts);
 
-        return \compact('classFqcn', 'isTrait', 'title', 'texts', 'methods');
+        return \compact('classFqcn', 'name', 'isTrait', 'title', 'texts', 'methods');
     }
 
     protected function shouldGenerateDocs(\ReflectionClass $reflex): bool
@@ -156,7 +155,7 @@ class DocsCommand extends BaseCommand
         }
 
         if (null !== $return = $parser->first('return')) {
-            $return = $return->getValue();
+            $return = \preg_replace(['/(.*\$\w+)(.*)/', '/ +/'], ['$1', ' '], $return->getValue());
         }
 
         $texts = $parser->texts();
@@ -165,11 +164,11 @@ class DocsCommand extends BaseCommand
         return ['static' => $method->isStatic()] + \compact('title', 'texts', 'params', 'return');
     }
 
-    protected function generate(array $metadata): int
+    protected function generate(array $docsMetadata): int
     {
         $templatePath = __DIR__ . '/../../resources';
         $generator    = new TwigGenerator($templatePath, $this->getCachePath());
 
-        return $generator->generateDocs($metadata, $this->values());
+        return $generator->generateDocs($docsMetadata, $this->values());
     }
 }
