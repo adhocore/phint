@@ -1,3 +1,12 @@
+## [v0.1.1] 2018-08-22 00:08:21 UTC
+
+- [2cb1a6f](https://github.com/adhocore/phint/commit/2cb1a6f) chore(tmpl.ghtmpl): fix title, and comment (Jitendra Adhikari)
+- [db4ab22](https://github.com/adhocore/phint/commit/db4ab22) chore: add contributing (Jitendra Adhikari)
+- [34f2bf4](https://github.com/adhocore/phint/commit/34f2bf4) chore: issue/pr template (Jitendra Adhikari)
+- [88e47a2](https://github.com/adhocore/phint/commit/88e47a2) chore: issue/pr template (Jitendra Adhikari)
+- [286e7a8](https://github.com/adhocore/phint/commit/286e7a8) docs: update init options (Jitendra Adhikari)
+- [abcf36e](https://github.com/adhocore/phint/commit/abcf36e) refactor: readme > README (Jitendra Adhikari)
+
 ## [v0.1.0] 2018-08-21 15:08:03 UTC
 
 - [5639cce](https://github.com/adhocore/phint/commit/5639cce) refactor(twig.gen): dont override on sync, use empty checks [closes #42] (Jitendra Adhikari)
