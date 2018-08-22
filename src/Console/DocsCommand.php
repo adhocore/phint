@@ -12,6 +12,8 @@
 namespace Ahc\Phint\Console;
 
 use Ahc\Phint\Generator\TwigGenerator;
+use Ahc\Phint\Util\Composer;
+use CrazyFactory\DocBlocks\DocBlock;
 
 class DocsCommand extends BaseCommand
 {
@@ -78,11 +80,13 @@ class DocsCommand extends BaseCommand
         $srcPaths = [];
         foreach ($namespaces as $ns => $path) {
             if (\preg_match('!^(source|src|lib|class)/?!', $path)) {
-                $srcPaths[] = $path;
+                $srcPaths[] = $this->_pathUtil->join($this->_workDir, $path);
+            } else {
+                unset($namespaces[$ns]);
             }
         }
 
-        $classes = $this->_pathUtil->loadClasses($srcPaths);
+        $classes = $this->_pathUtil->loadClasses($srcPaths, \array_keys($namespaces));
 
         return $this->getClassesMetadata($classes);
     }
@@ -127,7 +131,10 @@ class DocsCommand extends BaseCommand
             return [];
         }
 
-        return \compact('classFqcn', 'isTrait', 'isAbstract', 'isInterface', 'methods');
+        $texts = (new DocBlock($reflex))->texts();
+        $title = \array_shift($texts);
+
+        return \compact('classFqcn', 'isTrait', 'title', 'texts', 'methods');
     }
 
     protected function shouldGenerateDocs(\ReflectionClass $reflex): bool
@@ -141,9 +148,21 @@ class DocsCommand extends BaseCommand
 
     protected function getMethodMetadata(\ReflectionMethod $method): array
     {
-        $args = [];
+        $params = [];
+        $parser = new DocBlock($method);
 
-        return ['static' => $method->isStatic(), 'abstract' => $method->isAbstract(), 'args' => $args];
+        foreach ($parser->find('param') as $param) {
+            $params[] = \preg_replace(['/(.*\$\w+)(.*)/', '/ +/'], ['$1', ' '], $param->getValue());
+        }
+
+        if (null !== $return = $parser->first('return')) {
+            $return = $return->getValue();
+        }
+
+        $texts = $parser->texts();
+        $title = \array_shift($texts);
+
+        return ['static' => $method->isStatic()] + \compact('title', 'texts', 'params', 'return');
     }
 
     protected function generate(array $metadata): int
