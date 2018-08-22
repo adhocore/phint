@@ -165,9 +165,9 @@ class Path
 }
 
 /**
- * Isolated file require
+ * Isolated file require.
  *
- * @param  string $file
+ * @param string $file
  *
  * @return void
  */
