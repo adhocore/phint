@@ -155,7 +155,7 @@ class DocsCommand extends BaseCommand
         }
 
         if (null !== $return = $parser->first('return')) {
-            $return = \preg_replace(['/(.*\$\w+)(.*)/', '/ +/'], ['$1', ' '], $return->getValue());
+            $return = \preg_replace('/ .*?$/', '', $return->getValue());
         }
 
         $texts = $parser->texts();
