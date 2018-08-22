@@ -1,0 +1,31 @@
+{% for class in docsMetadata %}
+## {{class.name}}
+
+```php
+use {{class.classFqcn}};
+```
+{% if class.title %}
+
+> {{class.title}}
+{% endif %}
+{% if class.texts %}
+
+{{class.texts|join("\n")}}
+{% endif %}
+{% for name, method in class.methods %}
+### {{name}}()
+{% if method.title %}
+
+> {{method.title}}
+{% endif %}
+
+```php
+{{method.static ? '::' : '->'}}{{name}}({{method.params|join(', ')}}){{method.return ? ': ' ~ method.return : ''}}
+```
+{% if method.texts %}
+
+{{method.texts|join("\n")|replace({'<code>':"```php",'</code>':"```"})|raw}}
+{% endif %}
+{% endfor %}
+
+{% endfor %}
