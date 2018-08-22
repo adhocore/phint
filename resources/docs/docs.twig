@@ -20,7 +20,7 @@ use {{class.classFqcn}};
 {% endif %}
 
 ```php
-{{method.static ? '::' : '->'}}{{name}}({{method.params|join(', ')}}){{method.return ? ': ' ~ method.return : ''}}
+{{name}}({{method.params|join(', ')}}){{method.return ? ': ' ~ method.return : ''}}
 ```
 {% if method.texts %}
 
