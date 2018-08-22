@@ -118,7 +118,7 @@ class Path
         $len    = \strlen($ext);
 
         $finder->files()->ignoreDotFiles($dotfiles)->filter(function ($file) use ($ext, $len) {
-            return \substr($file, -$len) === $ext);
+            return \substr($file, -$len) === $ext;
         });
 
         foreach ($inPaths as $path) {
