@@ -28,7 +28,7 @@ class Path
      */
     public function isAbsolute(string $path): bool
     {
-        if (DIRECTORY_SEPARATOR === '\\') {
+        if (\DIRECTORY_SEPARATOR === '\\') {
             return strpos($path, ':') === 1;
         }
 
@@ -133,6 +133,19 @@ class Path
         return $files;
     }
 
+    public function loadClasses(array $inPaths, string $ext): array
+    {
+        $classes = \array_merge(\get_declared_interfaces(), \get_declared_classes(), \get_declared_traits());
+
+        foreach ($this->findFiles($inPaths) as $file) {
+            _require($file);
+        }
+
+        $newClasses = \array_merge(\get_declared_interfaces(), \get_declared_classes(), \get_declared_traits());
+
+        return \array_diff($newClasses, $classes);
+    }
+
     protected function initPhintPath()
     {
         if (null !== $this->phintPath) {
@@ -149,4 +162,16 @@ class Path
             }
         }
     }
+}
+
+/**
+ * Isolated file require
+ *
+ * @param  string $file
+ *
+ * @return void
+ */
+function _require(string $file)
+{
+    require_once $file;
 }
