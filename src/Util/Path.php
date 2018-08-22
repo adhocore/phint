@@ -114,36 +114,38 @@ class Path
     public function findFiles(array $inPaths, string $ext, bool $dotfiles = false): array
     {
         $finder = new Finder;
-        $ext    = '.' . \ltrim($ext, '.');
-        $len    = \strlen($ext);
 
-        $finder->files()->ignoreDotFiles($dotfiles)->filter(function ($file) use ($ext, $len) {
-            return \substr($file, -$len) === $ext;
-        });
+        if ($ext !== '*') {
+            $ext = '.' . \ltrim($ext, '.');
+            $len = \strlen($ext);
+
+            $finder->filter(function ($file) use ($ext, $len) {
+                return \substr($file, -$len) === $ext;
+            });
+        }
 
         foreach ($inPaths as $path) {
             $finder->in($path);
         }
 
         $files = [];
-        foreach ($finder as $file) {
+        foreach ($finder->files()->ignoreDotFiles($dotfiles) as $file) {
             $files[] = (string) $file;
         }
 
         return $files;
     }
 
-    public function loadClasses(array $inPaths, string $ext): array
+    public function loadClasses(array $inPaths, array $namespaces, string $ext = 'php'): array
     {
-        $classes = \array_merge(\get_declared_interfaces(), \get_declared_classes(), \get_declared_traits());
-
-        foreach ($this->findFiles($inPaths) as $file) {
+        foreach ($this->findFiles($inPaths, $ext) as $file) {
             _require($file);
         }
 
-        $newClasses = \array_merge(\get_declared_interfaces(), \get_declared_classes(), \get_declared_traits());
+        $namespaces = \implode('\|', $namespaces);
+        $allClasses = \array_merge(\get_declared_interfaces(), \get_declared_classes(), \get_declared_traits());
 
-        return \array_diff($newClasses, $classes);
+        return \preg_grep('~^' . \preg_quote($namespaces) . '~', $allClasses);
     }
 
     protected function initPhintPath()
