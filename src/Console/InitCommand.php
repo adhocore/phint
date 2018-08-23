@@ -38,7 +38,7 @@ class InitCommand extends BaseCommand
     {
         $this
             ->argument('<project>', 'The project name without slashes')
-            ->option('-T --type', 'Project type')
+            ->option('-T --type', "Project type\nproject | library | composer-plugin")
             ->option('-n --name', 'Vendor full name', null, $this->_git->getConfig('user.name'))
             ->option('-e --email', 'Vendor email', null, $this->_git->getConfig('user.email'))
             ->option('-u --username', 'Vendor handle/username')
@@ -61,12 +61,12 @@ class InitCommand extends BaseCommand
             ->option('-c --no-codecov', 'Disable codecov')
             ->option('-s --no-scrutinizer', 'Disable scrutinizer')
             ->option('-l --no-styleci', 'Disable StyleCI')
-            ->option('-L --license', 'License')
+            ->option('-L --license', 'License (m: MIT | g: GNULGPL | a: Apache2 | b: BSDSimple | i: ISC')
             ->usage($this->writer()->colorizer()->colors(''
                 . '<bold>  phint init</end> <line><project></end> '
                 . '<comment>--force --descr "Awesome project" --name "YourName" --email you@domain.com</end><eol/>'
                 . '<bold>  phint init</end> <line><project></end> '
-                . '<comment>--using laravel/lumen --namespace Project/Api --type project</end><eol/>'
+                . '<comment>--using laravel/lumen --namespace Project/Api --type project --license m</end><eol/>'
                 . '<bold>  phint init</end> <line><project></end> '
                 . '<comment>--php 7.0 --config /path/to/json --dev mockery/mockery --req adhocore/cli</end><eol/>'
             ));
