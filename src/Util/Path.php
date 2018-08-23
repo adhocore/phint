@@ -61,7 +61,16 @@ class Path
 
     public function readAsJson(string $filePath, bool $asArray = true)
     {
-        return (new Comment)->decode(\file_get_contents($filePath), $asArray);
+        return (new Comment)->decode($this->read($filePath) ?? 'null', $asArray);
+    }
+
+    public function read(string $filePath): ?string
+    {
+        if (\is_file($filePath)) {
+            return \file_get_contents($filePath);
+        }
+
+        return null;
     }
 
     public function writeFile(string $file, $content, int $mode = null): bool
