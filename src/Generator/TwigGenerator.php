@@ -97,6 +97,29 @@ class TwigGenerator implements GeneratorInterface
         return $generated;
     }
 
+    public function generateDocs(array $docsMetadata, array $parameters): int
+    {
+        if (!$this->twig) {
+            $this->initTwig();
+        }
+
+        $targetFile = $parameters['output'] ?? 'README.md';
+        $docContent = $this->twig->render('docs/docs.twig', \compact('docsMetadata') + $parameters);
+        $docContent = "<!-- DOCS START -->\n$docContent\n<!-- DOCS END -->";
+
+        if (null === $oldContent = $this->pathUtil->read($targetFile)) {
+            return (int) $this->pathUtil->writeFile($targetFile, $docContent);
+        }
+
+        if (\strpos($oldContent, '<!-- DOCS START -->')) {
+            $docContent = \preg_replace('~<!-- DOCS START -->.*?<!-- DOCS END -->~s', $docContent, $oldContent);
+
+            return (int) $this->pathUtil->writeFile($targetFile, $docContent);
+        }
+
+        return (int) $this->pathUtil->appendFile($targetFile, $content);
+    }
+
     protected function initTwig()
     {
         $options = [
