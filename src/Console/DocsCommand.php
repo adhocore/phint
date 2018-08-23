@@ -39,7 +39,7 @@ class DocsCommand extends BaseCommand
                 . "\n(OR mark region with <!-- DOCS START --> and <!-- DOCS END --> to inject docs)",
                 null, 'README.md'
             )
-            ->option('-a --with-abstract', 'Create stub for abstract/interface class')
+            ->option('-a --with-abstract', 'Create docs for abstract/interface class')
             ->usage(
                 '<bold>  phint docs</end>               Appends to readme.md<eol/>' .
                 '<bold>  phint d</end> <comment>-o docs/api.md</end>   Writes to docs/api.md<eol/>'
