@@ -151,6 +151,7 @@ What can you put in config? Anything but we suggest you put only known options (
 }
 ```
 
+---
 ## update
 
 > alias u
@@ -173,6 +174,7 @@ Usage Examples:
   phint u --rollback  Also rolls back to prev version
 ```
 
+---
 ## test
 
 > alias t
@@ -203,6 +205,7 @@ Usage Examples:
   phint test -a          With stubs for abstract/interface
 ```
 
+---
 ## docs
 
 > alias d
@@ -228,7 +231,105 @@ Usage Examples:
   phint d -o docs/api.md   Writes to docs/api.md (Same rule applies regarding inject/append)
 ```
 
+### Sample docs
 
+***PHP code***
+
+```php
+namespace Abc;
+
+/**
+ * This is dummy class.
+ *
+ * It does nothing as of now.
+ * Maybe you could fix it?
+ */
+class Dummy
+{
+    /**
+     * Alpha beta.
+     *
+     * Example:
+     *
+     * <code>
+     * $dummy = new Dummy;
+     * $dummy->alpha('john', true);
+     * // '...'
+     * </code>
+     *
+     * @param string $name
+     * @param bool   $flag
+     *
+     * @return string|null
+     */
+    public function alpha($name, $flag)
+    {
+        //
+    }
+}
+```
+
+***Generated Markdown***
+
+```md
+## Dummy
+
+```php
+use Abc\Dummy;
+```\
+
+> This is dummy class.
+
+It does nothing as of now.
+Maybe you could fix it?
+
+### alpha()
+
+> Alpha beta.
+
+```php
+alpha(string $name, bool $flag): string|null
+```\
+
+Example:
+
+```php
+$dummy = new Dummy;
+$dummy->alpha('john', true);
+// '...'
+```\
+```
+
+***Preview***
+
+## Dummy
+
+```php
+use Ahc\Dummy;
+```
+
+> This is dummy class.
+
+It does nothing as of now.
+Maybe you could fix it?
+
+### alpha()
+
+> Alpha beta.
+
+```php
+alpha(string $name, bool $flag): string|null
+```
+
+Example:
+
+```php
+$dummy = new Dummy;
+$dummy->alpha('john', true);
+// '...'
+```
+
+---
 ## Todo
 
 Including but not limited to:
