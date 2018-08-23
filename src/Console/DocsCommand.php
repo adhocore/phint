@@ -12,7 +12,6 @@
 namespace Ahc\Phint\Console;
 
 use Ahc\Phint\Generator\TwigGenerator;
-use Ahc\Phint\Util\Composer;
 use CrazyFactory\DocBlocks\DocBlock;
 
 class DocsCommand extends BaseCommand
@@ -37,7 +36,7 @@ class DocsCommand extends BaseCommand
 
         $this
             ->option('-o --output', 'Output file (default README.md). For old project you should use something else'
-                ."\n(OR mark region with <!-- DOCS START --> and <!-- DOCS END --> to inject docs)",
+                . "\n(OR mark region with <!-- DOCS START --> and <!-- DOCS END --> to inject docs)",
                 null, 'README.md'
             )
             ->option('-a --with-abstract', 'Create stub for abstract/interface class')
