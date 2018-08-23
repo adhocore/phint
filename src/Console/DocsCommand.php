@@ -120,9 +120,10 @@ class DocsCommand extends BaseCommand
         $methods = [];
         $isTrait = $reflex->isTrait();
         $name    = $reflex->getShortName();
+        $exclude = ['__construct', '__destruct'];
 
         foreach ($reflex->getMethods(\ReflectionMethod::IS_PUBLIC) as $m) {
-            if ($m->class !== $classFqcn) {
+            if ($m->class !== $classFqcn && \in_array($m->name, $exclude)) {
                 continue;
             }
 
