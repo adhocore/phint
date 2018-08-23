@@ -36,7 +36,10 @@ class DocsCommand extends BaseCommand
         $this->_workDir  = \realpath(\getcwd());
 
         $this
-            ->option('-o --output', "Output file (default README.md)\nFor old project you should use something else")
+            ->option('-o --output', 'Output file (default README.md). For old project you should use something else'
+                ."\n(OR mark region with <!-- DOCS START --> and <!-- DOCS END --> to inject docs)",
+                null, 'README.md'
+            )
             ->option('-a --with-abstract', 'Create stub for abstract/interface class')
             ->usage(
                 '<bold>  phint docs</end>               Appends to readme.md<eol/>' .
@@ -63,7 +66,7 @@ class DocsCommand extends BaseCommand
         }
 
         $io->comment('Generating docs ...', true);
-        $generated = $this->generate($docsMetadata);
+        $generated = $this->generate($docsMetadata, $this->values());
 
         if ($generated) {
             $io->cyan("$generated doc(s) generated", true);
@@ -164,11 +167,15 @@ class DocsCommand extends BaseCommand
         return ['static' => $method->isStatic()] + \compact('title', 'texts', 'params', 'return');
     }
 
-    protected function generate(array $docsMetadata): int
+    protected function generate(array $docsMetadata, array $parameters): int
     {
         $templatePath = __DIR__ . '/../../resources';
         $generator    = new TwigGenerator($templatePath, $this->getCachePath());
 
-        return $generator->generateDocs($docsMetadata, $this->values());
+        if (!$this->_pathUtil->isAbsolute($parameters['output'])) {
+            $parameters['output'] = $this->_pathUtil->join($this->_workDir, $parameters['output']);
+        }
+
+        return $generator->generateDocs($docsMetadata, $parameters);
     }
 }
