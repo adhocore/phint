@@ -106,7 +106,7 @@ class TwigGenerator implements GeneratorInterface
         $docContent = $this->twig->render('docs/docs.twig', \compact('docsMetadata') + $parameters);
         $docContent = "<!-- DOCS START -->\n$docContent\n<!-- DOCS END -->";
 
-        if (null === $oldContent = $this->pathUtil->read($targetFile)) {
+        if (null === $oldContent = \trim($this->pathUtil->read($targetFile))) {
             return (int) $this->pathUtil->writeFile($targetFile, $docContent);
         }
 
@@ -116,7 +116,7 @@ class TwigGenerator implements GeneratorInterface
             return (int) $this->pathUtil->writeFile($targetFile, $docContent);
         }
 
-        return (int) $this->pathUtil->appendFile($targetFile, $content);
+        return (int) $this->pathUtil->writeFile($targetFile, \trim("$oldContent\n\n$docContent"));
     }
 
     protected function initTwig()
