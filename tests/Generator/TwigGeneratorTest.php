@@ -27,6 +27,6 @@ class TwigGeneratorTest extends TestCase
     {
         $twigGenerator = new TwigGenerator(__DIR__ . '/../fixtures/twig', __DIR__ . '/../fixtures/twig_cache');
 
-        $this->assertNull($twigGenerator->generate(__DIR__ . '/../fixtures/twig', []));
+        $this->assertSame(1, $twigGenerator->generate(__DIR__ . '/../fixtures/twig', []));
     }
 }
