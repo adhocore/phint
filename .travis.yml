@@ -1,9 +1,13 @@
+cache:
+  directories:
+    - $HOME/.composer/cache/files
+
 language: php
 
 php:
-  - 7.0
   - 7.1
   - 7.2
+  - nightly
 
 install:
   - composer install --prefer-dist

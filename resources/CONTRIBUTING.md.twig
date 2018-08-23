@@ -13,7 +13,10 @@ You may need to fork this project in [GitHub](https://github.com/{{username}}/{{
 git clone git@github.com:{{username}}/{{project}}.git
 
 # OR if you have a fork
-# git clone git@github.com:<your_github_handle>/{{project}}.git
+git clone git@github.com:<your_github_handle>/{{project}}.git
+
+# You may also add upstream
+git remote add upstream https://github.com/{{username}}/{{project}}.git
 
 cd {{project}}
 
@@ -39,6 +42,11 @@ for P in src tests; do find $P -type f -name '*.php' -exec php -l {} \;; done
 
 # Run tests
 vendor/bin/phpunit --coverage-text
+
+
+# If your feature takes long your dev branch might be out of sync, you may want to
+git checkout $branch_name
+git pull upstream master # branch could be something else than master
 ```
 
 ### Finalizing
@@ -58,6 +66,8 @@ Now goto [GitHub](https://github.com/{{username}}/{{project}}/compare?expand=1),
 
 ### Getting PR merged
 
-You have to wait. You have to address change requests.
+You have to wait. You have to address change requests. Be patient.
 
 Thank you for contribution!
+
+**Lastly** Please be informed that your works will be licensed same as the project [license](./LICENSE)

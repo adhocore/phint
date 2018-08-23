@@ -73,6 +73,12 @@ phint init project-name --config phint.json
 
 ## Commands
 
+Each of the commands below should be used like so:
+```sh
+cd /path/to/project
+phint <command> [--options] [args]
+```
+
 ### init
 
 > alias i
@@ -154,16 +160,11 @@ Update Phint to lastest version or rollback to earlier locally installed version
 ***Parameters:***
 
 ```
-Arguments:
-  (n/a)
-
 Options:
   [-h|--help]         Show help
   [-r|--rollback]     Rollback to earlier version
   [-v|--verbosity]    Verbosity level
   [-V|--version]      Show version
-
-Legend: <required> [optional] variadic...
 
 Usage Examples:
   phint update        Updates to latest version
@@ -177,18 +178,19 @@ Usage Examples:
 > alias t
 
 Generate test files with proper classes and test methods analogous to their source counterparts.
+If a test class already exists, it is skipped. In future we may append test stubs for new methods.
+
+Ideally you would run it on existing project **or** after you create/update `src/` files.
 
 ***Parameters:***
 
 ```
-Arguments:
-  (n/a)
-
 Options:
   [-a|--with-abstract]    Create stub for abstract/interface class
   [-d|--dump-autoload]    Force composer dumpautoload (slow)
   [-h|--help]             Show help
-  [-n|--naming]           Test method naming format [t: testMethod | m: test_method | i: it_tests_]
+  [-n|--naming]           Test method naming format
+                          (t: testMethod | m: test_method | i: it_tests_)
   [-p|--phpunit]          Base PHPUnit class to extend from
   [-s|--no-setup]         Dont add setup method
   [-t|--no-teardown]      Dont add teardown method
@@ -201,11 +203,37 @@ Usage Examples:
   phint test -a          With stubs for abstract/interface
 ```
 
+## docs
+
+> alias d
+
+Generate docs (`.md`) for all public classes and methods from their docblocks.
+
+Ideally you would run it on existing project **or** after you create/update `src/` files.
+
+***Parameters:***
+
+```
+Options:
+  [-a|--with-abstract]    Create docs for abstract/interface class
+  [-h|--help]             Show help
+  [-o|--output]           Output file (default README.md). For old project you should use something else
+                          (OR mark region with <!-- DOCS START --> and <!-- DOCS END --> to inject docs)
+  [-v|--verbosity]        Verbosity level
+  [-V|--version]          Show version
+
+Usage Examples:
+  phint docs               If there is `<!-- DOCS START -->` and `<!-- DOCS END -->` region
+                           Injects new doc in between them otherwise appends to bottom
+  phint d -o docs/api.md   Writes to docs/api.md (Same rule applies regarding inject/append)
+```
+
 
 ## Todo
 
 Including but not limited to:
 
-- [ ] Readme.md generator
+- [x] README.md/Docs generator
 - [x] Test files generator
-- [ ] Specify template path (with fallback to current)
+- [ ] Support user templates
+- [ ] Test stubs for new methods

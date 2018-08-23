@@ -13,7 +13,6 @@ namespace Ahc\Phint\Generator;
 
 use Ahc\Phint\Util\Inflector;
 use Ahc\Phint\Util\Path;
-use Symfony\Component\Finder\Finder;
 
 class TwigGenerator implements GeneratorInterface
 {
@@ -41,6 +40,7 @@ class TwigGenerator implements GeneratorInterface
     /** @var array Templates only loaded by some specific commands */
     protected $commandTemplates = [
         'test' => true,
+        'docs' => true,
     ];
 
     public function __construct(string $templatePath, string $cachePath)
@@ -54,20 +54,24 @@ class TwigGenerator implements GeneratorInterface
     /**
      * {@inheritdoc}
      */
-    public function generate(string $targetPath, array $parameters, CollisionHandlerInterface $handler = null)
+    public function generate(string $targetPath, array $parameters, CollisionHandlerInterface $handler = null): int
     {
+        $generated = 0;
+
         if (!$this->twig) {
             $this->initTwig();
         }
 
-        $templates = $this->findTemplates($this->templatePath);
+        $templates = $this->pathUtil->findFiles([$this->templatePath], '.twig', false);
         foreach ($templates as $template) {
             if ($this->shouldGenerate($template, $parameters)) {
-                $this->doGenerate($template, $targetPath, $parameters, $handler);
+                $generated += (int) $this->doGenerate($template, $targetPath, $parameters, $handler);
             }
         }
 
         $this->pathUtil->createBinaries($parameters['bin'] ?? [], $parameters['path'] ?? '');
+
+        return $generated;
     }
 
     public function generateTests(array $testMetadata, array $parameters): int
@@ -84,14 +88,35 @@ class TwigGenerator implements GeneratorInterface
                 continue;
             }
 
-            $generated++;
-
             $content = $this->twig->render('tests/test.twig', $metadata + $parameters);
 
-            $this->pathUtil->writeFile($targetFile, $content);
+            $generated += (int) $this->pathUtil->writeFile($targetFile, $content);
         }
 
         return $generated;
+    }
+
+    public function generateDocs(array $docsMetadata, array $parameters): int
+    {
+        if (!$this->twig) {
+            $this->initTwig();
+        }
+
+        $targetFile = $parameters['output'] ?? 'README.md';
+        $docContent = $this->twig->render('docs/docs.twig', \compact('docsMetadata') + $parameters);
+        $docContent = "<!-- DOCS START -->\n$docContent\n<!-- DOCS END -->";
+
+        if (null === $oldContent = $this->pathUtil->read($targetFile)) {
+            return (int) $this->pathUtil->writeFile($targetFile, $docContent);
+        }
+
+        if (\strpos($oldContent, '<!-- DOCS START -->')) {
+            $docContent = \preg_replace('~<!-- DOCS START -->.*?<!-- DOCS END -->~s', $docContent, $oldContent);
+
+            return (int) $this->pathUtil->writeFile($targetFile, $docContent);
+        }
+
+        return (int) $this->pathUtil->appendFile($targetFile, $content);
     }
 
     protected function initTwig()
@@ -119,28 +144,20 @@ class TwigGenerator implements GeneratorInterface
             return \lcfirst($x);
         }));
 
+        $this->twig->addFilter(new \Twig_SimpleFilter('ucfirst', function ($x) {
+            return \ucfirst($x);
+        }));
+
         $this->twig->addFunction(new \Twig_Function('gmdate', function ($f = null) {
             return \gmdate($f ?? 'Y-m-d H:i:s');
         }));
+
+        $this->twig->addFilter(new \Twig_SimpleFilter('call', function ($fn) {
+            return $fn(\array_slice(\func_get_args(), 1));
+        }));
     }
 
-    protected function findTemplates(string $templatePath)
-    {
-        $templates = [];
-        $finder    = new Finder;
-
-        $finder->files()->ignoreDotFiles(false)->filter(function ($file) {
-            return \substr($file, -5) === '.twig';
-        });
-
-        foreach ($finder->in($templatePath) as $file) {
-            $templates[] = (string) $file;
-        }
-
-        return $templates;
-    }
-
-    protected function doGenerate(string $template, string $targetPath, array $parameters, CollisionHandlerInterface $handler = null)
+    protected function doGenerate(string $template, string $targetPath, array $parameters, CollisionHandlerInterface $handler = null): bool
     {
         $relativePath = $this->pathUtil->getRelativePath($template, $this->templatePath);
         $targetFile   = $this->pathUtil->join($targetPath, $this->getRelativeTarget($parameters, $relativePath));
@@ -149,14 +166,14 @@ class TwigGenerator implements GeneratorInterface
         $content      = $this->twig->render($relativePath, $parameters);
 
         if ($handler && $fileExists) {
-            $handler->handle($targetFile, $content, $parameters);
-
-            return;
+            return $handler->handle($targetFile, $content, $parameters);
         }
 
         if ($this->mayOverride($fileExists, $parameters)) {
-            $this->pathUtil->writeFile($targetFile, $content);
+            return $this->pathUtil->writeFile($targetFile, $content);
         }
+
+        return false;
     }
 
     protected function getRelativeTarget(array $parameters, string $relativePath): string

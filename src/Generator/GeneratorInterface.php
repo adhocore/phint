@@ -20,7 +20,7 @@ interface GeneratorInterface
      * @param array                     $parameters
      * @param CollisionHandlerInterface $handler    Optional, if not provided files are overwritten.
      *
-     * @return void
+     * @return int The count of generated files.
      */
-    public function generate(string $targetPath, array $parameters, CollisionHandlerInterface $handler = null);
+    public function generate(string $targetPath, array $parameters, CollisionHandlerInterface $handler = null): int;
 }

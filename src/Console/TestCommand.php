@@ -38,7 +38,7 @@ class TestCommand extends BaseCommand
         $this
             ->option('-t --no-teardown', 'Dont add teardown method')
             ->option('-s --no-setup', 'Dont add setup method')
-            ->option('-n --naming', 'Test method naming format')
+            ->option('-n --naming', "Test method naming format\n(t: testMethod | m: test_method | i: it_tests_)")
             ->option('-a --with-abstract', 'Create stub for abstract/interface class')
             ->option('-p --phpunit [classFqcn]', 'Base PHPUnit class to extend from')
             ->option('-d --dump-autoload', 'Force composer dumpautoload (slow)', null, false)

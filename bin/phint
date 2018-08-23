@@ -38,9 +38,10 @@ $app = new Ahc\Cli\Application(
     \trim(\file_get_contents(__DIR__ . '/../VERSION'))
 );
 
-// Aliased as `i`
+// Add commands and their aliases
 $app->add(new Ahc\Phint\Console\InitCommand,   'i');
 $app->add(new Ahc\Phint\Console\UpdateCommand, 'u');
 $app->add(new Ahc\Phint\Console\TestCommand,   't');
+$app->add(new Ahc\Phint\Console\DocsCommand,   'd');
 
 $app->logo($logo)->handle($_SERVER['argv']);

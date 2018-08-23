@@ -1,7 +1,8 @@
-## This is a
+## Introduction
 
-<-- Put a cross `x` in relevant boxes below -->
+**This is a**
 
+<!-- Put a cross `x` in relevant boxes below -->
 - [ ] New feature
 - [ ] Fix for ... <!-- (the issue/bug) -->
 - [ ] General improvement

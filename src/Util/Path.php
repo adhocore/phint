@@ -12,6 +12,7 @@
 namespace Ahc\Phint\Util;
 
 use Ahc\Json\Comment;
+use Symfony\Component\Finder\Finder;
 
 class Path
 {
@@ -27,7 +28,7 @@ class Path
      */
     public function isAbsolute(string $path): bool
     {
-        if (DIRECTORY_SEPARATOR === '\\') {
+        if (\DIRECTORY_SEPARATOR === '\\') {
             return strpos($path, ':') === 1;
         }
 
@@ -60,7 +61,16 @@ class Path
 
     public function readAsJson(string $filePath, bool $asArray = true)
     {
-        return (new Comment)->decode(\file_get_contents($filePath), $asArray);
+        return (new Comment)->decode($this->read($filePath) ?? 'null', $asArray);
+    }
+
+    public function read(string $filePath): ?string
+    {
+        if (\is_file($filePath)) {
+            return \file_get_contents($filePath);
+        }
+
+        return null;
     }
 
     public function writeFile(string $file, $content, int $mode = null): bool
@@ -110,6 +120,43 @@ class Path
         return \implode('/', $paths);
     }
 
+    public function findFiles(array $inPaths, string $ext, bool $dotfiles = false): array
+    {
+        $finder = new Finder;
+
+        if ($ext !== '*') {
+            $ext = '.' . \ltrim($ext, '.');
+            $len = \strlen($ext);
+
+            $finder->filter(function ($file) use ($ext, $len) {
+                return \substr($file, -$len) === $ext;
+            });
+        }
+
+        foreach ($inPaths as $path) {
+            $finder->in($path);
+        }
+
+        $files = [];
+        foreach ($finder->files()->ignoreDotFiles($dotfiles) as $file) {
+            $files[] = (string) $file;
+        }
+
+        return $files;
+    }
+
+    public function loadClasses(array $inPaths, array $namespaces, string $ext = 'php'): array
+    {
+        foreach ($this->findFiles($inPaths, $ext) as $file) {
+            _require($file);
+        }
+
+        $namespaces = \implode('\|', $namespaces);
+        $allClasses = \array_merge(\get_declared_interfaces(), \get_declared_classes(), \get_declared_traits());
+
+        return \preg_grep('~^' . \preg_quote($namespaces) . '~', $allClasses);
+    }
+
     protected function initPhintPath()
     {
         if (null !== $this->phintPath) {
@@ -126,4 +173,16 @@ class Path
             }
         }
     }
+}
+
+/**
+ * Isolated file require.
+ *
+ * @param string $file
+ *
+ * @return void
+ */
+function _require(string $file)
+{
+    require_once $file;
 }
