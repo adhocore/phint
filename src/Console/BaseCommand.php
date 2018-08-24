@@ -22,12 +22,16 @@ abstract class BaseCommand extends Command
     /** @var string Full path of log file */
     protected $_logFile;
 
+    /** @var string Current working dir */
+    protected $_workDir;
+
     public function __construct()
     {
         $logFile = @\tempnam(\sys_get_temp_dir(), 'PHT') ?: '';
 
         $this->_logFile  = $logFile;
         $this->_pathUtil = new Path;
+        $this->_workDir  = \realpath(\getcwd());
         $this->_git      = new Git(null, $logFile);
         $this->_composer = new Composer(null, $logFile);
 
