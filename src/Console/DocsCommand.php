@@ -22,9 +22,6 @@ class DocsCommand extends BaseCommand
     /** @var string Command description */
     protected $_desc = 'Generate basic readme docs from docblocks';
 
-    /** @var string Current working dir */
-    protected $_workDir;
-
     /**
      * Configure the command options/arguments.
      *
@@ -32,8 +29,6 @@ class DocsCommand extends BaseCommand
      */
     protected function onConstruct()
     {
-        $this->_workDir  = \realpath(\getcwd());
-
         $this
             ->option('-o --output', 'Output file (default README.md). For old project you should use something else'
                 . "\n(OR mark region with <!-- DOCS START --> and <!-- DOCS END --> to inject docs)",
@@ -170,7 +165,7 @@ class DocsCommand extends BaseCommand
     protected function generate(array $docsMetadata, array $parameters): int
     {
         $templatePath = __DIR__ . '/../../resources';
-        $generator    = new TwigGenerator($templatePath, $this->getCachePath());
+        $generator    = new TwigGenerator([$templatePath], $this->getCachePath());
 
         if (!$this->_pathUtil->isAbsolute($parameters['output'])) {
             $parameters['output'] = $this->_pathUtil->join($this->_workDir, $parameters['output']);
