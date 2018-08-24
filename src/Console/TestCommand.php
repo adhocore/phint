@@ -23,9 +23,6 @@ class TestCommand extends BaseCommand
     /** @var string Command description */
     protected $_desc = 'Generate test stubs';
 
-    /** @var string Current working dir */
-    protected $_workDir;
-
     /**
      * Configure the command options/arguments.
      *
@@ -33,8 +30,6 @@ class TestCommand extends BaseCommand
      */
     protected function onConstruct()
     {
-        $this->_workDir  = \realpath(\getcwd());
-
         $this
             ->option('-t --no-teardown', 'Dont add teardown method')
             ->option('-s --no-setup', 'Dont add setup method')
@@ -212,7 +207,7 @@ class TestCommand extends BaseCommand
     protected function generate(array $testMetadata): int
     {
         $templatePath = __DIR__ . '/../../resources';
-        $generator    = new TwigGenerator($templatePath, $this->getCachePath());
+        $generator    = new TwigGenerator([$templatePath], $this->getCachePath());
 
         return $generator->generateTests($testMetadata, $this->values());
     }
