@@ -37,6 +37,7 @@ class TestCommand extends BaseCommand
             ->option('-a --with-abstract', 'Create stub for abstract/interface class')
             ->option('-p --phpunit [classFqcn]', 'Base PHPUnit class to extend from')
             ->option('-d --dump-autoload', 'Force composer dumpautoload (slow)', null, false)
+            ->option('-x --template', "User supplied template path\nIt has higher precedence than inbuilt templates")
             ->usage(
                 '<bold>  phint test</end> <comment>-n i</end>        With `it_` naming<eol/>' .
                 '<bold>  phint t</end> <comment>--no-teardown</end>  Without `tearDown()`<eol/>' .
@@ -206,8 +207,7 @@ class TestCommand extends BaseCommand
 
     protected function generate(array $testMetadata): int
     {
-        $templatePath = __DIR__ . '/../../resources';
-        $generator    = new TwigGenerator([$templatePath], $this->getCachePath());
+        $generator = new TwigGenerator($this->getTemplatePaths($parameters), $this->getCachePath());
 
         return $generator->generateTests($testMetadata, $this->values());
     }
