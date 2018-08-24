@@ -38,7 +38,7 @@ class InitCommand extends BaseCommand
     {
         $this
             ->argument('<project>', 'The project name without slashes')
-            ->option('-T --type', "Project type (project | library | composer-plugin)")
+            ->option('-T --type', 'Project type (project | library | composer-plugin)')
             ->option('-n --name', 'Vendor full name', null, $this->_git->getConfig('user.name'))
             ->option('-e --email', 'Vendor email', null, $this->_git->getConfig('user.email'))
             ->option('-u --username', 'Vendor handle/username')
