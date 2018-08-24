@@ -29,26 +29,28 @@ class Path
     public function isAbsolute(string $path): bool
     {
         if (\DIRECTORY_SEPARATOR === '\\') {
-            return strpos($path, ':') === 1;
+            return \strpos($path, ':') === 1;
         }
 
         return isset($path[0]) && $path[0] === '/';
     }
 
-    public function getRelativePath($fullPath, $basePath): string
+    public function getRelativePath(string $fullPath, string ...$basePaths): string
     {
-        if (strpos($fullPath, $basePath) === 0) {
-            return substr($fullPath, strlen($basePath));
+        foreach ($basePaths as $basePath) {
+            if (\strpos($fullPath, $basePath) === 0) {
+                return \substr($fullPath, \strlen($basePath));
+            }
         }
 
         // Hmm!
         return $fullPath;
     }
 
-    public function ensureDir(string $dir): bool
+    public function ensureDir(string $dir, $mode = 0777): bool
     {
         if (!\is_dir($dir)) {
-            return \mkdir($dir, 0777, true);
+            return \mkdir($dir, $mode, true);
         }
 
         return true;
