@@ -159,6 +159,19 @@ class Path
         return \preg_grep('~^' . \preg_quote($namespaces) . '~', $allClasses);
     }
 
+    protected function expand(string $path, string $from = ''): string
+    {
+        if ($path[0] === '~') {
+            return \str_replace('~', \getenv('HOME'), $path);
+        }
+
+        if (\strlen($from) > 0 && !$this->isAbsolute($path)) {
+            return $this->join($from, $path);
+        }
+
+        return $path;
+    }
+
     protected function initPhintPath()
     {
         if (null !== $this->phintPath) {
