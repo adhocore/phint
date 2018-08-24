@@ -35,6 +35,7 @@ class DocsCommand extends BaseCommand
                 null, 'README.md'
             )
             ->option('-a --with-abstract', 'Create docs for abstract/interface class')
+            ->option('-x --template', "User supplied template path\nIt has higher precedence than inbuilt templates")
             ->usage(
                 '<bold>  phint docs</end>               Appends to readme.md<eol/>' .
                 '<bold>  phint d</end> <comment>-o docs/api.md</end>   Writes to docs/api.md<eol/>'
@@ -164,12 +165,9 @@ class DocsCommand extends BaseCommand
 
     protected function generate(array $docsMetadata, array $parameters): int
     {
-        $templatePath = __DIR__ . '/../../resources';
-        $generator    = new TwigGenerator([$templatePath], $this->getCachePath());
+        $generator = new TwigGenerator($this->getTemplatePaths($parameters), $this->getCachePath());
 
-        if (!$this->_pathUtil->isAbsolute($parameters['output'])) {
-            $parameters['output'] = $this->_pathUtil->join($this->_workDir, $parameters['output']);
-        }
+        $parameters['output'] = $this->_pathUtil->expand($parameters['output'], $this->_workDir);
 
         return $generator->generateDocs($docsMetadata, $parameters);
     }
