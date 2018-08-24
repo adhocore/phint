@@ -208,6 +208,10 @@ class TwigGenerator implements GeneratorInterface
             return false;
         }
 
+        if (empty($parameters['travis'])) {
+            return $name !== '.travis.yml';
+        }
+
         return true;
     }
 
