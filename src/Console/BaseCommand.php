@@ -94,4 +94,22 @@ abstract class BaseCommand extends Command
             $this->app()->io()->comment("Logging to $logFile", true);
         }
     }
+
+    protected function getTemplatePaths(array $parameters): array
+    {
+        // Phint provided path.
+        $templatePaths = [\realpath(__DIR__ . '/../../resources')];
+        $userPath      = $parameters['template'] ?? null;
+
+        if (empty($userPath)) {
+            return $templatePaths;
+        }
+
+        $userPath = $this->_pathUtil->expand($userPath, $this->_workDir);
+
+        // User supplied path comes first.
+        \array_unshift($templatePaths, $userPath);
+
+        return $templatePaths;
+    }
 }
