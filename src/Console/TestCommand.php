@@ -57,6 +57,7 @@ class TestCommand extends BaseCommand
                     ? 'PHPUnit\\Framework\\TestCase'
                     : 'PHPUnit_Framework_TestCase',
             ],
+            'template' => false,
         ];
 
         $this->logging('start');
@@ -88,7 +89,7 @@ class TestCommand extends BaseCommand
         }
 
         $io->comment('Generating tests ...', true);
-        $generated = $this->generate($metadata);
+        $generated = $this->generate($metadata, $this->values());
 
         if ($generated) {
             $io->cyan("$generated test(s) generated", true);
@@ -205,10 +206,10 @@ class TestCommand extends BaseCommand
         return compact('className', 'testFqns', 'testFqcn', 'testPath');
     }
 
-    protected function generate(array $testMetadata): int
+    protected function generate(array $testMetadata, array $parameters): int
     {
         $generator = new TwigGenerator($this->getTemplatePaths($parameters), $this->getCachePath());
 
-        return $generator->generateTests($testMetadata, $this->values());
+        return $generator->generateTests($testMetadata, $parameters);
     }
 }
