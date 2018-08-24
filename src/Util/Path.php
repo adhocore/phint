@@ -159,7 +159,7 @@ class Path
         return \preg_grep('~^' . \preg_quote($namespaces) . '~', $allClasses);
     }
 
-    protected function expand(string $path, string $from = ''): string
+    public function expand(string $path, string $from = ''): string
     {
         if ($path[0] === '~') {
             return \str_replace('~', \getenv('HOME'), $path);
