@@ -12,7 +12,7 @@ use {{class.classFqcn}};
 
 {{class.texts|join("\n")}}
 {% endif %}
-{% for name, method in class.methods %}
+{% for name, method in class.methods if method.isPublic and not method.maybeMagic %}
 
 ### {{name}}()
 {% if method.title %}
@@ -21,7 +21,7 @@ use {{class.classFqcn}};
 {% endif %}
 
 ```php
-{{method.static ? '::' : ''}}{{name}}({{method.params|join(', ')}}){{method.return ? ': ' ~ method.return : ''}}
+{{method.isStatic ? '::' : ''}}{{name}}({{method.params|join(', ')}}){{method.return ? ': ' ~ method.return : ''}}
 ```
 {% if method.texts %}
 

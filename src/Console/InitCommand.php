@@ -38,7 +38,7 @@ class InitCommand extends BaseCommand
     {
         $this
             ->argument('<project>', 'The project name without slashes')
-            ->option('-T --type', 'Project type')
+            ->option('-T --type', 'Project type (project | library | composer-plugin)')
             ->option('-n --name', 'Vendor full name', null, $this->_git->getConfig('user.name'))
             ->option('-e --email', 'Vendor email', null, $this->_git->getConfig('user.email'))
             ->option('-u --username', 'Vendor handle/username')
@@ -46,8 +46,9 @@ class InitCommand extends BaseCommand
             ->option('-P --php', 'Minimum PHP version', 'floatval')
             ->option('-p --path', 'The project path (Auto resolved)')
             ->option('-S --sync', "Only create missing files\nUse with caution, take backup if needed", null, false)
-            ->option('-f --force', 'Run even if the project exists', null, false)
+            ->option('-f --force', "Run even if the project exists\nUse with caution, take backup if needed", null, false)
             ->option('-g --package', 'Packagist name (Without vendor handle)')
+            ->option('-x --template', "User supplied template path\nIt has higher precedence than inbuilt templates")
             ->option('-d --descr', 'Project description')
             ->option('-w --keywords [words...]', 'Project Keywords')
             ->option('-y --year', 'License Year', null, date('Y'))
@@ -61,12 +62,12 @@ class InitCommand extends BaseCommand
             ->option('-c --no-codecov', 'Disable codecov')
             ->option('-s --no-scrutinizer', 'Disable scrutinizer')
             ->option('-l --no-styleci', 'Disable StyleCI')
-            ->option('-L --license', 'License')
+            ->option('-L --license', 'License (m: MIT | g: GNULGPL | a: Apache2 | b: BSDSimple | i: ISC')
             ->usage($this->writer()->colorizer()->colors(''
                 . '<bold>  phint init</end> <line><project></end> '
                 . '<comment>--force --descr "Awesome project" --name "YourName" --email you@domain.com</end><eol/>'
                 . '<bold>  phint init</end> <line><project></end> '
-                . '<comment>--using laravel/lumen --namespace Project/Api --type project</end><eol/>'
+                . '<comment>--using laravel/lumen --namespace Project/Api --type project --license m</end><eol/>'
                 . '<bold>  phint init</end> <line><project></end> '
                 . '<comment>--php 7.0 --config /path/to/json --dev mockery/mockery --req adhocore/cli</end><eol/>'
             ));
@@ -131,11 +132,11 @@ class InitCommand extends BaseCommand
         $io   = $this->app()->io();
 
         if (!$this->_pathUtil->isAbsolute($path)) {
-            $path = \getcwd() . '/' . $path;
+            $path = $this->_workDir . '/' . $path;
         }
 
         if (\is_dir($path)) {
-            $this->projectExists();
+            $this->projectExists($io);
         } else {
             \mkdir($path, 0777, true);
         }
@@ -143,7 +144,7 @@ class InitCommand extends BaseCommand
         return $path;
     }
 
-    protected function projectExists()
+    protected function projectExists(Interactor $io)
     {
         if (!$this->force && !$this->sync) {
             throw new InvalidArgumentException(
@@ -251,8 +252,7 @@ class InitCommand extends BaseCommand
 
     protected function generate(string $projectPath, array $parameters)
     {
-        $templatePath = __DIR__ . '/../../resources';
-        $generator    = new TwigGenerator($templatePath, $this->getCachePath());
+        $generator = new TwigGenerator($this->getTemplatePaths($parameters), $this->getCachePath());
 
         // Normalize license (default MIT)
         $parameters['license']   = \strtolower($parameters['license'][0] ?? 'm');

@@ -23,9 +23,6 @@ class TestCommand extends BaseCommand
     /** @var string Command description */
     protected $_desc = 'Generate test stubs';
 
-    /** @var string Current working dir */
-    protected $_workDir;
-
     /**
      * Configure the command options/arguments.
      *
@@ -33,15 +30,13 @@ class TestCommand extends BaseCommand
      */
     protected function onConstruct()
     {
-        $this->_workDir  = \realpath(\getcwd());
-
         $this
             ->option('-t --no-teardown', 'Dont add teardown method')
             ->option('-s --no-setup', 'Dont add setup method')
             ->option('-n --naming', "Test method naming format\n(t: testMethod | m: test_method | i: it_tests_)")
             ->option('-a --with-abstract', 'Create stub for abstract/interface class')
             ->option('-p --phpunit [classFqcn]', 'Base PHPUnit class to extend from')
-            ->option('-d --dump-autoload', 'Force composer dumpautoload (slow)', null, false)
+            ->option('-x --template', "User supplied template path\nIt has higher precedence than inbuilt templates")
             ->usage(
                 '<bold>  phint test</end> <comment>-n i</end>        With `it_` naming<eol/>' .
                 '<bold>  phint t</end> <comment>--no-teardown</end>  Without `tearDown()`<eol/>' .
@@ -57,10 +52,9 @@ class TestCommand extends BaseCommand
                 'default' => 't',
             ],
             'phpunit' => [
-                'default' => \class_exists('\\PHPUnit\\Framework\\TestCase')
-                    ? 'PHPUnit\\Framework\\TestCase'
-                    : 'PHPUnit_Framework_TestCase',
+                'default' => 'PHPUnit\\Framework\\TestCase',
             ],
+            'template' => false,
         ];
 
         $this->logging('start');
@@ -76,12 +70,6 @@ class TestCommand extends BaseCommand
     {
         $io = $this->app()->io();
 
-        // Generate namespace mappings
-        if ($this->dumpAutoload) {
-            $io->colors('Running <cyanBold>composer dumpautoload</end> <comment>(takes some time)</end><eol>');
-            $this->_composer->dumpAutoload();
-        }
-
         $io->comment('Preparing metadata ...', true);
         $metadata = $this->prepare();
 
@@ -92,7 +80,7 @@ class TestCommand extends BaseCommand
         }
 
         $io->comment('Generating tests ...', true);
-        $generated = $this->generate($metadata);
+        $generated = $this->generate($metadata, $this->values());
 
         if ($generated) {
             $io->cyan("$generated test(s) generated", true);
@@ -108,112 +96,59 @@ class TestCommand extends BaseCommand
         $namespaces  = $this->_composer->config('autoload.psr-4');
         $namespaces += $this->_composer->config('autoload-dev.psr-4');
 
-        $testNs = [];
+        $srcNs = $testNs = [];
+
         foreach ($namespaces as $ns => $path) {
-            if (!\preg_match('!src/?|lib/?!', $path)) {
-                unset($namespaces[$ns]);
-            }
-
-            if (\strpos($path, 'test') === 0) {
-                $path   = \rtrim($path, '/\\');
-                $nsPath = "{$this->_workDir}/$path";
-                $testNs = \compact('ns', 'nsPath');
-            } elseif ([] === $testNs) {
-                $ns     = $ns . '\\Test';
-                $nsPath = "{$this->_workDir}/tests";
-                $testNs = \compact('ns', 'nsPath');
+            $ns = \rtrim($ns, '\\') . '\\';
+            if (\preg_match('!^(source|src|lib|class)/?!', $path)) {
+                $path    = \rtrim($path, '/\\') . '/';
+                $srcNs[] = ['ns' => $ns, 'nsPath' => "{$this->_workDir}/$path"];
+            } elseif (\strpos($path, 'test') === 0) {
+                $path   = \rtrim($path, '/\\') . '/';
+                $testNs = ['ns' => $ns, 'nsPath' => "{$this->_workDir}/$path"];
             }
         }
 
-        $classMap = require $this->_workDir . '/vendor/composer/autoload_classmap.php';
+        if (empty($srcNs) || empty($testNs)) {
+            throw new \RuntimeException(
+                'The composer.json#(autoload.psr-4, autoload-dev.psr-4) contains no `src` or `test` paths'
+            );
+        }
 
-        return $this->getTestMetadata($classMap, $namespaces, $testNs);
+        return $this->getTestMetadata($this->getSourceClasses(), $srcNs, $testNs);
     }
 
-    protected function getTestMetadata(array $classMap, array $namespaces, array $testNs): array
+    protected function getTestMetadata(array $classes, array $srcNs, array $testNs): array
     {
-        $testMeta = [];
+        $metadata = [];
 
-        require_once $this->_workDir . '/vendor/autoload.php';
-
-        foreach ($classMap as $classFqcn => $classPath) {
-            foreach ($namespaces as $ns => $nsPath) {
-                if (\strpos($classFqcn, $ns) !== 0 || \strpos($classFqcn, $testNs['ns']) === 0) {
-                    continue;
-                }
-
-                if ([] === $meta = $this->getClassMetadata($classFqcn, $testNs['ns'])) {
-                    continue;
-                }
-
-                $data       = \compact('classFqcn', 'classPath', 'ns', 'nsPath');
-                $testMeta[] = $meta + $this->convertToTest($data, $testNs);
-            }
-        }
-
-        return $testMeta;
-    }
-
-    protected function getClassMetadata(string $classFqcn): array
-    {
-        $reflex = new \ReflectionClass($classFqcn);
-
-        if (!$this->shouldGenerateTest($reflex)) {
-            return [];
-        }
-
-        $methods     = [];
-        $isTrait     = $reflex->isTrait();
-        $newable     = $reflex->isInstantiable();
-        $isAbstract  = $reflex->isAbstract();
-        $isInterface = $reflex->isInterface();
-        $excludes    = ['__construct', '__destruct'];
-
-        foreach ($reflex->getMethods(\ReflectionMethod::IS_PUBLIC) as $m) {
-            if ($m->class !== $classFqcn || \in_array($m->name, $excludes)) {
+        foreach ($classes as $classFqcn) {
+            if ([] === $meta = $this->getClassMetaData($classFqcn)) {
                 continue;
             }
 
-            $methods[\ltrim($m->name, '_')] = ['static' => $m->isStatic(), 'abstract' => $m->isAbstract()];
+            $metadata[] = $meta + $this->convertToTest($meta, $srcNs, $testNs);
         }
 
-        return \compact('classFqcn', 'isTrait', 'isAbstract', 'isInterface', 'newable', 'methods');
+        return $metadata;
     }
 
-    protected function shouldGenerateTest(\ReflectionClass $reflex): bool
+    private function convertToTest(array $metadata, array $srcNs, array $testNs): array
     {
-        if ($reflex->isSubclassOf(\Throwable::class)) {
-            return false;
-        }
+        $testClass = $metadata['className'] . 'Test';
+        $testPath  = \str_replace(\array_column($srcNs, 'nsPath'), $testNs['nsPath'], $metadata['classPath']);
+        $testPath  = \preg_replace('!\.php$!i', 'Test.php', $testPath);
+        $testFqcn  = \str_replace(\array_column($srcNs, 'ns'), $testNs['ns'], $metadata['classFqcn']) . 'Test';
 
-        if ($this->abstract) {
-            return true;
-        }
+        $testNamespace = \str_replace(\array_column($srcNs, 'ns'), $testNs['ns'], $metadata['namespace']);
 
-        return !$reflex->isInterface() && !$reflex->isAbstract();
+        return compact('testClass', 'testNamespace', 'testFqcn', 'testPath');
     }
 
-    private function convertToTest(array $metadata, array $testNs): array
+    protected function generate(array $testMetadata, array $parameters): int
     {
-        $classFqcn  = $metadata['classFqcn'];
-        $classPath  = \realpath($metadata['classPath']);
-        $nsFullPath = $this->_workDir . '/' . \trim($metadata['nsPath'], '/\\') . '/';
-        $testPath   = \preg_replace('!^' . \preg_quote($nsFullPath) . '!', $testNs['nsPath'] . '/', $classPath);
-        $testPath   = \preg_replace('!\.php$!i', 'Test.php', $testPath);
-        $testFqcn   = \preg_replace('!^' . \preg_quote($metadata['ns']) . '!', $testNs['ns'], $classFqcn);
-        $fqcnParts  = \explode('\\', $testFqcn);
-        $className  = \array_pop($fqcnParts);
-        $testFqns   = \implode('\\', $fqcnParts);
-        $testFqcn   = $testFqcn . '\\Test';
+        $generator = new TwigGenerator($this->getTemplatePaths($parameters), $this->getCachePath());
 
-        return compact('className', 'testFqns', 'testFqcn', 'testPath');
-    }
-
-    protected function generate(array $testMetadata): int
-    {
-        $templatePath = __DIR__ . '/../../resources';
-        $generator    = new TwigGenerator($templatePath, $this->getCachePath());
-
-        return $generator->generateTests($testMetadata, $this->values());
+        return $generator->generateTests($testMetadata, $parameters);
     }
 }

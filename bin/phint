@@ -1,8 +1,8 @@
 #!/usr/bin/env php
 <?php
 
-if (\PHP_VERSION_ID < 70000) {
-    echo "Phint requires PHP7\n";
+if (\PHP_VERSION_ID < 70100) {
+    echo "Phint requires PHP7.1 or newer\n";
 
     exit(1);
 }
@@ -43,5 +43,6 @@ $app->add(new Ahc\Phint\Console\InitCommand,   'i');
 $app->add(new Ahc\Phint\Console\UpdateCommand, 'u');
 $app->add(new Ahc\Phint\Console\TestCommand,   't');
 $app->add(new Ahc\Phint\Console\DocsCommand,   'd');
+$app->add(new Ahc\Phint\Console\ExportCommand, 'e');
 
 $app->logo($logo)->handle($_SERVER['argv']);
