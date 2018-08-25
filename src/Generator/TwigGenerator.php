@@ -120,7 +120,7 @@ class TwigGenerator implements GeneratorInterface
             return (int) $this->pathUtil->writeFile($targetFile, $docContent);
         }
 
-        if (\strpos($oldContent, '<!-- DOCS START -->')) {
+        if (\strpos($oldContent, '<!-- DOCS START -->') !== false) {
             $docContent = \preg_replace('~<!-- DOCS START -->.*?<!-- DOCS END -->~s', $docContent, $oldContent);
 
             return (int) $this->pathUtil->writeFile($targetFile, $docContent);
