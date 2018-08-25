@@ -15,13 +15,16 @@ use CrazyFactory\DocBlocks\DocBlock;
 
 class Metadata
 {
-    public function forClass(string $classFqcn, bool $docblock = false): array
+    public function forClass(string $classFqcn): array
     {
-        return $this->forReflectionClass(new \ReflectionClass($classFqcn), $docblock);
+        return $this->forReflectionClass(new \ReflectionClass($classFqcn));
     }
 
-    public function forReflectionClass(\ReflectionClass $class, bool $docblock = false): array
+    public function forReflectionClass(\ReflectionClass $class): array
     {
+        $texts = (new DocBlock($class))->texts();
+        $title = \array_shift($texts);
+
         $metadata = [
             'classFqcn'   => $classFqcn,
             'classPath'   => $class->getFilePath(),
@@ -30,62 +33,52 @@ class Metadata
             'isAbstract'  => $class->isAbstract(),
             'isInterface' => $class->isInterface(),
             'newable'     => $class->isInstantiable(),
+            'title'       => $title,
+            'texts'       => $texts,
+            'methods'     => [],
         ];
-
-        if ($docblock) {
-            $texts = (new DocBlock($class))->texts();
-            $title = \array_shift($texts);
-
-            $metadata += \compact('title', 'texts');
-        }
-
-        $metadata['methods'] = [];
 
         foreach ($class->getMethods() as $method) {
             if ($method->class !== $classFqcn) {
                 continue;
             }
 
-            $metadata['methods'][$method->name] = $this->forReflectionMethod($method, $docblock);
+            $metadata['methods'][$method->name] = $this->forReflectionMethod($method);
         }
 
         return $metadata;
     }
 
-    public function forMethod(string $classFqcn, string $method, bool $docblock = false): array
+    public function forMethod(string $classFqcn, string $method): array
     {
         $reflMethod = (new \ReflectionClass($classFqcn))->getMethod($method);
 
         return $this->forReflectionMethod($reflMethod);
     }
 
-    public function forReflectionMethod(\ReflectionMethod $method, bool $docblock = false): array
+    public function forReflectionMethod(\ReflectionMethod $method): array
     {
-        $params = [];
         $parser = new DocBlock($method);
-
-        foreach ($parser->find('param') as $param) {
-            $params[] = \preg_replace(['/(.*\$\w+)(.*)/', '/ +/'], ['$1', ' '], $param->getValue());
-        }
-
-        if (null !== $return = $parser->first('return')) {
-            $return = \preg_replace('/(\S+)(.*)/', '$1', $return->getValue());
-        }
+        $texts  = $parser->texts();
+        $title  = \array_shift($texts);
 
         $metadata = [
             'isStatic'   => $method->isStatic(),
             'isFinal'    => $method->isFinal(),
             'isPublic'   => $method->isPublic(),
             'isAbstract' => $method->isAbstract(),
-            'params'     => $params,
-            'return'     => $return,
+            'title'      => $title,
+            'texts'      => $texts,
+            'return'     => 'void',
+            'params'     => [],
         ];
 
-        if ($docblock) {
-            $texts = $parser->texts();
-            $title = \array_shift($texts);
+        foreach ($parser->find('param') as $param) {
+            $metadata['params'][] = \preg_replace(['/(.*\$\w+)(.*)/', '/ +/'], ['$1', ' '], $param->getValue());
+        }
 
-            $metadata += \compact('title', 'texts');
+        if (null !== $return = $parser->first('return')) {
+            $metadata['return'] = \preg_replace('/(\S+)(.*)/', '$1', $return->getValue());
         }
 
         return $metadata;
