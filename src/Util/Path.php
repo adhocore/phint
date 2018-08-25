@@ -161,6 +161,10 @@ class Path
 
     public function expand(string $path, string $from = ''): string
     {
+        if ($path === '.') {
+            return $from;
+        }
+
         if ($path[0] === '~') {
             return \str_replace('~', \getenv('HOME'), $path);
         }
