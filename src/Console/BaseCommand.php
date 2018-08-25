@@ -15,6 +15,7 @@ use Ahc\Cli\Input\Command;
 use Ahc\Cli\IO\Interactor;
 use Ahc\Phint\Util\Composer;
 use Ahc\Phint\Util\Git;
+use Ahc\Phint\Util\Metadata;
 use Ahc\Phint\Util\Path;
 
 abstract class BaseCommand extends Command
@@ -111,5 +112,63 @@ abstract class BaseCommand extends Command
         \array_unshift($templatePaths, $userPath);
 
         return $templatePaths;
+    }
+
+    protected function getClassesMetadata(): array
+    {
+        $metadata = [];
+
+        foreach ($this->getSourceClasses() as $classFqcn) {
+            if ([] === $meta = $this->getClassMetadata($classFqcn)) {
+                continue;
+            }
+
+            $metadata[] = $meta;
+        }
+
+        return $metadata;
+    }
+
+    protected function getSourceClasses(): array
+    {
+        // Sorry psr-0!
+        $namespaces = $this->_composer->config('autoload.psr-4');
+
+        $srcPaths = [];
+        foreach ($namespaces as $ns => $path) {
+            if (\preg_match('!^(source|src|lib|class)/?!', $path)) {
+                $srcPaths[] = $this->_pathUtil->join($this->_workDir, $path);
+            } else {
+                unset($namespaces[$ns]);
+            }
+        }
+
+        return $this->_pathUtil->loadClasses($srcPaths, \array_keys($namespaces));
+    }
+
+    protected function getClassMetaData(string $classFqcn): array
+    {
+        $class = new \ReflectionClass($classFqcn);
+
+        if (!$this->shouldGenerateFor($class)) {
+            return [];
+        }
+
+        $metadata = (new Metadata)->forReflectionClass($class);
+
+        return empty($metadata['methods']) ? [] : $metadata;
+    }
+
+    protected function shouldGenerateFor(\ReflectionClass $class): bool
+    {
+        if ($class->isSubclassOf(\Throwable::class)) {
+            return false;
+        }
+
+        if ($this->abstract) {
+            return true;
+        }
+
+        return !$class->isInterface() && !$class->isAbstract();
     }
 }
