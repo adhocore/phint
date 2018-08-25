@@ -13,7 +13,7 @@ It helps you be even more lazier! `phint` is work in progress and the plan is to
 
 ![Phint Preview](https://imgur.com/gkidPSz.png "Phint Preview")
 
-[Installation](#installation) &middot; [Features](#features) &middot; [Usage](#usage) &middot; [Phint init](#init) &middot; [Phint update](#update) &middot; [Phint test](#test) &middot; [Phint socs](#docs) &middot; [Templating](#templating)
+[Installation](#installation) &middot; [Features](#features) &middot; [Usage](#usage) &middot; [phint init](#init) &middot; [phint update](#update) &middot; [phint test](#test) &middot; [phint docs](#docs) &middot; [Templating](#templating)
 
 ## Installation
 
@@ -52,6 +52,7 @@ phint --help
 - generate `phpunit.xml`, test `bootstrap.php`
 - generate test stubs for all classes/methods corresponding to `src` (`phint test`)
 - generate docs for all public class/methods
+- export templates to chosen path so it can be customized (`phint export`)
 - use custom templates from a path specified by user
 - update its own self (`phint update`)
 
@@ -121,7 +122,7 @@ Options:
   [-s, --no-scrutinizer]    Disable scrutinizer
   [-l, --no-styleci]        Disable StyleCI
   [-S, --sync]              Only create missing files
-                           Use with caution, take backup if needed
+                            Use with caution, take backup if needed
   [-t, --no-travis]         Disable travis
   [-T, --type]              Project type
   [-u, --username]          Vendor handle/username
@@ -191,7 +192,7 @@ Options:
   [-a, --with-abstract]    Create stub for abstract/interface class
   [-h, --help]             Show help
   [-n, --naming]           Test method naming format
-                          (t: testMethod | m: test_method | i: it_tests_)
+                           (t: testMethod | m: test_method | i: it_tests_)
   [-p, --phpunit]          Base PHPUnit class to extend from
   [-s, --no-setup]         Dont add setup method
   [-t, --no-teardown]      Dont add teardown method
@@ -218,7 +219,7 @@ Options:
   [-a, --with-abstract]    Create docs for abstract/interface class
   [-h, --help]             Show help
   [-o, --output]           Output file (default README.md). For old project you should use something else
-                          (OR mark region with <!-- DOCS START --> and <!-- DOCS END --> to inject docs)
+                           (OR mark region with <!-- DOCS START --> and <!-- DOCS END --> to inject docs)
 
 Usage Examples:
   phint docs               If there is `<!-- DOCS START -->` and `<!-- DOCS END -->` region
