@@ -13,6 +13,8 @@ It helps you be even more lazier! `phint` is work in progress and the plan is to
 
 ![Phint Preview](https://imgur.com/gkidPSz.png "Phint Preview")
 
+[Installation](#installation) &middot; [Features](#features) &middot; [Usage](#usage) &middot; [Phint init](#init) &middot; [Phint update](#update) &middot; [Phint test](#test) &middot; [Phint socs](#docs) &middot; [Templating](#templating)
+
 ## Installation
 
 > Requires PHP7.
@@ -39,7 +41,7 @@ sudo ln -s ~/phint.phar /usr/local/bin/phint
 phint --help
 ```
 
-## Features:
+## Features
 
 - generate dot files the likes of `.gitignore, .travis.yml, . editorconfig` etc
 - generate `LICENSE`, `README.md`, `composer.json`
@@ -49,6 +51,8 @@ phint --help
 - interactively ask and install all the dev and prod deps
 - generate `phpunit.xml`, test `bootstrap.php`
 - generate test stubs for all classes/methods corresponding to `src` (`phint test`)
+- generate docs for all public class/methods
+- use custom templates from a path specified by user
 - update its own self (`phint update`)
 
 
@@ -96,35 +100,33 @@ Arguments:
   <project>  The project name without slashes
 
 Options:
-  [-b|--bin...]            Executable binaries
-  [-c|--no-codecov]        Disable codecov
-  [-C|--config]            JSON filepath to read config from
-  [-d|--descr]             Project description
-  [-D|--dev...]            Developer packages
-  [-e|--email]             Vendor email
-  [-f|--force]             Run even if the project exists
-  [-G|--gh-template]       Use `.github/` as template path
+  [-b, --bin...]            Executable binaries
+  [-c, --no-codecov]        Disable codecov
+  [-C, --config]            JSON filepath to read config from
+  [-d, --descr]             Project description
+  [-D, --dev...]            Developer packages
+  [-e, --email]             Vendor email
+  [-f, --force]             Run even if the project exists
+  [-G, --gh-template]       Use `.github/` as template path
                            By default uses `docs/`
-  [-h|--help]              Show help
-  [-w|--keywords...]       Project Keywords
-  [-L|--license]           License
-  [-n|--name]              Vendor full name
-  [-N|--namespace]         Root namespace (use `/` separator)
-  [-g|--package]           Packagist name (Without vendor handle)
-  [-p|--path]              The project path (Auto resolved)
-  [-P|--php]               Minimum PHP version
-  [-R|--req...]            Required packages
-  [-s|--no-scrutinizer]    Disable scrutinizer
-  [-l|--no-styleci]        Disable StyleCI
-  [-S|--sync]              Only create missing files
+  [-h, --help]              Show help
+  [-w, --keywords...]       Project Keywords
+  [-L, --license]           License
+  [-n, --name]              Vendor full name
+  [-N, --namespace]         Root namespace (use `/` separator)
+  [-g, --package]           Packagist name (Without vendor handle)
+  [-p, --path]              The project path (Auto resolved)
+  [-P, --php]               Minimum PHP version
+  [-R, --req...]            Required packages
+  [-s, --no-scrutinizer]    Disable scrutinizer
+  [-l, --no-styleci]        Disable StyleCI
+  [-S, --sync]              Only create missing files
                            Use with caution, take backup if needed
-  [-t|--no-travis]         Disable travis
-  [-T|--type]              Project type
-  [-u|--username]          Vendor handle/username
-  [-z|--using]             Reference package
-  [-v|--verbosity]         Verbosity level
-  [-V|--version]           Show version
-  [-y|--year]              License Year
+  [-t, --no-travis]         Disable travis
+  [-T, --type]              Project type
+  [-u, --username]          Vendor handle/username
+  [-z, --using]             Reference package
+  [-y, --year]              License Year
 
 Usage Examples:
   phint init <project> --force --descr "Awesome project" --name "YourName" --email you@domain.com
@@ -162,10 +164,8 @@ Update Phint to lastest version or rollback to earlier locally installed version
 
 ```
 Options:
-  [-h|--help]         Show help
-  [-r|--rollback]     Rollback to earlier version
-  [-v|--verbosity]    Verbosity level
-  [-V|--version]      Show version
+  [-h, --help]         Show help
+  [-r, --rollback]     Rollback to earlier version
 
 Usage Examples:
   phint update        Updates to latest version
@@ -188,16 +188,13 @@ Ideally you would run it on existing project **or** after you create/update `src
 
 ```
 Options:
-  [-a|--with-abstract]    Create stub for abstract/interface class
-  [-d|--dump-autoload]    Force composer dumpautoload (slow)
-  [-h|--help]             Show help
-  [-n|--naming]           Test method naming format
+  [-a, --with-abstract]    Create stub for abstract/interface class
+  [-h, --help]             Show help
+  [-n, --naming]           Test method naming format
                           (t: testMethod | m: test_method | i: it_tests_)
-  [-p|--phpunit]          Base PHPUnit class to extend from
-  [-s|--no-setup]         Dont add setup method
-  [-t|--no-teardown]      Dont add teardown method
-  [-v|--verbosity]        Verbosity level
-  [-V|--version]          Show version
+  [-p, --phpunit]          Base PHPUnit class to extend from
+  [-s, --no-setup]         Dont add setup method
+  [-t, --no-teardown]      Dont add teardown method
 
 Usage Examples:
   phint test -n i        With `it_` naming
@@ -218,12 +215,10 @@ Ideally you would run it on existing project **or** after you create/update `src
 
 ```
 Options:
-  [-a|--with-abstract]    Create docs for abstract/interface class
-  [-h|--help]             Show help
-  [-o|--output]           Output file (default README.md). For old project you should use something else
+  [-a, --with-abstract]    Create docs for abstract/interface class
+  [-h, --help]             Show help
+  [-o, --output]           Output file (default README.md). For old project you should use something else
                           (OR mark region with <!-- DOCS START --> and <!-- DOCS END --> to inject docs)
-  [-v|--verbosity]        Verbosity level
-  [-V|--version]          Show version
 
 Usage Examples:
   phint docs               If there is `<!-- DOCS START -->` and `<!-- DOCS END -->` region
@@ -276,7 +271,7 @@ class Dummy
 
 ```php
 use Abc\Dummy;
-```\
+\```
 
 > This is dummy class.
 
@@ -289,7 +284,7 @@ Maybe you could fix it?
 
 ```php
 alpha(string $name, bool $flag): string|null
-```\
+\```
 
 Example:
 
@@ -297,7 +292,7 @@ Example:
 $dummy = new Dummy;
 $dummy->alpha('john', true);
 // '...'
-```\
+\```
 ```
 
 ***Preview***
@@ -330,11 +325,76 @@ $dummy->alpha('john', true);
 ```
 
 ---
+## Templating
+
+So you would like to have your own templates and customize `phint` to your taste!
+
+First you need to create a directory root (of any name, eg: `myphint`) with structure that looks like:
+
+```tree
+myphint
+├── CHANGELOG.md.twig
+├── composer.json.twig
+├── CONTRIBUTING.md.twig
+├── docs
+│   ├── docs.twig
+│   ├── ISSUE_TEMPLATE.md.twig
+│   └── PULL_REQUEST_TEMPLATE.md.twig
+├── .editorconfig.twig
+├── .env.example.twig
+├── .gitignore.twig
+├── LICENSE.twig
+├── package.json.twig
+├── phpunit.xml.dist.twig
+├── README.md.twig
+├── tests
+│   ├── bootstrap.php.twig
+│   └── test.twig
+└── .travis.yml.twig
+```
+
+Note that you dont need to have all the files there in new directory just pick the ones you would like to customize and start hacking.
+
+Luckily you **dont** have to create these templates yourself, just run `phint export --to ~/myphint`!
+
+**Pro Tip**
+You can actually introduce any new template as long as their extension is `.twig`.
+Such templates are *only* used by `phint init` command. Check [Template variables](#template-variables).
+
+After you are done customizing these templates you can use them in each of the *phint* commands like so
+
+```sh
+phint init project --template ~/myphint
+phint docs --template ~/myphint
+phint test --template ~/myphint
+```
+
+The short option name for `--template` is `-x`.
+
+#### Template variables
+
+Here's what parameters these templates would receive when run:
+
+- ***[docs/docs.twig](https://github.com/adhocore/phint/blob/master/resources/docs/docs.twig):*** classes [metadata](#class-metadata) and [docs parameters](#docs)
+- ***[tests/test.twig](https://github.com/adhocore/phint/blob/master/resources/tests/test.twig):*** class [metadata](#class-metadata) and [test parameters](#test)
+- ***Everything else:*** [init parameters](#init)
+
+***Metadata***
+
+- The `docs` and `test` commands read and use source files metadata.
+- The `docs.twig` template recieves metadata collection of all classes at once.
+- The `test.twig` template recieves metadata unit of one class at a time.
+
+### Class metadata
+
+```php
+```
+
 ## Todo
 
 Including but not limited to:
 
 - [x] README.md/Docs generator
 - [x] Test files generator
-- [ ] Support user templates
+- [x] Support user templates
 - [ ] Test stubs for new methods
