@@ -99,7 +99,7 @@ class TwigGenerator implements GeneratorInterface
             }
 
             $content = $this->twig->render('tests/test.twig', $metadata + $parameters);
-            $count  += (int) $this->pathUtil->writeFile($targetFile, $content);
+            $count += (int) $this->pathUtil->writeFile($targetFile, $content);
         }
 
         return $count;

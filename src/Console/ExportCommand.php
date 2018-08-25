@@ -11,8 +11,6 @@
 
 namespace Ahc\Phint\Console;
 
-use Ahc\Phint\Generator\TwigGenerator;
-
 class ExportCommand extends BaseCommand
 {
     /** @var string Command name */
@@ -63,7 +61,7 @@ class ExportCommand extends BaseCommand
             }
 
             $content = \file_get_contents($template);
-            $count  += (int) $this->_pathUtil->writeFile($target, $content);
+            $count += (int) $this->_pathUtil->writeFile($target, $content);
         }
 
         $io->cyan("$count template(s) copied to {$this->to}", true);
