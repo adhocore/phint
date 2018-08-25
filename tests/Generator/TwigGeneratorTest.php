@@ -16,17 +16,26 @@ use PHPUnit\Framework\TestCase;
 
 class TwigGeneratorTest extends TestCase
 {
-    protected $templatePath = __DIR__ . '/../fixtures/twig';
+    protected $templatePath;
 
     public function setUp()
     {
-        @\mkdir(__DIR__ . '/../fixtures/twig');
+        $path = __DIR__ . '/../fixtures/twig';
+
+        if (!is_dir($path . '_cache')) {
+            mkdir($path . '_cache', 0777);
+        }
+
+        $this->templatePath = realpath($path);
     }
 
     public function testGenerate()
     {
-        $twigGenerator = new TwigGenerator(__DIR__ . '/../fixtures/twig', __DIR__ . '/../fixtures/twig_cache');
+        $twigGenerator = new TwigGenerator([$this->templatePath], __DIR__ . '/../fixtures/twig_cache');
 
-        $this->assertSame(1, $twigGenerator->generate(__DIR__ . '/../fixtures/twig', []));
+        $rand = '_' . rand();
+        $this->assertSame(1, $twigGenerator->generate($this->templatePath, ['string' => $rand]));
+
+        $this->assertContains($rand, file_get_contents($this->templatePath . '/example'));
     }
 }
