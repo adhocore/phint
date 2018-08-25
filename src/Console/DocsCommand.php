@@ -12,7 +12,6 @@
 namespace Ahc\Phint\Console;
 
 use Ahc\Phint\Generator\TwigGenerator;
-use CrazyFactory\DocBlocks\DocBlock;
 
 class DocsCommand extends BaseCommand
 {
