@@ -119,7 +119,7 @@ abstract class BaseCommand extends Command
         $metadata = [];
 
         foreach ($this->getSourceClasses() as $classFqcn) {
-            if ([] === $meta = $this->getClassMetadata($classFqcn)) {
+            if ([] === $meta = $this->getClassMetaData($classFqcn)) {
                 continue;
             }
 
