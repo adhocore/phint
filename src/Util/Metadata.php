@@ -63,10 +63,13 @@ class Metadata
         $title  = \array_shift($texts);
 
         $metadata = [
+            'name'       => $method->name,
+            'inClass'    => $method->getDeclaringClass()->name,
             'isStatic'   => $method->isStatic(),
             'isFinal'    => $method->isFinal(),
             'isPublic'   => $method->isPublic(),
             'isAbstract' => $method->isAbstract(),
+            'maybeMagic' => \substr($method->name, 0, 2) === '__',
             'title'      => $title,
             'texts'      => $texts,
             'return'     => 'void',
