@@ -22,13 +22,16 @@ class Metadata
 
     public function forReflectionClass(\ReflectionClass $class): array
     {
+        $name  = $class->name;
         $texts = (new DocBlock($class))->texts();
         $title = \array_shift($texts);
 
         $metadata = [
-            'classFqcn'   => $class->name,
+            'namespace'   => \preg_replace('!\W\w+$!', '', $name),
+            'classFqcn'   => $name,
             'classPath'   => $class->getFileName(),
             'name'        => $class->getShortName(),
+            'className'   => $class->getShortName(),
             'isTrait'     => $class->isTrait(),
             'isAbstract'  => $class->isAbstract(),
             'isInterface' => $class->isInterface(),
@@ -39,7 +42,7 @@ class Metadata
         ];
 
         foreach ($class->getMethods() as $method) {
-            if ($method->class !== $class->name) {
+            if ($method->class !== $name) {
                 continue;
             }
 
