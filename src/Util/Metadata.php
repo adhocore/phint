@@ -22,16 +22,6 @@ class Metadata
 
     public function forReflectionClass(\ReflectionClass $class, bool $docblock = false): array
     {
-        $methods = [];
-
-        foreach ($class->getMethods(\ReflectionMethod::IS_PUBLIC) as $m) {
-            if ($m->class !== $classFqcn) {
-                continue;
-            }
-
-            // $methods[$m->name] = $this->getMethodMetadata($m);
-        }
-
         $metadata = [
             'classFqcn'   => $classFqcn,
             'classPath'   => $class->getFilePath(),
@@ -49,7 +39,15 @@ class Metadata
             $metadata += \compact('title', 'texts');
         }
 
-        $metadata['methods'] = $methods;
+        $metadata['methods'] = [];
+
+        foreach ($class->getMethods() as $method) {
+            if ($method->class !== $classFqcn) {
+                continue;
+            }
+
+            $metadata['methods'][$method->name] = $this->forReflectionMethod($method, $docblock);
+        }
 
         return $metadata;
     }
