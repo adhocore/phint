@@ -26,8 +26,8 @@ class Metadata
         $title = \array_shift($texts);
 
         $metadata = [
-            'classFqcn'   => $classFqcn,
-            'classPath'   => $class->getFilePath(),
+            'classFqcn'   => $class->name,
+            'classPath'   => $class->getFileName(),
             'name'        => $class->getShortName(),
             'isTrait'     => $class->isTrait(),
             'isAbstract'  => $class->isAbstract(),
@@ -39,7 +39,7 @@ class Metadata
         ];
 
         foreach ($class->getMethods() as $method) {
-            if ($method->class !== $classFqcn) {
+            if ($method->class !== $class->name) {
                 continue;
             }
 
