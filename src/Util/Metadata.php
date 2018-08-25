@@ -75,18 +75,55 @@ class Metadata
             'maybeMagic' => \substr($method->name, 0, 2) === '__',
             'title'      => $title,
             'texts'      => $texts,
-            'return'     => 'void',
-            'params'     => [],
         ];
 
+        $params = [];
         foreach ($parser->find('param') as $param) {
-            $metadata['params'][] = \preg_replace(['/(.*\$\w+)(.*)/', '/ +/'], ['$1', ' '], $param->getValue());
+            if (\preg_match('/(.*)\$(\w+)/', $param->getValue(), $match)) {
+                $params[$match[2]] = \trim($match[1]);
+            }
         }
 
         if (null !== $return = $parser->first('return')) {
-            $metadata['return'] = \preg_replace('/(\S+)(.*)/', '$1', $return->getValue());
+            $return = \preg_replace('/(\S+)(.*)/', '$1', $return->getValue());
         }
 
-        return $metadata;
+        return $metadata + $this->getMethodParameters($method, $params, $return ?? '');
+    }
+
+    protected function getMethodParameters(\ReflectionMethod $method, array $docParams, string $return)
+    {
+        $params = [];
+        $parser = new DocBlock($method);
+
+        foreach ($method->getParameters() as $param) {
+            $name = $param->name;
+            if (!$param->hasType()) {
+                $params[] = \trim(($docParams[$name] ?? '') . " \$$name");
+
+                continue;
+            }
+
+            $params[] = $this->getRealType($param) . " \$$name";
+        }
+
+        if ($returnType = $method->getReturnType()) {
+            $return = $this->getRealType($returnType);
+        }
+
+        return \compact('params', 'return');
+    }
+
+    protected function getRealType($param): string
+    {
+        $type = \method_exists($param, 'getType')
+            ? $param->getType()
+            : (string) $param;
+
+        if (\preg_match('/void|null/', $type)) {
+            return $type;
+        }
+
+        return $type . ($param->allowsNull() ? '|null' : '');
     }
 }
