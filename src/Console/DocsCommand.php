@@ -52,7 +52,7 @@ class DocsCommand extends BaseCommand
         $io = $this->app()->io();
 
         $io->comment('Preparing metadata ...', true);
-        $docsMetadata = $this->prepare();
+        $docsMetadata = $this->getClassesMetadata();
 
         if (empty($docsMetadata)) {
             $io->bgGreen('Looks like nothing to do here', true);
@@ -68,99 +68,6 @@ class DocsCommand extends BaseCommand
         }
 
         $io->ok('Done', true);
-    }
-
-    protected function prepare(): array
-    {
-        // Sorry psr-0!
-        $namespaces = $this->_composer->config('autoload.psr-4');
-
-        $srcPaths = [];
-        foreach ($namespaces as $ns => $path) {
-            if (\preg_match('!^(source|src|lib|class)/?!', $path)) {
-                $srcPaths[] = $this->_pathUtil->join($this->_workDir, $path);
-            } else {
-                unset($namespaces[$ns]);
-            }
-        }
-
-        $classes = $this->_pathUtil->loadClasses($srcPaths, \array_keys($namespaces));
-
-        return $this->getClassesMetadata($classes);
-    }
-
-    protected function getClassesMetadata(array $classes): array
-    {
-        $metadata = [];
-
-        foreach ($classes as $classFqcn) {
-            if ([] === $meta = $this->getClassMetadata($classFqcn)) {
-                continue;
-            }
-
-            $metadata[] = $meta;
-        }
-
-        return $metadata;
-    }
-
-    protected function getClassMetadata(string $classFqcn): array
-    {
-        $reflex = new \ReflectionClass($classFqcn);
-
-        if (!$this->shouldGenerateDocs($reflex)) {
-            return [];
-        }
-
-        $methods = [];
-        $isTrait = $reflex->isTrait();
-        $name    = $reflex->getShortName();
-        $exclude = ['__construct', '__destruct'];
-
-        foreach ($reflex->getMethods(\ReflectionMethod::IS_PUBLIC) as $m) {
-            if ($m->class !== $classFqcn && \in_array($m->name, $exclude)) {
-                continue;
-            }
-
-            $methods[$m->name] = $this->getMethodMetadata($m);
-        }
-
-        if (empty($methods)) {
-            return [];
-        }
-
-        $texts = (new DocBlock($reflex))->texts();
-        $title = \array_shift($texts);
-
-        return \compact('classFqcn', 'name', 'isTrait', 'title', 'texts', 'methods');
-    }
-
-    protected function shouldGenerateDocs(\ReflectionClass $reflex): bool
-    {
-        if ($this->abstract) {
-            return true;
-        }
-
-        return !$reflex->isInterface() && !$reflex->isAbstract();
-    }
-
-    protected function getMethodMetadata(\ReflectionMethod $method): array
-    {
-        $params = [];
-        $parser = new DocBlock($method);
-
-        foreach ($parser->find('param') as $param) {
-            $params[] = \preg_replace(['/(.*\$\w+)(.*)/', '/ +/'], ['$1', ' '], $param->getValue());
-        }
-
-        if (null !== $return = $parser->first('return')) {
-            $return = \preg_replace('/ .*?$/', '', $return->getValue());
-        }
-
-        $texts = $parser->texts();
-        $title = \array_shift($texts);
-
-        return ['static' => $method->isStatic()] + \compact('title', 'texts', 'params', 'return');
     }
 
     protected function generate(array $docsMetadata, array $parameters): int
