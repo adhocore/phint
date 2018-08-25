@@ -387,7 +387,51 @@ Here's what parameters these templates would receive when run:
 
 ### Class metadata
 
+Example metadata for [Abc\\Dummy](#sample-docs) above:
+
 ```php
+[
+  'namespace'   => 'Abc',
+  'classFqcn'   => 'Abc\\Dummy',
+  'classPath'   => '/home/user/projects/src/Dummy.php',
+  'name'        => 'Dummy',
+  'className'   => 'Dummy',
+  'isTrait'     => false,
+  'isAbstract'  => false,
+  'isInterface' => false,
+  'newable'     => true,
+  'title'       => 'This is dummy class.',
+  'texts'       => [
+    'It does nothing as of now.',
+    'Maybe you could fix it?',
+  ],
+  'methods' => [
+    'alpha' => [
+      'name'       => 'alpha',
+      'inClass'    => 'Abc\\Dummy',
+      'isStatic'   => false,
+      'isFinal'    => false,
+      'isPublic'   => true,
+      'isAbstract' => false,
+      'maybeMagic' => false,
+      'title'      => 'Alpha beta.',
+      'texts'      => [
+        'Example:',
+        '<code>',
+        '$dummy = new Dummy;',
+        '$dummy->alpha(\'john\', true);',
+        '// \'...\'',
+        '</code>',
+      ],
+      'return' => 'string|null',
+      'params' => [
+        'string $name',
+        'bool $flag',
+      ],
+    ],
+    // more methods ...
+  ],
+];
 ```
 
 ## Todo
