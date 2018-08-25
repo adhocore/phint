@@ -75,7 +75,7 @@ class TwigGenerator implements GeneratorInterface
             $processed[$relativePath] = true;
 
             if ($this->shouldGenerate($template, $parameters)) {
-                $generated += (int) $this->doGenerate($template, $targetPath, $parameters, $handler);
+                $generated += (int) $this->doGenerate($relativePath, $targetPath, $parameters, $handler);
             }
         }
 
