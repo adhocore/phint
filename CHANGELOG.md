@@ -1,3 +1,7 @@
+## [v0.3.1] 2018-08-25 14:08:41 UTC
+
+- [f511845](https://github.com/adhocore/phint/commit/f511845) fix(exportcmd): realpath() fails when in phar (Jitendra Adhikari)
+
 ## [v0.3.0] 2018-08-25 13:08:23 UTC
 
 - [06bb162](https://github.com/adhocore/phint/commit/06bb162) feat(util.meta): prefer reflection type over docblocks (Jitendra Adhikari)
