@@ -56,7 +56,7 @@ class TwigGenerator implements GeneratorInterface
      */
     public function generate(string $targetPath, array $parameters, CollisionHandlerInterface $handler = null): int
     {
-        $generated = 0;
+        $count = 0;
 
         if (!$this->twig) {
             $this->initTwig();
@@ -75,13 +75,13 @@ class TwigGenerator implements GeneratorInterface
             $processed[$relativePath] = true;
 
             if ($this->shouldGenerate($template, $parameters)) {
-                $generated += (int) $this->doGenerate($relativePath, $targetPath, $parameters, $handler);
+                $count += (int) $this->doGenerate($relativePath, $targetPath, $parameters, $handler);
             }
         }
 
         $this->pathUtil->createBinaries($parameters['bin'] ?? [], $parameters['path'] ?? '');
 
-        return $generated;
+        return $count;
     }
 
     public function generateTests(array $testMetadata, array $parameters): int
@@ -90,7 +90,7 @@ class TwigGenerator implements GeneratorInterface
             $this->initTwig();
         }
 
-        $generated = 0;
+        $count = 0;
 
         foreach ($testMetadata as $metadata) {
             // Skip existing
@@ -99,11 +99,10 @@ class TwigGenerator implements GeneratorInterface
             }
 
             $content = $this->twig->render('tests/test.twig', $metadata + $parameters);
-
-            $generated += (int) $this->pathUtil->writeFile($targetFile, $content);
+            $count  += (int) $this->pathUtil->writeFile($targetFile, $content);
         }
 
-        return $generated;
+        return $count;
     }
 
     public function generateDocs(array $docsMetadata, array $parameters): int
