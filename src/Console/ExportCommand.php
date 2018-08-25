@@ -43,7 +43,7 @@ class ExportCommand extends BaseCommand
     public function execute()
     {
         $io  = $this->app()->io();
-        $res = \realpath(__DIR__ . '/../../resources');
+        $res = __DIR__ . '/../../resources';
         $dir = $this->_pathUtil->expand($this->to, $this->_workDir);
 
         $this->_pathUtil->ensureDir($dir);
