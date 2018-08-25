@@ -43,5 +43,6 @@ $app->add(new Ahc\Phint\Console\InitCommand,   'i');
 $app->add(new Ahc\Phint\Console\UpdateCommand, 'u');
 $app->add(new Ahc\Phint\Console\TestCommand,   't');
 $app->add(new Ahc\Phint\Console\DocsCommand,   'd');
+$app->add(new Ahc\Phint\Console\ExportCommand, 'e');
 
 $app->logo($logo)->handle($_SERVER['argv']);
