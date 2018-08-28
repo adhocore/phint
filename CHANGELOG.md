@@ -1,3 +1,8 @@
+## [v0.3.2] 2018-08-28 14:08:36 UTC
+
+- [1afb621](https://github.com/adhocore/phint/commit/1afb621) chore(initcmd): update option desc (Jitendra Adhikari)
+- [2f16c43](https://github.com/adhocore/phint/commit/2f16c43) chore(updcmd): show error msg if fetch latest release failed (Jitendra Adhikari)
+
 ## [v0.3.1] 2018-08-25 14:08:41 UTC
 
 - [f511845](https://github.com/adhocore/phint/commit/f511845) fix(exportcmd): realpath() fails when in phar (Jitendra Adhikari)
