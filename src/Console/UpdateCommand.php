@@ -56,7 +56,8 @@ class UpdateCommand extends BaseCommand
         $release = \json_decode($release);
 
         if (\JSON_ERROR_NONE !== \json_last_error() || empty($release->assets[0])) {
-            $io->bgRed('Error getting latest release', true);
+            $io->bgRed('Problem getting latest release', true);
+            $io->red($release->message ?? 'Unknown error', true);
 
             return;
         }

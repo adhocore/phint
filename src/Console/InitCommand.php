@@ -53,7 +53,7 @@ class InitCommand extends BaseCommand
             ->option('-w --keywords [words...]', 'Project Keywords')
             ->option('-y --year', 'License Year', null, date('Y'))
             ->option('-b --bin [binaries...]', 'Executable binaries')
-            ->option('-z --using', 'Reference package')
+            ->option('-z --using', 'Reference package (should be known to composer)')
             ->option('-C --config', 'JSON filepath to read config from')
             ->option('-G --gh-template', "Use `.github/` as template path\nBy default uses `docs/`", null, false)
             ->option('-R --req [pkgs...]', 'Required packages')
