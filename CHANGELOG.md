@@ -1,3 +1,8 @@
+## [v0.3.3] 2018-08-31 12:08:46 UTC
+
+- [63fb737](https://github.com/adhocore/phint/commit/63fb737) fix(testcmd): the test namespace for file in root was broken (Jitendra Adhikari)
+- [1ece271](https://github.com/adhocore/phint/commit/1ece271) Add more Path tests (peter279k)
+
 ## [v0.3.2] 2018-08-28 14:08:36 UTC
 
 - [1afb621](https://github.com/adhocore/phint/commit/1afb621) chore(initcmd): update option desc (Jitendra Adhikari)
