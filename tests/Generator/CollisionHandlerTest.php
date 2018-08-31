@@ -21,7 +21,7 @@ class CollisionHandlerTest extends TestCase
         $this->assertInstanceOf(CollisionHandler::class, new CollisionHandler());
     }
 
-    public function testHandle()
+    public function testHandleOnJsonFile()
     {
         $targetjsonFile   = __DIR__ . '/../fixtures/example.json';
         $collisionHandler = new CollisionHandler();
@@ -31,5 +31,26 @@ class CollisionHandlerTest extends TestCase
 
         $this->assertArrayHasKey('type', $content);
         $this->assertArrayHasKey('key', $content);
+    }
+
+    public function testHandleOnMarkdownFile()
+    {
+        $targetjsonFile     = __DIR__ . '/../fixtures/example.md';
+        $expectedjsonFile   = __DIR__ . '/../fixtures/expected_example.md';
+        $collisionHandler   = new CollisionHandler();
+        $collisionHandler->handle($targetjsonFile, "key\nvalue\n");
+
+        $content         = \file_get_contents($targetjsonFile);
+        $expectedContent = \file_get_contents($expectedjsonFile);
+
+        $this->assertEquals($expectedContent, $content);
+    }
+
+    public function testHandleOnUnsupportedFile()
+    {
+        $targetjsonFile   = __DIR__ . '/../fixtures/example.txt';
+        $collisionHandler = new CollisionHandler();
+
+        $this->assertFalse($collisionHandler->handle($targetjsonFile, "key\nvalue\n"));
     }
 }
