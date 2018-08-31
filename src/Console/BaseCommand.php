@@ -99,7 +99,7 @@ abstract class BaseCommand extends Command
     protected function getTemplatePaths(array $parameters): array
     {
         // Phint provided path.
-        $templatePaths = [\realpath(__DIR__ . '/../../resources')];
+        $templatePaths = [__DIR__ . '/../../resources'];
         $userPath      = $parameters['template'] ?? null;
 
         if (empty($userPath)) {
