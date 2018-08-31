@@ -1,3 +1,9 @@
+## [v0.3.4] 2018-08-31 15:08:19 UTC
+
+- [5003ec4](https://github.com/adhocore/phint/commit/5003ec4) fix(initcmd): donot prompt --template (Jitendra Adhikari)
+- [1356bc3](https://github.com/adhocore/phint/commit/1356bc3) fix(basecmd): realpath fails on phar (Jitendra Adhikari)
+- [03616f3](https://github.com/adhocore/phint/commit/03616f3) docs: reorder test section, add sample test (Jitendra Adhikari)
+
 ## [v0.3.3] 2018-08-31 12:08:46 UTC
 
 - [63fb737](https://github.com/adhocore/phint/commit/63fb737) fix(testcmd): the test namespace for file in root was broken (Jitendra Adhikari)
