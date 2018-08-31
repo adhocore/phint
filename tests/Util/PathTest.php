@@ -46,6 +46,13 @@ class PathTest extends TestCase
         $this->assertTrue($path->ensureDir(__DIR__ . '/../fixtures/ensure_dir'));
     }
 
+    public function testEnsureDirOnNonExistedDir()
+    {
+        $path = new Path;
+
+        $this->assertTrue($path->ensureDir(__DIR__ . '/../fixtures/add_dir'));
+    }
+
     public function testGetExtension()
     {
         $path = new Path;
@@ -60,6 +67,20 @@ class PathTest extends TestCase
         $this->assertArrayHasKey('name', $path->readAsJson(__DIR__ . '/../fixtures/example.json'));
     }
 
+    public function testReadDirShouldReturnNull()
+    {
+        $path = new Path;
+
+        $this->assertNull($path->read(__DIR__ . '/../fixtures'));
+    }
+
+    public function testGetPhintPath()
+    {
+        $path = new Path;
+
+        $this->assertContains('/home', $path->getPhintPath('/fixtures'));
+    }
+
     public function testWriteFile()
     {
         $writeFilePath = __DIR__ . '/../fixtures/write_file.txt';
@@ -67,5 +88,48 @@ class PathTest extends TestCase
         $path->writeFile($writeFilePath, 'write_file_test');
 
         $this->assertEquals('write_file_test', \file_get_contents($writeFilePath));
+    }
+
+    public function testJoinOnEmptyPathArray()
+    {
+        $path = new Path;
+
+        $this->assertSame('', $path->join([]));
+    }
+
+    public function testLoadClasses()
+    {
+        $path = new Path;
+
+        $this->assertContains('Ahc\Phint\Test\PathTest', $path->loadClasses([__DIR__ . '/../../src'], ['Ahc\Phint\Test\PathTest']));
+    }
+
+    public function testExpandOnEmptyPath()
+    {
+        $path = new Path;
+
+        $this->assertSame('', $path->expand('.'));
+    }
+
+    public function testExpandOnContainingHomePath()
+    {
+        $path = new Path;
+
+        $this->assertContains('/home', $path->expand('~'));
+    }
+
+    public function testExpandOnRelativePath()
+    {
+        $path = new Path;
+
+        $this->assertSame('../fixtures/.', $path->expand('./', '../fixtures'));
+    }
+
+    public function testExpandOnAbsolutePath()
+    {
+        $path         = new Path;
+        $absolutePath = '/usr/local/bin';
+
+        $this->assertSame('/usr/local/bin', $path->expand($absolutePath));
     }
 }
