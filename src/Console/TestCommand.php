@@ -135,12 +135,13 @@ class TestCommand extends BaseCommand
 
     private function convertToTest(array $metadata, array $srcNs, array $testNs): array
     {
+        $srcNspcs  = \array_column($srcNs, 'ns');
         $testClass = $metadata['className'] . 'Test';
         $testPath  = \str_replace(\array_column($srcNs, 'nsPath'), $testNs['nsPath'], $metadata['classPath']);
         $testPath  = \preg_replace('!\.php$!i', 'Test.php', $testPath);
-        $testFqcn  = \str_replace(\array_column($srcNs, 'ns'), $testNs['ns'], $metadata['classFqcn']) . 'Test';
+        $testFqcn  = \str_replace($srcNspcs, $testNs['ns'], $metadata['classFqcn']) . 'Test';
 
-        $testNamespace = \str_replace(\array_column($srcNs, 'ns'), $testNs['ns'], $metadata['namespace']);
+        $testNamespace = \trim(\str_replace($srcNspcs, $testNs['ns'], $metadata['namespace'] . '\\'), '\\');
 
         return compact('testClass', 'testNamespace', 'testFqcn', 'testPath');
     }
