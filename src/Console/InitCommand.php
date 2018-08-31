@@ -199,10 +199,11 @@ class InitCommand extends BaseCommand
             'keywords' => ['retry' => 0, 'extra' => ' (CSV, ENTER to skip)', 'default' => "php, {$this->project}"],
             'bin'      => ['retry' => 0, 'extra' => ' (CSV, ENTER to skip)'],
 
-            // Donot promt these here!
-            'req'    => false,
-            'dev'    => false,
-            'config' => false,
+            // Donot prompt these here!
+            'req'      => false,
+            'dev'      => false,
+            'config'   => false,
+            'template' => false,
         ];
 
         $this->promptAll($io, $promptConfig);
