@@ -62,7 +62,7 @@ class InitCommand extends BaseCommand
             ->option('-c --no-codecov', 'Disable codecov')
             ->option('-s --no-scrutinizer', 'Disable scrutinizer')
             ->option('-l --no-styleci', 'Disable StyleCI')
-            ->option('-L --license', 'License (m: MIT | g: GNULGPL | a: Apache2 | b: BSDSimple | i: ISC')
+            ->option('-L --license', 'License (m: MIT, g: GNULGPL, a: Apache2, b: BSDSimple, i: ISC, w: WTFPL)')
             ->usage($this->writer()->colorizer()->colors(''
                 . '<bold>  phint init</end> <line><project></end> '
                 . '<comment>--force --descr "Awesome project" --name "YourName" --email you@domain.com</end><eol/>'
@@ -188,7 +188,7 @@ class InitCommand extends BaseCommand
             ],
             'package' => ['default' => $this->project, 'retry' => 0],
             'license' => [
-                'choices' => ['m' => 'MIT', 'g' => 'GNULGPL', 'a' => 'Apache2', 'b' => 'BSDSimple', 'i' => 'ISC'],
+                'choices' => ['m' => 'MIT', 'g' => 'GNULGPL', 'a' => 'Apache2', 'b' => 'BSDSimple', 'i' => 'ISC', 'w' => 'WTFPL'],
                 'default' => 'm',
             ],
             'php' => [
