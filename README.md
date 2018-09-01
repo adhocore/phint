@@ -120,7 +120,7 @@ Options:
                             By default uses `docs/`
   [-h, --help]              Show help
   [-w, --keywords...]       Project Keywords
-  [-L, --license]           License
+  [-L, --license]           License (m: MIT, g: GNULGPL, a: Apache2, b: BSDSimple, i: ISC, w: WTFPL)
   [-n, --name]              Vendor full name
   [-N, --namespace]         Root namespace (use `/` separator)
   [-g, --package]           Packagist name (Without vendor handle)
