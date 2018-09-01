@@ -21,6 +21,8 @@ It helps you be even more lazier! **phint** is continuously evolving and the pla
 
 [Installation](#installation) &middot; [Features](#features) &middot; [Usage](#usage) &middot; [phint init](#init) &middot; [phint update](#update) &middot; [phint docs](#docs) &middot; [phint test](#test) &middot; [Templating](#templating)
 
+> Phint is powered by [adhocore/cli](https://github.com/adhocore/php-cli)
+
 ## Installation
 
 > Requires PHP7.
