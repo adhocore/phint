@@ -117,7 +117,7 @@ Options:
   [-e, --email]             Vendor email
   [-f, --force]             Run even if the project exists
   [-G, --gh-template]       Use `.github/` as template path
-                           By default uses `docs/`
+                            By default uses `docs/`
   [-h, --help]              Show help
   [-w, --keywords...]       Project Keywords
   [-L, --license]           License
