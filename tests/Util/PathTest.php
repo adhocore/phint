@@ -81,6 +81,13 @@ class PathTest extends TestCase
         $this->assertContains('/home', $path->getPhintPath('/fixtures'));
     }
 
+    public function testGetPhintPathOnEmptySubPath()
+    {
+        $path = new Path;
+
+        $this->assertContains('', $path->getPhintPath());
+    }
+
     public function testWriteFile()
     {
         $writeFilePath = __DIR__ . '/../fixtures/write_file.txt';
