@@ -1,3 +1,10 @@
+## [v0.3.5] 2018-09-01 12:09:26 UTC
+
+- [376fea9](https://github.com/adhocore/phint/commit/376fea9) chore: support wtfpl license [closes #52] (Jitendra Adhikari)
+- [487681b](https://github.com/adhocore/phint/commit/487681b) chore: add wtfpl license support (Jitendra Adhikari)
+- [a0c040b](https://github.com/adhocore/phint/commit/a0c040b) docs: template with anchor and jumps [closes #47] (Jitendra Adhikari)
+- [f5f2242](https://github.com/adhocore/phint/commit/f5f2242) Add generateTest and generateDoc tests (peter279k)
+
 ## [v0.3.4] 2018-08-31 15:08:19 UTC
 
 - [5003ec4](https://github.com/adhocore/phint/commit/5003ec4) fix(initcmd): donot prompt --template (Jitendra Adhikari)
