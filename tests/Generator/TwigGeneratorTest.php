@@ -38,4 +38,41 @@ class TwigGeneratorTest extends TestCase
 
         $this->assertContains($rand, file_get_contents($this->templatePath . '/example'));
     }
+
+    public function testGenerateTestsOnExistedTestTwigFile()
+    {
+        $twigGenerator = new TwigGenerator([$this->templatePath], __DIR__ . '/../fixtures/twig_cache');
+        $metaData      = [
+            ['testPath' => __DIR__ . '/../fixtures/twig/test.twig'],
+        ];
+        $parameters = [
+            'string' => 'here',
+        ];
+
+        $this->assertSame(0, $twigGenerator->generateTests($metaData, $parameters));
+    }
+
+    public function testGenerateTestsOnNonExistedTestTwigFile()
+    {
+        $twigGenerator = new TwigGenerator([$this->templatePath], __DIR__ . '/../fixtures/twig_cache');
+        $metaData      = [
+            ['testPath' => __DIR__ . '/../fixtures/test_non_exsited.twig'],
+        ];
+        $parameters = [
+            'string' => 'here',
+        ];
+
+        $this->assertSame(1, $twigGenerator->generateTests($metaData, $parameters));
+    }
+
+    public function testGeneradteDocs()
+    {
+        $twigGenerator = new TwigGenerator([$this->templatePath], __DIR__ . '/../fixtures/twig_cache');
+        $metaData      = [];
+        $parameters    = [
+            'output' => __DIR__ . '/../fixtures/doc.md',
+        ];
+
+        $this->assertSame(1, $twigGenerator->generateDocs($metaData, $parameters));
+    }
 }
