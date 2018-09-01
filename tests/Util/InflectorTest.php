@@ -23,6 +23,13 @@ class InflectorTest extends TestCase
         $this->assertEquals('ThisWillBeUcwordString', $inflector->stuldyCase('this-will-be-ucword-string'));
     }
 
+    public function testSnakeCase()
+    {
+        $inflector = new Inflector;
+
+        $this->assertEquals('this_will_be_snake_case_string', $inflector->snakeCase('this will be snake case string'));
+    }
+
     public function testWords()
     {
         $inflector = new Inflector;
