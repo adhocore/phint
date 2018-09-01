@@ -2,7 +2,13 @@
 
 Initializes new PHP project with sane defaults using templates.
 It scaffolds PHP library &/or project to boost your productivity and save time.
-It helps you be even more lazier! `phint` is work in progress and the plan is to make it [big](#todo).
+
+For already existing project, run with `--sync` flag to add missing stuffs, see [phint init](#init).
+
+Once you have files in your `src/` or `lib/` you can run [phint docs](#docs) to generate API like documentation in `.md` format
+and [phint test](#test) to generate basic test stubs with all the structures already maintained.
+
+It helps you be even more lazier! **phint** is continuously evolving and the plan is to make it [big](#todo).
 
 [![Latest Version](https://img.shields.io/github/release/adhocore/phint.svg?style=flat-square)](https://github.com/adhocore/phint/releases)
 [![Travis Build](https://img.shields.io/travis/adhocore/phint/master.svg?style=flat-square)](https://travis-ci.org/adhocore/phint?branch=master)
