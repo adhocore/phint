@@ -1,3 +1,4 @@
+<a name="the-top"></a>
 {% for class in docsMetadata %}
 ## {{class.name}}
 
@@ -28,5 +29,7 @@ use {{class.classFqcn}};
 {{method.texts|join("\n")|replace({'<code>':"```php",'</code>':"```"})|raw}}
 {% endif %}
 {% endfor %}
+
+**[⬆ back to top](#the-top)**
 
 {% endfor %}
