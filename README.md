@@ -19,7 +19,7 @@ It helps you be even more lazier! **phint** is continuously evolving and the pla
 
 ![Phint Preview](https://imgur.com/F6PkX9Z.png "Phint Preview")
 
-[Installation](#installation) &middot; [Features](#features) &middot; [Usage](#usage) &middot; [phint init](#init) &middot; [phint update](#update) &middot; [phint docs](#docs) &middot; [phint test](#test) &middot; [Templating](#templating)
+[Installation](#installation) &middot; [Features](#features) &middot; [Autocompletion](#autocompletion) &middot; [Usage](#usage) &middot; [phint init](#init) &middot; [phint update](#update) &middot; [phint docs](#docs) &middot; [phint test](#test) &middot; [Templating](#templating)
 
 > Phint is powered by [adhocore/cli](https://github.com/adhocore/php-cli)
 
@@ -114,7 +114,8 @@ Create and Scaffold a bare new PHP project.
 
 Dont be intimidated by long list of parameters, you are not required to enter any of them
 as arguments as they are interactively collected when required.
-Also check [config](#exampleconfig) on how to create a reusable json config so you can use `phint` like a *pro*.
+
+Also check [config](#example-config) on how to create a reusable json config so you can use `phint` like a *pro*.
 
 ```
 Arguments:
@@ -385,6 +386,8 @@ class DummyTest extends TestCase
 
 ---
 ## Templating
+
+> `phint export --to ~/myphint`
 
 So you would like to have your own templates and customize `phint` to your taste!
 
