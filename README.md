@@ -64,6 +64,18 @@ phint --help
 - use custom templates from a path specified by user
 - update its own self (`phint update`)
 
+## Autocompletion
+
+The phint commands and options can be [autocompleted](https://github.com/adhocore/php-cli#autocompletion) if you use zsh shell with oh-my-zsh.
+
+Setting up auto complete:
+
+```sh
+mkdir -p ~/.oh-my-zsh/custom/plugins/phpcli && cd ~/.oh-my-zsh/custom/plugins/phpcli
+[ -f ./phpcli.plugin.zsh ] || curl -sSLo ./phpcli.plugin.zsh https://raw.githubusercontent.com/adhocore/php-cli/master/phpcli.plugin.zsh
+echo compdef _phpcli phint >> ./phpcli.plugin.zsh
+chmod +x ./phpcli.plugin.zsh && source ./phpcli.plugin.zsh && cd -
+```
 
 ## Usage
 
