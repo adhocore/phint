@@ -71,11 +71,16 @@ The phint commands and options can be [autocompleted](https://github.com/adhocor
 Setting up auto complete:
 
 ```sh
-mkdir -p ~/.oh-my-zsh/custom/plugins/phpcli && cd ~/.oh-my-zsh/custom/plugins/phpcli
-[ -f ./phpcli.plugin.zsh ] || curl -sSLo ./phpcli.plugin.zsh https://raw.githubusercontent.com/adhocore/php-cli/master/phpcli.plugin.zsh
-echo compdef _phpcli phint >> ./phpcli.plugin.zsh
-chmod +x ./phpcli.plugin.zsh && source ./phpcli.plugin.zsh && cd -
+mkdir -p ~/.oh-my-zsh/custom/plugins/ahccli && cd ~/.oh-my-zsh/custom/plugins/ahccli
+
+[ -f ./ahccli.plugin.zsh ] || curl -sSLo ./ahccli.plugin.zsh https://raw.githubusercontent.com/adhocore/php-cli/master/ahccli.plugin.zsh
+
+echo compdef _ahccli phint >> ./ahccli.plugin.zsh
+
+chmod +x ./ahccli.plugin.zsh && source ./ahccli.plugin.zsh && cd -
 ```
+
+Dont forget to [add](https://github.com/adhocore/php-cli#load-ahccli-plugin) `ahccli` into `plugins=(... ...)` list in `~/.zshrc` file.
 
 ## Usage
 
