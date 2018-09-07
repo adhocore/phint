@@ -11,10 +11,12 @@
 
 namespace Ahc\Phint\Util;
 
+use Ahc\Cli\Exception\RuntimeException;
+
 class Composer extends Executable
 {
     /** @var array Content of composer.json decoded */
-    protected $config = [];
+    protected $config = null;
 
     /** @var string The binary executable */
     protected $binary = 'composer';
@@ -49,9 +51,7 @@ class Composer extends Executable
 
     public function config(string $key, $default = null)
     {
-        if (!$this->config) {
-            $this->config = (new Path)->readAsJson($this->workDir . '/composer.json');
-        }
+        $this->initConfig();
 
         $temp = $this->config;
         foreach (\explode('.', $key) as $part) {
@@ -63,5 +63,16 @@ class Composer extends Executable
         }
 
         return $temp;
+    }
+
+    protected function initConfig()
+    {
+        if (null === $this->config) {
+            $this->config = (new Path)->readAsJson($this->workDir . '/composer.json');
+        }
+
+        if (null === $this->config) {
+            throw new RuntimeException("Non existent or invalid composer.json at {$this->workDir}");
+        }
     }
 }
