@@ -50,12 +50,13 @@ class MetadataTest extends TestCase
             'isPublic'   => true,
             'isAbstract' => false,
             'maybeMagic' => false,
+            'throws'     => [],
             'title'      => null,
             'texts'      => [],
             'params'     => [
-                'string $classFqcn',
+                ['string $classFqcn', ''],
             ],
-            'return' => 'array',
+            'return' => ['array', ''],
         ], $result);
     }
 }
