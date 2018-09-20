@@ -106,11 +106,11 @@ class Metadata
                 continue;
             }
 
-            $params[] = $this->getRealType($param) . " \$$name";
+            $params[] = [$this->getRealType($param) . " \$$name", $docParams[$name][1] ?? ''];
         }
 
         if ($returnType = $method->getReturnType()) {
-            $return[0] = $this->getRealType($returnType);
+            $return = [$this->getRealType($returnType), $return[1] ?? ''];
         }
 
         return \compact('params', 'return');
