@@ -1,3 +1,15 @@
+## [v0.3.6] 2018-09-20 15:09:16 UTC
+
+- [0485057](https://github.com/adhocore/phint/commit/0485057) fix(util.meta): param must be array (Jitendra Adhikari)
+- [3f3fc5e](https://github.com/adhocore/phint/commit/3f3fc5e) test: fix meta test (Jitendra Adhikari)
+- [bb27989](https://github.com/adhocore/phint/commit/bb27989) test: fix git test (Jitendra Adhikari)
+- [ef48c80](https://github.com/adhocore/phint/commit/ef48c80) chore(docs.tmpl): make collaspible. add throws. fix return/param (Jitendra Adhikari)
+- [a8898a6](https://github.com/adhocore/phint/commit/a8898a6) refactor(util.metadata): add throws, improve return/params (Jitendra Adhikari)
+- [72bc7fa](https://github.com/adhocore/phint/commit/72bc7fa) fix(twig.generator): fix call() fn (Jitendra Adhikari)
+- [92230ae](https://github.com/adhocore/phint/commit/92230ae) fix(initcmd): add missing path arg in projectExists() (Jitendra Adhikari)
+- [a443885](https://github.com/adhocore/phint/commit/a443885) docs: update autocomplete section (Jitendra Adhikari)
+- [79029f9](https://github.com/adhocore/phint/commit/79029f9) Intialize Util Composer, Git and Metadata tests (peter279k)
+
 ## [v0.3.5] 2018-09-01 12:09:26 UTC
 
 - [376fea9](https://github.com/adhocore/phint/commit/376fea9) chore: support wtfpl license [closes #52] (Jitendra Adhikari)
