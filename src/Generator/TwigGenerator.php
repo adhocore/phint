@@ -161,8 +161,8 @@ class TwigGenerator implements GeneratorInterface
             return \gmdate($f ?? 'Y-m-d H:i:s');
         }));
 
-        $this->twig->addFilter(new \Twig_SimpleFilter('call', function ($fn) {
-            return $fn(\array_slice(\func_get_args(), 1));
+        $this->twig->addFunction(new \Twig_Function('call', function ($fn) {
+            return $fn(...\array_slice(\func_get_args(), 1));
         }));
     }
 
