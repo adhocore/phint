@@ -21,13 +21,24 @@ use {{class.classFqcn}};
 > {{method.title}}
 {% endif %}
 
+<details><summary>Details …</summary>
+<div>
+
 ```php
-{{method.isStatic ? '::' : ''}}{{name}}({{method.params|join(', ')}}){{method.return ? ': ' ~ method.return : ''}}
+{% set params = call('array_column', method.params, 0) %}
+{{method.isStatic ? '::' : ''}}{{name}}({{params|join(', ')}}){{method.return ? ': ' ~ method.return[0] : ''}}
 ```
 {% if method.texts %}
 
-{{method.texts|join("\n")|replace({'<code>':"```php",'</code>':"```"})|raw}}
+{{method.texts|join("\n\n")|replace({'<code>':"```php", '</code>':"```"})|raw|nl2br}}
 {% endif %}
+{% if method.throws %}
+
+> _Throws_ **{{method.throws[0]}}** {{ method.throws[1] ? '_' ~ method.throws[1] ~ '_' : '' }}
+{% endif %}
+
+</div>
+</details>
 {% endfor %}
 
 **[⬆ back to top](#the-top)**
