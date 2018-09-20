@@ -136,7 +136,7 @@ class InitCommand extends BaseCommand
         }
 
         if (\is_dir($path)) {
-            $this->projectExists($io);
+            $this->projectExists($io, $path);
         } else {
             \mkdir($path, 0777, true);
         }
@@ -144,7 +144,7 @@ class InitCommand extends BaseCommand
         return $path;
     }
 
-    protected function projectExists(Interactor $io)
+    protected function projectExists(Interactor $io, string $path)
     {
         if (!$this->force && !$this->sync) {
             throw new InvalidArgumentException(

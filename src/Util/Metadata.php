@@ -64,6 +64,7 @@ class Metadata
         $parser = new DocBlock($method);
         $texts  = $parser->texts();
         $title  = \array_shift($texts);
+        $throws = $parser->first('throws');
 
         $metadata = [
             'name'       => $method->name,
@@ -73,25 +74,26 @@ class Metadata
             'isPublic'   => $method->isPublic(),
             'isAbstract' => $method->isAbstract(),
             'maybeMagic' => \substr($method->name, 0, 2) === '__',
+            'throws'     => $throws ? \explode(' ', \trim($throws->getValue()), 2) : [],
             'title'      => $title,
             'texts'      => $texts,
         ];
 
         $params = [];
         foreach ($parser->find('param') as $param) {
-            if (\preg_match('/(.*)\$(\w+)/', $param->getValue(), $match)) {
-                $params[$match[2]] = \trim($match[1]);
+            if (\preg_match('/(.*)\$(\w+)(.*)/', $param->getValue(), $match)) {
+                $params[$match[2]] = [\trim($match[1]), \trim($match[3])];
             }
         }
 
         if (null !== $return = $parser->first('return')) {
-            $return = \preg_replace('/(\S+)(.*)/', '$1', $return->getValue());
+            $return = \explode(' ', \trim($return->getValue()), 2);
         }
 
-        return $metadata + $this->getMethodParameters($method, $params, $return ?? '');
+        return $metadata + $this->getMethodParameters($method, $params, $return ?? []);
     }
 
-    protected function getMethodParameters(\ReflectionMethod $method, array $docParams, string $return)
+    protected function getMethodParameters(\ReflectionMethod $method, array $docParams, array $return)
     {
         $params = [];
         $parser = new DocBlock($method);
@@ -99,16 +101,16 @@ class Metadata
         foreach ($method->getParameters() as $param) {
             $name = $param->name;
             if (!$param->hasType()) {
-                $params[] = \trim(($docParams[$name] ?? '') . " \$$name");
+                $params[] = [\trim(($docParams[$name][0] ?? '') . " \$$name"), $docParams[$name][1] ?? ''];
 
                 continue;
             }
 
-            $params[] = $this->getRealType($param) . " \$$name";
+            $params[] = [$this->getRealType($param) . " \$$name", $docParams[$name][1] ?? ''];
         }
 
         if ($returnType = $method->getReturnType()) {
-            $return = $this->getRealType($returnType);
+            $return = [$this->getRealType($returnType), $return[1] ?? ''];
         }
 
         return \compact('params', 'return');
