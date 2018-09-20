@@ -18,17 +18,11 @@ class GitTest extends TestCase
 {
     public function testGetConfig()
     {
-        $git = new Git;
+        $git  = new Git;
+        $conf = $git->getConfig();
 
-        $this->assertArraySubset([
-            'core.repositoryformatversion' => '0',
-            'core.filemode'                => 'true',
-            'core.bare'                    => 'false',
-            'core.logallrefupdates'        => 'true',
-            'remote.origin.url'            => 'https://github.com/adhocore/phint.git',
-            'remote.origin.fetch'          => '+refs/heads/master:refs/remotes/origin/master',
-            ''                             => '',
-        ], $git->getConfig());
+        $this->assertArrayHasKey('remote.origin.url', $conf);
+        $this->assertContains('adhocore/phint.git', $conf['remote.origin.url']);
     }
 
     public function testGetConfigOnSpecificKey()
