@@ -11,6 +11,7 @@
 
 namespace Ahc\Phint\Util;
 
+use Ahc\Cli\Helper\Shell;
 use Ahc\Cli\IO\Interactor;
 use Symfony\Component\Process\ExecutableFinder;
 use Symfony\Component\Process\Process;
@@ -36,7 +37,7 @@ abstract class Executable
     {
         $this->workDir = \getcwd();
         $this->logFile = $logFile;
-        $this->binary  = $binary ? '"' . $binary . '"' : $this->binary;
+        $this->binary  = $this->findBinary($binary ?? $this->binary);
     }
 
     public function withWorkDir($workDir = null)
@@ -55,7 +56,7 @@ abstract class Executable
         return $this->isSuccessful;
     }
 
-    protected function findBinary($binary)
+    protected function findBinary(string $binary)
     {
         if (\is_executable($binary)) {
             return $binary;
@@ -75,17 +76,13 @@ abstract class Executable
      */
     protected function runCommand($command)
     {
-        $proc = new Process($this->binary . ' ' . $command, $this->workDir, null, null, null);
+        $proc = new Shell($this->binary . ' ' . $command);
 
-        $pathUtil = new Path;
+        $proc->setOptions($this->workDir)->execute();
 
-        $proc->run(function ($type, $data) use ($pathUtil) {
-            if ($this->logFile) {
-                $pathUtil->writeFile($this->logFile, $data, \FILE_APPEND);
-            }
-        });
+        (new Path)->writeFile($this->logFile, $proc->getErrorOutput(), \FILE_APPEND);
 
-        $this->isSuccessful = $proc->isSuccessful();
+        $this->isSuccessful = 0 === $proc->getExitCode();
 
         return $proc->getOutput();
     }
