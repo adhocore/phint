@@ -1,3 +1,12 @@
+## [v0.4.0] 2018-09-23 03:09:47 UTC
+
+- [fce6e4e](https://github.com/adhocore/phint/commit/fce6e4e) fix(util.executable): log if only writable (Jitendra Adhikari)
+- [b9d8c09](https://github.com/adhocore/phint/commit/b9d8c09) chore: composer remove unused deps (Jitendra Adhikari)
+- [e178127](https://github.com/adhocore/phint/commit/e178127) refactor(util.executable): log output, cleanup unused imports (Jitendra Adhikari)
+- [c53e469](https://github.com/adhocore/phint/commit/c53e469) feat(util.executable): add windows binary finder (Jitendra Adhikari)
+- [b51feee](https://github.com/adhocore/phint/commit/b51feee) refactor(util.executable): use ahc/cli/shell and findBinary (Jitendra Adhikari)
+- [56747a3](https://github.com/adhocore/phint/commit/56747a3) chore: composer deps bump (Jitendra Adhikari)
+
 ## [v0.3.6] 2018-09-20 15:09:16 UTC
 
 - [0485057](https://github.com/adhocore/phint/commit/0485057) fix(util.meta): param must be array (Jitendra Adhikari)
