@@ -11,9 +11,8 @@
 
 namespace Ahc\Phint\Util;
 
+use Ahc\Cli\Helper\Shell;
 use Ahc\Cli\IO\Interactor;
-use Symfony\Component\Process\ExecutableFinder;
-use Symfony\Component\Process\Process;
 
 abstract class Executable
 {
@@ -36,7 +35,7 @@ abstract class Executable
     {
         $this->workDir = \getcwd();
         $this->logFile = $logFile;
-        $this->binary  = $binary ? '"' . $binary . '"' : $this->binary;
+        $this->binary  = $this->findBinary($binary ?? $this->binary);
     }
 
     public function withWorkDir($workDir = null)
@@ -55,15 +54,30 @@ abstract class Executable
         return $this->isSuccessful;
     }
 
-    protected function findBinary($binary)
+    protected function findBinary(string $binary): string
     {
         if (\is_executable($binary)) {
-            return $binary;
+            return '"' . $binary . '"';
         }
 
-        $finder = new ExecutableFinder();
+        $isWin = \DIRECTORY_SEPARATOR === '\\';
 
-        return $finder->find($binary) ?: $binary;
+        return $isWin ? $this->findWindowsBinary($binary) : '"' . $binary . '"';
+    }
+
+    protected function findWindowsBinary(string $binary): string
+    {
+        $paths = \explode(\PATH_SEPARATOR, \getenv('PATH') ?: \getenv('Path'));
+
+        foreach ($paths as $path) {
+            foreach (['.exe', '.bat', '.cmd'] as $ext) {
+                if (\is_file($file = $path . '\\' . $binary . $ext)) {
+                    return '"' . $file . '"';
+                }
+            }
+        }
+
+        return '"' . $binary . '"';
     }
 
     /**
@@ -75,17 +89,17 @@ abstract class Executable
      */
     protected function runCommand($command)
     {
-        $proc = new Process($this->binary . ' ' . $command, $this->workDir, null, null, null);
+        $proc = new Shell($this->binary . ' ' . $command);
 
-        $pathUtil = new Path;
+        $proc->setOptions($this->workDir)->execute();
 
-        $proc->run(function ($type, $data) use ($pathUtil) {
-            if ($this->logFile) {
-                $pathUtil->writeFile($this->logFile, $data, \FILE_APPEND);
-            }
-        });
+        if ($this->logFile && \is_writable(\dirname($this->logFile))) {
+            $data = $proc->getOutput() . \PHP_EOL . $proc->getErrorOutput();
 
-        $this->isSuccessful = $proc->isSuccessful();
+            (new Path)->writeFile($this->logFile, $data, \FILE_APPEND);
+        }
+
+        $this->isSuccessful = 0 === $proc->getExitCode();
 
         return $proc->getOutput();
     }
