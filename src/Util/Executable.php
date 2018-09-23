@@ -56,15 +56,30 @@ abstract class Executable
         return $this->isSuccessful;
     }
 
-    protected function findBinary(string $binary)
+    protected function findBinary(string $binary): string
     {
         if (\is_executable($binary)) {
-            return $binary;
+            return '"' . $binary . '"';
         }
 
-        $finder = new ExecutableFinder();
+        $isWin = \DIRECTORY_SEPARATOR === '\\';
 
-        return $finder->find($binary) ?: $binary;
+        return $isWin ? $this->findWindowsBinary($binary) : '"' . $binary . '"';
+    }
+
+    protected function findWindowsBinary(string $binary): string
+    {
+        $paths = \explode(\PATH_SEPARATOR, \getenv('PATH') ?: \getenv('Path'));
+
+        foreach ($paths as $path) {
+            foreach (['.exe', '.bat', '.cmd'] as $ext) {
+                if (\is_file($file = $path . '\\' . $binary . $ext)) {
+                    return '"' . $file . '"';
+                }
+            }
+        }
+
+        return '"' . $binary . '"';
     }
 
     /**
