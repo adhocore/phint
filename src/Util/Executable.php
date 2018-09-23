@@ -13,8 +13,6 @@ namespace Ahc\Phint\Util;
 
 use Ahc\Cli\Helper\Shell;
 use Ahc\Cli\IO\Interactor;
-use Symfony\Component\Process\ExecutableFinder;
-use Symfony\Component\Process\Process;
 
 abstract class Executable
 {
@@ -95,8 +93,8 @@ abstract class Executable
 
         $proc->setOptions($this->workDir)->execute();
 
-        (new Path)->writeFile($this->logFile, $proc->getErrorOutput(), \FILE_APPEND);
-
+        $data = $proc->getOutput() . \PHP_EOL . $proc->getErrorOutput();
+        (new Path)->writeFile($this->logFile, $data, \FILE_APPEND);
         $this->isSuccessful = 0 === $proc->getExitCode();
 
         return $proc->getOutput();
