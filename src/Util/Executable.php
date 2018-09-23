@@ -93,8 +93,12 @@ abstract class Executable
 
         $proc->setOptions($this->workDir)->execute();
 
-        $data = $proc->getOutput() . \PHP_EOL . $proc->getErrorOutput();
-        (new Path)->writeFile($this->logFile, $data, \FILE_APPEND);
+        if ($this->logFile && \is_writable(\dirname($this->logFile))) {
+            $data = $proc->getOutput() . \PHP_EOL . $proc->getErrorOutput();
+
+            (new Path)->writeFile($this->logFile, $data, \FILE_APPEND);
+        }
+
         $this->isSuccessful = 0 === $proc->getExitCode();
 
         return $proc->getOutput();
