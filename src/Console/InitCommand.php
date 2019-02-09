@@ -192,7 +192,7 @@ class InitCommand extends BaseCommand
                 'default' => 'm',
             ],
             'php' => [
-                'choices' => ['5.4', '5.5', '5.6', '7.0', '7.1', '7.2'],
+                'choices' => ['5.4', '5.5', '5.6', '7.0', '7.1', '7.2', '7.3'],
                 'default' => '7.0',
             ],
             'using'    => ['retry' => 0, 'extra' => ' (ENTER to skip)'],
