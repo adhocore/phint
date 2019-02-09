@@ -1,3 +1,9 @@
+## [v0.4.1] 2019-02-09 15:02:20 UTC
+
+- [f303d13](https://github.com/adhocore/phint/commit/f303d13) build(travis): no nightly (Jitendra Adhikari)
+- [b8d3bc3](https://github.com/adhocore/phint/commit/b8d3bc3) build(travis): php 7.3 (Jitendra Adhikari)
+- [9fa7a31](https://github.com/adhocore/phint/commit/9fa7a31) chore: also list php 7.3 (Jitendra Adhikari)
+
 ## [v0.4.0] 2018-09-23 03:09:47 UTC
 
 - [fce6e4e](https://github.com/adhocore/phint/commit/fce6e4e) fix(util.executable): log if only writable (Jitendra Adhikari)
