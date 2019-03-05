@@ -1,3 +1,8 @@
+## [v0.5.0] 2019-03-05 14:03:22 UTC
+
+- fix(basecmd): autoload classes (Jitendra Adhikari)
+- feat(util.composer): add force autoload (Jitendra Adhikari)
+
 ## [v0.4.1] 2019-02-09 15:02:20 UTC
 
 - [f303d13](https://github.com/adhocore/phint/commit/f303d13) build(travis): no nightly (Jitendra Adhikari)
