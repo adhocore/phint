@@ -64,4 +64,13 @@ class Composer extends Executable
 
         return $temp;
     }
+
+    public function forceAutoload()
+    {
+        $autoloader = $this->workDir . '/vendor/autoload.php';
+
+        if (\array_search($autoloader, \get_included_files()) === false) {
+            require_once $autoloader;
+        }
+    }
 }

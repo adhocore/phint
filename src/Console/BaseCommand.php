@@ -11,6 +11,7 @@
 
 namespace Ahc\Phint\Console;
 
+use Ahc\Cli\Exception\RuntimeException;
 use Ahc\Cli\Input\Command;
 use Ahc\Cli\IO\Interactor;
 use Ahc\Phint\Util\Composer;
@@ -135,13 +136,19 @@ abstract class BaseCommand extends Command
         $namespaces = $this->_composer->config('autoload.psr-4');
 
         $srcPaths = [];
-        foreach ($namespaces as $ns => $path) {
+        foreach ($namespaces ?: [] as $ns => $path) {
             if (\preg_match('!^(source|src|lib|class)/?!', $path)) {
                 $srcPaths[] = $this->_pathUtil->join($this->_workDir, $path);
             } else {
                 unset($namespaces[$ns]);
             }
         }
+
+        if (empty($srcPaths)) {
+            throw new RuntimeException('Source namespaces not specified in composer.json');
+        }
+
+        $this->_composer->forceAutoload();
 
         return $this->_pathUtil->loadClasses($srcPaths, \array_keys($namespaces));
     }
