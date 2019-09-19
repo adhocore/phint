@@ -14,7 +14,6 @@ namespace Ahc\Phint\Console;
 use Ahc\Cli\Exception\RuntimeException;
 use Ahc\Cli\Input\Command;
 use Ahc\Phint\Util\Composer;
-use Ahc\Phint\Util\Path;
 
 /**
  * Some ideas related to phar taken from `composer selfupdate`.

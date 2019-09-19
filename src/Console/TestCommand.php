@@ -13,7 +13,6 @@ namespace Ahc\Phint\Console;
 
 use Ahc\Cli\IO\Interactor;
 use Ahc\Phint\Generator\TwigGenerator;
-use Ahc\Phint\Util\Composer;
 
 class TestCommand extends BaseCommand
 {
