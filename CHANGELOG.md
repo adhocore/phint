@@ -1,3 +1,13 @@
+## [v0.5.1](https://github.com/adhocore/phint/releases/tag/v0.5.1) (2019-12-16)
+
+### Miscellaneous
+- **Template**: Bootstrapped by phint (Jitendra Adhikari) [_7f33932_](https://github.com/adhocore/phint/commit/7f33932)
+- Bump adhocore/cli (Jitendra Adhikari) [_05791b3_](https://github.com/adhocore/phint/commit/05791b3)
+
+### Builds
+- **Deps**: Update adhocore/cli requirement from ^0.3 to ^0.3 || ^0.5 (dependabot-preview[bot]) [_69d2322_](https://github.com/adhocore/phint/commit/69d2322)
+
+
 ## [v0.5.0] 2019-03-05 14:03:22 UTC
 
 - fix(basecmd): autoload classes (Jitendra Adhikari)
