@@ -1,3 +1,12 @@
+## [v0.5.2](https://github.com/adhocore/phint/releases/tag/v0.5.2) (2019-12-28)
+
+### Miscellaneous
+- Bump adhocore/cli (Jitendra Adhikari) [_dce602c_](https://github.com/adhocore/phint/commit/dce602c)
+
+### Builds
+- **Deps**: Update adhocore/cli requirement from ^0.5 to ^0.5 || ^0.6 (dependabot-preview[bot]) [_a35483a_](https://github.com/adhocore/phint/commit/a35483a)
+
+
 ## [v0.5.1](https://github.com/adhocore/phint/releases/tag/v0.5.1) (2019-12-16)
 
 ### Miscellaneous
