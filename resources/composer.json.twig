@@ -27,7 +27,7 @@
 
     },
     "require-dev": {
-        "phpunit/phpunit": "^4.8 || ^5.7 || ^6.5"{% for pkg in dev %},
+        "phpunit/phpunit": "^5.7 || ^6.5" || ^7.5{% for pkg in dev %},
         "{{pkg.name}}": "{{pkg.version}}"{% endfor %}
 
     },
@@ -54,6 +54,7 @@
 {%if type == 'project' %}
         "@env": "php -r \"is_file('.env') || copy('.env.example', '.env');\"",
 {% endif %}
-        "test": "vendor/bin/phpunit --coverage-text --coverage-clover coverage.xml"
+        "test": "phpunit",
+        "test:cov": "phpunit --coverage-text --coverage-clover coverage.xml --coverage-html vendor/cov"
     }
 }
