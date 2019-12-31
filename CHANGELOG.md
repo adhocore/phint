@@ -1,3 +1,18 @@
+## [v0.5.3](https://github.com/adhocore/phint/releases/tag/v0.5.3) (2019-12-31)
+
+### Bug Fixes
+- **Phpunit**: Rm xml.syntaxCheck (Jitendra Adhikari) [_50b872b_](https://github.com/adhocore/phint/commit/50b872b)
+
+### Miscellaneous
+- **Template**: Update test stuffs (Jitendra Adhikari) [_d8ccb9b_](https://github.com/adhocore/phint/commit/d8ccb9b)
+- **Travis**: Script (Jitendra Adhikari) [_6322753_](https://github.com/adhocore/phint/commit/6322753)
+- **Composer**: Tweak script.test (Jitendra Adhikari) [_fd12251_](https://github.com/adhocore/phint/commit/fd12251)
+- **Deps**: Bump cli (Jitendra Adhikari) [_c20ca7e_](https://github.com/adhocore/phint/commit/c20ca7e)
+
+### Builds
+- **Deps**: Update adhocore/cli requirement from ^0.6 to ^0.6 || ^0.7 (dependabot-preview[bot]) [_31b6101_](https://github.com/adhocore/phint/commit/31b6101)
+
+
 ## [v0.5.2](https://github.com/adhocore/phint/releases/tag/v0.5.2) (2019-12-28)
 
 ### Miscellaneous
