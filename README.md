@@ -509,3 +509,11 @@ Including but not limited to:
 - [x] Test files generator
 - [x] Support user templates
 - [ ] Test stubs for new methods
+
+## License
+
+> &copy; 2017-2020, [Jitendra Adhikari](https://github.com/adhocore) | [MIT](./LICENSE)
+
+### Credits
+
+This library is release managed by [please](https://github.com/adhocore/please).
