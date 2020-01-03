@@ -1,3 +1,9 @@
+## [0.6.1](https://github.com/adhocore/phint/releases/tag/0.6.1) (2020-01-03)
+
+### Miscellaneous
+- **Composer**: Bump adhocore/cli (Jitendra Adhikari) [_b48e4d3_](https://github.com/adhocore/phint/commit/b48e4d3)
+
+
 ## [0.6.0](https://github.com/adhocore/phint/releases/tag/0.6.0) (2020-01-03)
 
 ### Miscellaneous
