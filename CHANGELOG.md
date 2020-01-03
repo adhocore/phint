@@ -1,3 +1,12 @@
+## [v0.5.4](https://github.com/adhocore/phint/releases/tag/v0.5.4) (2020-01-03)
+
+### Miscellaneous
+- **Composer**: Bump adhocore/cli (Jitendra Adhikari) [_862cf7a_](https://github.com/adhocore/phint/commit/862cf7a)
+
+### Documentations
+- Add credits, update license year (Jitendra Adhikari) [_2dfdf67_](https://github.com/adhocore/phint/commit/2dfdf67)
+
+
 ## [v0.5.3](https://github.com/adhocore/phint/releases/tag/v0.5.3) (2019-12-31)
 
 ### Bug Fixes
