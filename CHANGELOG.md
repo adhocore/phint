@@ -1,3 +1,9 @@
+## [0.6.0](https://github.com/adhocore/phint/releases/tag/0.6.0) (2020-01-03)
+
+### Miscellaneous
+- **Composer**: Bump cli and json-comment (Jitendra Adhikari) [_e872c21_](https://github.com/adhocore/phint/commit/e872c21)
+
+
 ## [v0.5.4](https://github.com/adhocore/phint/releases/tag/v0.5.4) (2020-01-03)
 
 ### Miscellaneous
