@@ -60,7 +60,8 @@ class InitCommand extends BaseCommand
             ->option('-s --no-scrutinizer', 'Disable scrutinizer')
             ->option('-l --no-styleci', 'Disable StyleCI')
             ->option('-L --license', 'License (m: MIT, g: GNULGPL, a: Apache2, b: BSDSimple, i: ISC, w: WTFPL)')
-            ->usage($this->writer()->colorizer()->colors(''
+            ->usage($this->writer()->colorizer()->colors(
+                ''
                 . '<bold>  phint init</end> <line><project></end> '
                 . '<comment>--force --descr "Awesome project" --name "YourName" --email you@domain.com</end><eol/>'
                 . '<bold>  phint init</end> <line><project></end> '
