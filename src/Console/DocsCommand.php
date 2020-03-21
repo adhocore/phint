@@ -29,9 +29,12 @@ class DocsCommand extends BaseCommand
     protected function onConstruct()
     {
         $this
-            ->option('-o --output', 'Output file (default README.md). For old project you should use something else'
+            ->option(
+                '-o --output',
+                'Output file (default README.md). For old project you should use something else'
                 . "\n(OR mark region with <!-- DOCS START --> and <!-- DOCS END --> to inject docs)",
-                null, 'README.md'
+                null,
+                'README.md'
             )
             ->option('-a --with-abstract', 'Create docs for abstract/interface class')
             ->option('-x --template', "User supplied template path\nIt has higher precedence than inbuilt templates")
