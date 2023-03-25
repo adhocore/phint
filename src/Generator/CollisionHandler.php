@@ -31,7 +31,7 @@ class CollisionHandler implements CollisionHandlerInterface
                 return $this->mergeJson($targetFile, $newContent);
 
             case 'md':
-               return $this->appendFile($targetFile, "\n---\n" . $newContent);
+                return $this->appendFile($targetFile, "\n---\n" . $newContent);
         }
 
         return false;
